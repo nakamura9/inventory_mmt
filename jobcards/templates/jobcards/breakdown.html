@@ -1,0 +1,80 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 well ">
+            <h3>New Unplanned Job:</h3><hr />
+            <form class="form form-group" method="POST" action="{% url 'jobcards:new_unplanned_job' %}" >
+                {% csrf_token %}
+                <table class="table">
+                {% for field in form %}
+                {% if forloop.counter == 4 %}
+                    <tr><td><label>Sub-Unit</label></td><td><div id="subunits"><select class="form-control" name="units"><option value="None">---------</option></select></div></td></tr>
+                    <tr><td><label>Sub-Assembly</label></td><td><div id="subassembly"><select class="form-control" name="subassembly"><option value="None">---------</option></select></div></td></tr>
+                    <tr><td><label>Component</label></td><td><div id="component"><select class="form-control" name="component"><option value="None">---------</option></select></div></td></tr>
+                {% endif %}
+                    <div class="fieldWrapper">
+        {{ field.errors }}
+        <tr>
+        <td>{{ field.label_tag }}</td> <td>{{ field }}</td></tr>
+        {% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
+                {% endfor %}
+                </table>
+            <button type="submit" class="btn btn-primary">Create JobCard</button>
+            </form>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+</div>
+{% endblock %}
+{% block body_script %}
+
+    function updateSubUnit(){
+        $.post("{% url 'jobcards:update_subunit' %}", {"machine":$("#id_machine").val()}, function(data){
+        var units = "<select name='units' class='form-control' onchange='updateSubAssembly()' id='units'> <option value='None'>------</option> ";
+
+        for(i in data.units){
+            units += "<option value='*'>".replace('*', data.units[i][0]) + data.units[i][1] + "</option>";
+            
+        }
+        units += "</select>";
+        $("#subunits").html(units);
+        
+    });
+    }
+
+    
+    
+    function updateSubAssembly(){
+        $.post("{% url 'jobcards:update_subassembly' %}", data={"unit":$("#units").val()}, function(data){
+        var units = "<select name='subassembly' class='form-control' onchange='updateComponents()' id='subassy'><option value='None'>------</option> ";
+
+        for(i in data.subassemblies){
+            units += "<option value='*'>".replace('*', data.subassemblies[i][0]) + data.subassemblies[i][1] + "</option>";
+            
+        }
+        units += "</select>";
+        $("#subassembly").html(units);
+        
+    });
+    }
+
+
+    function updateComponents(){
+        $.post("{% url 'jobcards:update_components' %}", data={"subassy":$("#subassy").val()}, function(data){
+        var units = "<select name='component' id='id_component' class='form-control'> <option value='None'>------</option>";
+        for(i in data.components){
+            units += "<option value='*'>".replace('*', data.components[i][0]) + data.components[i][1] + "</option>";
+            
+        }
+        units += "</select>";
+        $("#component").html(units);
+        
+    });
+    }
+
+    
+{% endblock %}

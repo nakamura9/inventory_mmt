@@ -1,0 +1,55 @@
+{% extends 'window.html' %}
+{% block content %}
+<div class="container-fluid" >
+    <div class="row" style="min-height: 600px;">
+        <div class="col-sm-3">
+            
+            <div class="panel panel-primary">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Control Panel</h3>
+                  </div>
+                  <div class="panel-body">
+                        <table class="table">
+                <tbody>
+                    <tr>
+                        <td>Regressor:</td>
+                        <td>
+                            <select class="form-control" id="regressor">
+                                <option value="1">Simple Linear</option>
+                                <option value="2">Multiple Linear</option>
+                                <option value="3">Random Forest</option>
+                                <option value="1">Polynomial</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Dependent Variable:</td>
+                        <td>
+                            <select class="form-control" id="dependent">
+                                <option value="1">Breakdown Probability</option>
+                                <option value="2">Breakdown Recurrence</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Independent Variable:</td>
+                        <td>
+                            <select multiple="multiple" id="independent" class="form-control">
+                                <option value="">Resolver</option>
+                                <option value="">Shift</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>            
+                  </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div id="image-window">
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

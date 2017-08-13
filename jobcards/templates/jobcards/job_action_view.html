@@ -1,0 +1,105 @@
+{% extends "window.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8 well">
+                <p></p>
+                <h4>Job Card</h4>
+                <form method="POST" action="{% url 'jobcards:complete_job' object.id %}">
+                    {% csrf_token %}
+                <table class="table">
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            <td><label>Jobcard ID:</label></td>
+                            <td>{{object.id}}</td>
+                            <td><label>Date created:</label></td>
+                            <td>{{object.date}}</td>
+                        </tr>
+                        <tr>
+                            <td><label>Response Interval:</label></td>
+                            <td>{{interval}}</td>
+                            <td><label>Requested by:</label></td>
+                            <td>{{object.requested_by}}</td>
+                        </tr>
+                        <tr>
+                            <td><label>Resolver:</label></td>
+                            <td><span id="resolver">
+                                <select name="resolver" class="form-control">
+                                    <option value="{{object.resolver.id}}">{{object.resolver}}</option>
+                                    </select>
+                                    </span></td><td><button type="button" onclick="changeResolver()" class="btn btn-primary">Change</button></td>
+                        </tr>
+                        <tr>
+                            <td><label>Machine:</label></td>
+                            <td>{{object.machine}}</td>
+                        </tr>
+                        <tr>
+                            <td><label>Sub-Unit:</label></td>
+                            <td>{{object.subunit}}</td>
+                        </tr>
+                        <tr>
+                            <td><label>Description of Job:</label></td>
+                            <td>{{object.description}}</td>
+                        </tr>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <h4>Job Actions:</h4>
+                
+                <table class="table">
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            
+                        <tr>
+                            <td><label>Resolver actions:</label></td>
+                            <td><textarea name="resolver_action" class="form-control" ></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><label>Root Cause:</label></td>
+                            <td><textarea name="root_cause" class="form-control"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><label>Requested Components:</label></td>
+                            <td><textarea name="components_requested" class="form-control"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><label>Notes:</label></td>
+                            <td><textarea name="notes" class="form-control"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><label>Recommended Planned Maintenance:</label></td>
+                            <td><textarea name="recommended_pm" class="form-control"></textarea></td>
+                        </tr>     
+                    </tbody>
+                </table>
+                <button class="btn btn-primary">Complete</button>
+                </form>
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+    </div>
+    
+
+{% endblock %}
+{% block body_script %}
+
+function changeResolver(){
+    var selectbox = "<select class='form-control' name='resolver'>";
+    
+    $.post("{% url 'jobcards:get_resolvers' %}",data={}, function(data){
+        for(i in data.resolvers){
+            selectbox += "<option value='*'>".replace('*', data.resolvers[i][1]); 
+            selectbox +=  data.resolvers[i][0]; 
+            selectbox += "</option>";   
+        }
+    })
+    alert("The resolver has changed.");
+    selectbox += "</select>";
+    $("#resolver").html(selectbox);
+}
+
+{% endblock %}

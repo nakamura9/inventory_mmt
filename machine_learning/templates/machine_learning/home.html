@@ -1,0 +1,49 @@
+{% extends "window.html" %}
+{% block content %}
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4">
+            <a href="{% url 'machine-learning:regression' %}"><div class="panel panel-primary">
+                <div class="panel-heading"><h3>Regression</h3></div>
+                <div class="panel-body">
+                    <img width="320" height="240" alt="regression" src="{% static 'machine_learning/regression.png' %}">
+                </div>
+            </div></a>
+        </div>
+        <div class="col-sm-4">
+            <a href="{% url 'machine-learning:classification' %}"><div class="panel panel-info">
+                <div class="panel-heading"><h3>Classification</h3></div>
+                <div class="panel-body">
+                    <img width="320" height="240" alt="classification " src="{% static 'machine_learning/clustering.png' %}">
+                </div>
+            </div></a>
+        </div>
+        <div class="col-sm-4">
+            <a href="{% url 'machine-learning:clustering' %}"><div class="panel panel-success">
+                <div class="panel-heading"><h3>Clustering</h3></div>
+                <div class="panel-body">
+                    <img width="320" height="240" alt="clustering" src="{% static 'machine_learning/classification.png' %}">
+                </div>
+            </div></a>
+        </div>
+    </div>
+    
+    <div class="row">
+        
+        
+        <div class="jumbotron">
+            <div class="container">
+                <h1>Root Cause Analysis</h1>
+                <p>Trace the faults that cause breakdowns</p>
+                <p>
+                    <a href="{% url 'rca:rca-form' %}" class="btn btn-primary btn-lg">Start Analysis</a>
+                </p>
+            </div>
+        </div>
+        
+        
+    </div>
+    
+</div>
+{% endblock %}

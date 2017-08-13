@@ -1,0 +1,47 @@
+{% extends "window.html" %}
+{% block content %}
+    <style>
+                    ul, li, span{
+                            list-style-type: none; 
+                        }
+                        .subunit {
+                            background-color: grey;
+                            border-color: grey;
+                        }
+
+                        .subassy .subsub .components{
+                            display: none;
+                        }
+
+                        a {
+                            color: white;
+                        }
+        </style>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4">
+                <ul>
+                    {% for component in object.component_set.all %}
+                        <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-sm-8">
+                <div class="well">
+                <h3>{{object.unit_name}}</h3>
+                <p>Sub Unit: {{object.subunit}}</p>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block body_script %}
+    function reveal(cls){
+        if($(cls).css("display") == "block"){
+            $(cls).css("display", "none");
+        }else{
+            $(cls).css("display", "block");
+        }   
+    }
+{% endblock %}

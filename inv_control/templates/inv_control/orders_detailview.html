@@ -1,0 +1,84 @@
+{% extends "window.html" %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-4">
+            
+            <div class="panel panel-info">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Description</h3>
+                  </div>
+                  <div class="panel-body">
+                        <p>{{object.description}}</p>
+                  </div>
+            </div>
+            
+        </div>
+        <div class="col-sm-4">
+            
+            <div class="panel panel-primary">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Time Frames</h3>
+                  </div>
+                  <div class="panel-body">
+                        
+                        <table class="table table-hover">
+                            <thead>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Manufacture Date</td>
+                                    <td>{{object.manufacture_date}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Scheduled Delivery Date</td>
+                                    <td>{{object.delivery_date}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Actual Delivery Date</td>
+                                    <td>{{object.actual_delivery_date}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                  </div>
+            </div>
+            
+        </div>
+        <div class="col-sm-4">
+            
+            <div class="panel panel-info">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Order Information</h3>
+                  </div>
+                  <div class="panel-body">
+                        
+                        <table class="table table-hover">
+                            <thead>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Customer</td>
+                                    <td>{{object.customer}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Order Quantity</td>
+                                    <td>{{object.quantity}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Unit Price</td>
+                                    <td>{{object.unit_price}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Status</td>
+                                    <td>{{object.status}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                  </div>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}

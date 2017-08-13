@@ -1,0 +1,140 @@
+{% extends "window.html" %}
+{% block content %}
+    <style>
+        span  a{
+            color: white;
+        }
+        
+    </style>
+
+    {% for machine in object_list %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3>{{machine.machine_name}} | <a href="{% url 'client:machine_details' pk=machine.pk %}">Details</a></h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-3 bg-info">
+                    <h4>Statistics</h4>
+                    <p>Number of units: {{machine.n_units}}</p>
+                    <p><u>Breakdown Summary:</u></p>
+                    <ul>
+                        <li>Today: {{machine.n_breakdowns_today}}</li>
+                        <li>This week: {{machine.n_breakdowns_weekly}}</li>
+                        <li>This month: {{machine.n_breakdowns_monthly}}</li>
+                        <li>In the past 6 months: {{machine.n_breakdowns_sixmonths}}</li>
+                    </ul>
+                    <p>Checklist coverage: {{machine.checklist_coverage}}%</p>
+                    </div>
+                <div class="col-sm-6">
+                    <h3>Open Jobs: </h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td>Date created</td>
+                                <td>Resolver</td>
+                                <td>Description</td>
+                                </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in machine.abstractjob_set.all %}
+                                {% if not job.completed %}
+                                    <tr>
+                                        <td>{{job.creation_epoch}}</td>
+                                        <td>{{job.resolver}}</td>
+                                        <td>{{job.description|truncatechars:40}}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="col-sm-3 bg-info">
+                    <h4>Structure:</h4>
+                    <style>
+                       row li{
+                            list-style-type: none; 
+                            padding: 2px;
+                            min-width: 200px;
+                            
+                        }
+                        ul {
+                            list-style-type: none; 
+
+                        }
+                        .subunit {
+                            display: block;
+                            padding: 5px;
+                            margin: 2px;
+                            min-height: 30px;
+                            min-width: 200px;
+                            background-color: #ccc;
+                            
+                        }
+
+                        .children{
+                            padding: 5px;
+                            margin: 2px;
+                            min-height: 30px;
+                            min-width: 200px;
+                            background-color: #ccc;
+                        }
+
+                        
+                    </style>
+                    
+                    <ul>
+                        {% for unit in machine.subunit_set.all %}
+                            <li><div class = "subunit" onclick = "reveal('#{{unit.unique_id|slugify}}')">
+                                    {{unit.unit_name}}  
+                                    <span style="float: right;">
+                                        <a href="{% url 'client:subunit_details' pk=unit.unique_id %}">Details</a>
+                                    </span>
+                                </div>
+                                <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
+                                    {% for sub in unit.subassembly_set.all %}
+                                        <li><div class="subassy" onclick = "reveal('#{{sub.unique_id|slugify}}')">
+                                                {{sub.unit_name}} 
+                                                <span style="float: right;">
+                                                    <a href="{% url 'client:subassembly_details' sub.unique_id %}">Details</a>
+                                                </span>
+                                            </div>
+                                            
+                                            <ul id="{{sub.unique_id|slugify}}" style="display:none;">
+                                            {% for component in sub.component_set.all %}
+                                                <li><div class="components">
+                                                        {{component.component_name}} 
+                                                        <span style="float: right;">
+                                                            <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a>
+                                                        </span>
+                                                        </div>
+                                                </li>
+                                            {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endfor%}    
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+{% block body_script %}
+    function reveal(cls){
+        
+        if($(cls).css("display") == "block"){
+            $(cls).css("display", "none");
+
+        }else{
+            $(cls).css("display", "block");
+            var selector = cls + " div";
+            $(selector).addClass("children");
+        }
+        
+    }
+
+{% endblock %}

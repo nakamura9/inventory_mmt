@@ -1,0 +1,25 @@
+{% extends "window.html" %}
+{% block content %}
+
+
+<form action="" method="POST" role="form">
+    <legend>Completed Order Form</legend>
+
+    <div class="form-group">
+        <table class="table">
+            {{form.as_table}}
+        </table>
+        {% csrf_token %}
+    </div>
+
+    
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+{% endblock %}
+{% block body_script %}
+    $("#id_delivery_date").datepicker();
+    $("#id_manufacture_date").datepicker();
+{% endblock %}

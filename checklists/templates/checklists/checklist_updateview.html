@@ -1,0 +1,51 @@
+<{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-6 well ">
+            <h3>Update Checklist Form:</h3>
+            <form class="form form-group" method="POST" action="" >
+                {% csrf_token %}
+                {{form.as_p}}
+            <button type="submit" class="btn btn-primary">Update</button>
+            </form>
+        </div>
+        <div class="col-sm-4" id="tasklist">
+            <h4>Add Tasks:</h4>
+            <div id="tasklist"></div>
+            <p><textarea id="task" rows="3" cols="48"></textarea></p>
+            <button type="button" onclick="addTask()" class="btn btn-warning">+ Add Task</button>
+            <h4>Existing Tasks:</h4>
+            <div id="tasklist">
+                
+            {% for task in object.task_set.all %}
+                <p>{{task.description}} <button class="btn btn-danger"  onclick="deleteTask(this)">Delete</button></p>
+            {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body_script %}
+
+    function addTask(){
+        $.post("{% url 'checklists:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+    }
+
+    function deleteTask(task){
+        var taskContent = task.parentElement.textContent.replace(" Delete", "");
+        $.post("{% url 'checklists:remove_task' %}", data={"task": taskContent});
+        $("p:contains('*')".replace("*", taskContent)).remove();
+    }
+    function editTasks(data){
+        var current = $("#task").val();
+        $("#tasklist").append(
+            "<p>" + current + " <button class='btn btn-danger'  onclick='deleteTask(this);'>Delete</button></p>"
+        );
+        $("#task").val("");
+
+    }
+{% endblock %}

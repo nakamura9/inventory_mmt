@@ -1,0 +1,124 @@
+{% extends "window.html" %}
+{% block content %}
+    <style>
+                    div ul, li, span{
+                            list-style-type: none; 
+                        }
+                        .subunit {
+                            background-color: grey;
+                            border-color: grey;
+                        }
+
+                        .subassy .subsub .components{
+                            display: none;
+                        }
+
+                        div a {
+                            color: white;
+                        }
+        </style>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>Children:</h3>
+                <ul>
+                    {% for sub in object.subassembly_set.all %}
+                        <li><span class="btn btn-info" onclick = "reveal('#{{sub.unique_id|slugify}}')">{{sub.unit_name}} | <a href="{% url 'client:subassembly_details' sub.unique_id %}">Details</a></span>
+                            <ul id="{{sub.unique_id|slugify}}" style="display:none;">
+                            {% for component in sub.component_set.all %}
+                                <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
+                            {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor%}    
+                </ul>
+            </div>
+            <div class="col-sm-8">
+                <div class="well">
+                <h3>{{object.unit_name}}</h3>
+                <p>Machine: {{object.machine}}</p>
+                 
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Maintenance Record:</h3>
+                <h4>Upcoming planned Jobs:</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Date</td>
+                            <td>Resolver</td>
+                            <td>Estimated Time</td>
+                            <td>Type</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in planned_jobs %}
+                            <tr>
+                                <td>{{job.date}}</td>
+                                <td>{{job.resolver}}</td>
+                                <td>{{job.est_time}}</td>
+                                <td>{{job.type}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h4>Recent Unplanned Jobs</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td>Date/Time</td>
+                                <td>Resolver</td>
+                                <td>Description</td>
+                                <td>Status</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in unplanned_jobs %}
+                            <tr>
+                                <td>{{job.date}}</td>
+                                <td>{{job.resolver}}</td>
+                                <td>{{job.description}}</td>
+                                <td>{{job.status}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+
+        </div>
+         <div class="row">
+            
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <h3>Reliability</h3>
+                <label for="period">Period</label>
+                <select name="period" id="id_period" class="form-control">   
+                    <option value="1">The Last Week</option>
+                    <option value="2">The Last Month</option>
+                    <option value="3">The Last Six Months</option>
+                </select>
+                <button onclick="show()" class="btn btn-primary">Show</button>
+                <div id="id_reliability_window"></div>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}
+{% block body_script %}
+    function reveal(cls){
+        if($(cls).css("display") == "block"){
+            $(cls).css("display", "none");
+        }else{
+            $(cls).css("display", "block");
+        }   
+    }
+
+    function show(){
+    $.post({% url 'control_forms:show'  %}, data={"period": $("#id_period").value()}, function(response){
+        $("#id_reliability_window").html(reponse);
+    });
+};
+{% endblock %}

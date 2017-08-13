@@ -1,0 +1,37 @@
+{% extends "window.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 well ">
+            <h3>Planned Job Card</h3>
+            <form class="form-group" method="POST" action="" >
+                {% csrf_token %}
+                <table>
+                {{form.as_table}}
+                </table>
+            <button type="submit" class="btn btn-primary">Create Planned Job</button>
+            </form>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+</div>
+{% endblock %}
+{% block body_script %}
+    $("#id_scheduled_for").datepicker();
+    function getSubUnits(){
+        $.post("{% url 'jobcards:update_subunit' %}", {"machine":$("#id_machine").val()}, function(data){
+        
+        var units =  "<option value='None'>------</option> ";
+
+        for(i in data.units){
+            units += "<option value='*'>".replace('*', data.units[i][0]) + data.units[i][1] + "</option>";
+            
+        }
+        var subunit = $("#id_subunit");
+        subunit.html(units);
+        
+    });
+    }
+{% endblock %}

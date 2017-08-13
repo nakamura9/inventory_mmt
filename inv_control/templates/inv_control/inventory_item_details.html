@@ -1,0 +1,101 @@
+{% extends "window.html" %}
+{% block content %}
+
+<h2>{{object.name}}</h3>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">I.D. Information</h3>
+            </div>
+            <div class="panel-body">
+            
+                <table class="table table-hover">
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Serial Number</td>
+                            <td>{{object.serial_number}}</td>
+                        </tr>
+                        <tr>
+                            <td>Category</td>
+                            <td>{{object.category}}</td>
+                        </tr>
+                        <tr>
+                            <td>Supplier</td>
+                            <td>{{object.supplier}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        
+        <div class="panel panel-primary">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Stock Level Info</h3>
+              </div>
+              <div class="panel-body">
+                    
+                    <table class="table table-hover">
+                        <thead>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Unit</td>
+                                <td>{{object.unit}}</td>
+                            </tr>
+                            <tr>
+                                <td>Quantity</td>
+                                <td>{{object.quantity}}</td>
+                            </tr>
+                            <tr>
+                                <td>Unit Price</td>
+                                <td>{{object.unit_price}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+              </div>
+        </div>
+        
+    </div>
+    <div class="col-sm-4">
+        
+        <div class="panel panel-primary">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Order Information</h3>
+              </div>
+              <div class="panel-body">
+                    
+                    <table class="table table-hover">
+                        <thead>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Order Number</td>
+                                <td>{{object.order_number}}</td>
+                            </tr>
+                            <tr>
+                                <td>Minimun Stock Level</td>
+                                <td>{{object.min_stock_level}}</td>
+                            </tr>
+                            <tr>
+                                <td>Reorder Quantity</td>
+                                <td>{{object.reorder_quantity}}</td>
+                            </tr>
+                            <tr>
+                                <td>Order Date</td>
+                                <td>{{object.order_date}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+              </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

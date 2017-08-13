@@ -1,0 +1,86 @@
+<{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-6 well ">
+            <h3>Create New Checklist:</h3>
+            <form class="form form-group" method="POST" action="" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <table class="table">
+                {{form.as_table}}
+                </table>
+                <hr />
+            <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>    
+        <div class="col-sm-4">
+            <h4>Tasks:</h4>
+            <div id="tasklist"></div>
+            <p><textarea id="task" rows="3" cols="48"></textarea></p>
+            <button type="button" onclick="addTask()" class="btn btn-warning">+ Add Task</button>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+{% block body_script %}
+    $("#id_creation_date").datepicker();
+        var num_tasks = 0;
+
+
+    function updateSubUnits(){
+        $.post("{% url 'jobcards:update_subunit' %}", {"machine":$("#id_machine").val()}, function(data){
+        
+        var units =  "<option value='None'>------</option> ";
+
+        for(i in data.units){
+            units += "<option value='*'>".replace('*', data.units[i][0]) + data.units[i][1] + "</option>";
+            
+        }
+        var subunit = $("#id_subunit");
+        subunit.html(units); // that is its children
+        
+    });
+    }
+
+
+    function updateSubAssemblies(){
+         $.post("{% url 'jobcards:update_subassembly' %}", data={"unit":$("#id_subunit").val()}, function(data){
+        var units = "<option value='None'>------</option> ";
+
+        for(i in data.subassemblies){
+            units += "<option value='*'>".replace('*', data.subassemblies[i][0]) + data.subassemblies[i][1] + "</option>";
+            
+        }
+        
+        $("#id_subassembly").html(units);
+        
+    });
+    }
+
+
+    function addTask(){
+        $.post("{% url 'checklists:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+
+    }
+
+    function editTasks(data){
+        console.log(data);
+        $("#tasklist").append(
+            "<p>" + $("#task").val() + "</p>"
+        );
+        $("#task").val("");
+        num_tasks += 1;
+    }
+
+    function validateForm(){
+        if(num_tasks == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "window.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        
+        <form action="" method="POST" role="form">
+            <legend>New Category</legend>
+        
+            <table>
+                {{form.as_table}}
+            </table>
+            {% csrf_token %}
+        
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        
+    </div>
+</div>
+
+{% endblock %}

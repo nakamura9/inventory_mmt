@@ -1,0 +1,54 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="row">
+        <div class="col-sm-12">
+            <a href="{% url 'production-calendar:month' 2017 '03' %}" class="btn btn-primary">Month</a>
+            <a href="{% url 'production-calendar:week' 2017 '03' 1 %}" class="btn btn-primary">Week</a>
+            <a href="{% url 'production-calendar:day' 2018 '03' 12 %}" class="btn btn-primary">Day</a>
+        </div>
+    </div>
+    
+<div class="row">
+    <div class="col-sm-3">
+        <input class="form-control" type="text" placeholder="Select Date..." id="month_select"><hr />
+        <button class="btn btn-primary" onclick="selectMonth()">Select Month</button>
+    </div>
+    <div class="col-sm-9">
+        
+        <table class="table table-hover">
+            <col width="75">
+            <col width="125">
+            <col width="125">
+            <col width="125">
+            <col width="125">
+            <col width="125">
+            <col width="125">
+            <col width="125">
+            <thead>
+                <tr>
+                    <th class="heading">Monday</th>
+                    <th class="heading">Tuesday</th>
+                    <th class="heading">Wednesday</th>
+                    <th class="heading">Thursday</th>
+                    <th class="heading">Friday</th>
+                    <th class="heading">Saturday</th>
+                    <th class="heading">Sunday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for day in week.week_agenda %}
+                    <td>
+                        <svg width="150" height="500">
+                            <rect width="150" height="500" style="fill:rgb(0,126,255);stroke-width:3;stroke-fill:rgb(255,255,255)"></rect>
+                        </svg>
+                    </td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+            
+    </div>
+</div>
+
+{% endblock %}

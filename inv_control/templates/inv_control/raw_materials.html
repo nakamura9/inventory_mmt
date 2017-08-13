@@ -1,0 +1,54 @@
+{% extends "window.html" %}
+{% block content %}
+<style>
+    .inline-tables {
+        display: None;
+
+    }
+
+    .dividers {
+        background-color: #ccc;
+        min-height: 30px;
+        min-width: 400px;
+
+    }
+</style>
+<div class="row">
+    <div class="col-sm-12 well">
+        <h3>Raw Material Inventory</h3>
+        <a class="btn btn-primary" href="{% url 'control_forms:new-category' %}">Add Category</a>
+       
+       <table class="table table-hover">
+           <thead>
+               <col width="100">
+               <col width="100">
+               <col width="600">
+               <tr>
+                   <th>List | New</th>
+                   <th>Name</th>
+                   <th>Descritpion</th>
+               </tr>
+           </thead>
+           <tbody>
+                {% for category in categories %}
+                    <tr class="clickable">
+                        <td>
+                            <a href="{% url 'control_forms:inventory-list' filter=category.name %}">
+                                <span class="glyphicon glyphicon-list" aria-hidden="true"></span></a> | 
+                            <a href="{% url 'control_forms:new-inventory-item' %}">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </a>
+                        </td>
+                        <td>{{category.name}}</td>
+                        <td>{{category.unit}}</td>
+                        <td>{{category.description}}</td>
+                    </tr>
+                {% endfor %}   
+           </tbody>
+       </table>
+       
+        
+    </div>
+</div>
+
+{% endblock %}

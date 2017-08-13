@@ -1,0 +1,57 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <h3>Planned Maintenance:</h3>
+    <div class="row">
+        <div class="col-sm-12">
+            <a class="btn btn-primary" href="{% url 'checklists:create_checklist' %}">New Checklist</a>
+            <a class="btn btn-primary" href="{% url 'jobcards:new_planned_job' %}">New Planned Job</a>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8 well">
+            <h4>Planned Jobs:</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Resolver</td>
+                        <td>Machine</td>
+                        <td>Description</td>
+                        <td>Actions</td>
+                    </tr>
+                </thead>
+                <tbody>
+            {% for  checklist in checklists %}
+                <tr>
+                    <td>{{checklist.resolver}}</td>
+                    <td>{{checklist.machine}}</td>
+                    <td>{{checklist.title | truncatechars:40}}</td>
+                    <td>
+                        <a href="{% url 'checklists:checklist_details' checklist.id %}">Details</a> |
+                        <a href="{% url 'checklists:delete_checklist' checklist.id %}">Delete</a> |
+                        <a href="{% url 'checklists:update_checklist' checklist.id %}">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            {% for job in planned_jobs %}
+                <tr>
+                    <td>{{job.resolver}}</td>
+                    <td>{{job.machine}}</td>
+                    <td>{{job.description | truncatechars:40}}</td>
+                    <td>
+                        <a href="#">Details</a> |
+                        <a href="{% url 'jobcards:delete_planned_job' pk=job.pk %}">Delete</a> |
+                        <a href="{% url 'jobcards:edit_planned_job' pk=job.pk %}">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-2"></div>
+    </div>
+</div>
+{% endblock %}
+            

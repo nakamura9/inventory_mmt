@@ -1,0 +1,115 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6 well">
+            <h3>Inventory classes</h3>
+            <p>Select a class below for item creation:</p>
+            <style>
+               row li{
+                            list-style-type: none; 
+                            padding: 2px;
+                            min-width: 200px;
+                            
+                        }
+                        ul {
+                            list-style-type: none; 
+                            margin: 2px;
+                        }
+                        ._item {
+                            display: block;
+                            padding: 5px;
+                            margin: 2px;
+                            min-height: 30px;
+                            min-width: 200px;
+                            background-color: #bbb;
+                            
+                        }
+                        span a{
+                            color: white;
+                        }
+
+                    </style>
+                <center>
+                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_plant' %}">Add Plant</a>
+                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_machine' %}">Add Machine</a>
+                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_subunit' %}">Add SubUnit</a>
+                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_subassembly' %}">Add Sub Assembly</a>
+                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_component' %}">Add Component</a>
+                </center>
+                
+                <hr />
+                
+                <ul>
+                {%for machine in machines %}
+                    <li><div class="_item" onclick = "reveal('#{{machine.unique_id|slugify}}')" >
+                            {{machine}} 
+                            <span style="float: right;">
+                                <a href="{% url 'client:machine_details' machine.pk %}">Details</a> |
+                                <a href="{% url 'control_forms:edit_machine' pk=machine.pk %}" >Edit</a> | 
+                                <a href="{% url 'control_forms:delete_machine' machine.pk %}">Delete</a>
+                            </span>
+                        </div>
+                    <ul id="{{machine.unique_id|slugify}}" style="display: none;" >
+                        {% for unit in machine.subunit_set.all %}
+                            <li><div class = "_item" onclick = "reveal('#{{unit.unique_id|slugify}}')">
+                                    {{unit.unit_name}}  
+                                    <span style="float: right;">
+                                        <a href="{% url 'client:subunit_details' pk=unit.unique_id %}">Details</a> |
+                                        <a href="{% url 'control_forms:edit_subunit' pk=unit.unique_id %}">Edit</a> |
+                                        <a href="{% url 'control_forms:delete_subunit' unit.unique_id %}">Delete</a>
+                                    </span>
+                                </div>
+                                <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
+                                    {% for sub in unit.subassembly_set.all %}
+                                        <li><div class="_item" onclick = "reveal('#{{sub.unique_id|slugify}}')">
+                                                {{sub.unit_name}} 
+                                                <span style="float: right;">
+                                                    <a href="{% url 'client:subassembly_details' sub.unique_id %}">Details</a> |
+                                                    <a href="{% url 'control_forms:edit_subassembly' pk=sub.unique_id %}">Edit</a> |
+                                                    <a href="{% url 'control_forms:delete_subassembly' sub.unique_id %}">Delete</a>
+                                                </span>
+                                            </div>
+                                            
+                                            <ul id="{{sub.unique_id|slugify}}" style="display:none;">
+                                            {% for component in sub.component_set.all %}
+                                                <li><div class="_item">
+                                                        {{component.component_name}} 
+                                                        <span style="float: right;">
+                                                            <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a> |
+                                                            <a href="{% url 'control_forms:edit_component' pk=component.unique_id %}">Edit</a> |
+                                                            <a href="{% url 'control_forms:delete_component' component.unique_id %}">Delete</a>
+                                                        </span>
+                                                        </div>
+                                                </li>
+                                            {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endfor%}    
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+        </li>
+    {% endfor %}
+</ul>
+</div>
+<div class="col-sm-3"></div>
+</div>
+</div>
+{% endblock %}
+
+{% block body_script %}
+    function reveal(cls){
+        
+        if($(cls).css("display") == "block"){
+            $(cls).css("display", "none");
+
+        }else{
+            $(cls).css("display", "block");
+        }
+        
+    }
+
+{% endblock %}

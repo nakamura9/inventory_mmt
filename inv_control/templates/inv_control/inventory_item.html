@@ -1,0 +1,16 @@
+{% extends "window.html" %}
+{% block content %}
+
+<form action="" method="POST" role="form">
+    <legend>Inventory Item Form</legend>
+    <table>
+        {{form.as_table}}
+    </table>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}
+{% block body_script %}
+$("#id_order_date").datepicker();
+{% endblock %}
