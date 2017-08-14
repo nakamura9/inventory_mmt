@@ -1,4 +1,4 @@
-<{% extends "window.html" %}
+{% extends "window.html" %}
 {% block content %}
 
     <div class="row">
@@ -28,7 +28,7 @@
                     <tr>
                         <td>User name:</td>
                         <td>    
-                            <select name="user" class="form-control">
+                            <select name="user" class="form-control" id="user">
                                 {% for user in users %}
                                 <option value="{{user.username}}">{{user.username}}</option>
                                 {% endfor %}
@@ -38,7 +38,7 @@
                     <tr>
                         <td>Password:</td>
                         <td>
-                            <input class="form-control" type ='password' name="password" id="hidden_field" class="form control" >
+                            <input class="form-control" type ='password' name="password" id="password" class="form control" >
                         </td>
                         <tr>
                             <td>Comments:</td>
@@ -50,7 +50,7 @@
             </form>
             <button onclick="holdChecklist()" class="btn btn-info" >Hold</button>
             <div id="hidden" style="display: none;">
-                <textarea class="form-control" id="reason" class="form-control">Reason...</textarea>
+                <textarea  class="form-control" id="reason" class="form-control">Reason...</textarea>
             </div>
             
         </div>
@@ -66,9 +66,23 @@
             if($("#reason").text() == ""){
                 alert("Please provide a reason for holding the checklist");
             }else{
-                $.post("{% url 'checklists:hold_checklist' pk=object.id %}", {"reason": $("#reason").text()});
-                holdCount = 0;
-                window.location.href = "{% url 'checklists:inbox' %}";
+                $.ajax({
+                        method: "POST",
+                        url:"{% url 'checklists:hold_checklist' pk=object.pk %}", 
+                        data: {
+                            "reason": $("#reason").text(),
+                            "username": $("#user").val(),
+                            "password":$("#password").val(),
+                        },
+                        success: function(result){
+                            if(result["authenticated"]==true){
+                                holdCount = 0;
+                            window.location.href = "{% url 'checklists:inbox' %}";
+                            }else{
+                                alert("The Authentication failed. Unable to Hold Checklist");
+                            }
+                        }
+                });
             } 
         }else{
             $("#hidden").css("display", "block");

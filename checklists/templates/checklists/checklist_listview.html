@@ -1,11 +1,17 @@
-<{% extends "window.html" %}
+{% extends "window.html" %}
 {% block content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-12 bg-info">
-            <form method="GET">
-                {{message}}<table style="float:right; margin: 5px;"><tr><td>{{users}}</td><td> <input type="password" name="pwd" class="form-control" ></td><td>
-                <button type="submit" class="btn btn-default">Login</button> </td></tr></table>
+            <form method="GET" action="" role="form">
+                <span style="float:left; font-size:24px;">{{message}}</span>
+                <table style="float:right; margin: 5px;">
+                    <tr>
+                        <td>{{users}}</td>
+                        <td><input type="password" name="pwd" class="form-control" ></td>
+                        <td><button type="submit" class="btn btn-default">Login</button> </td>
+                    </tr>
+                </table>
             </form>
         </div>
     </div>
@@ -55,6 +61,7 @@
                 <div class="tab-pane fade" id="checklists"> 
                     <h3>Checklists:</h3>
                     {% for checklist in checklists %}
+                    {% if checklist.is_open %}
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             {{checklist.title}}
@@ -63,9 +70,10 @@
                             <p>Resolver: {{checklist.resolver}}</p>
                             <p>Machine: {{checklist.machine}}</p>
                             <p>Category: {{checklist.category}}</p>
-                            <a href="{% url 'checklists:complete_checklist' pk=checklist.id %}" class="btn btn-primary" >Complete</a>
+                            <a href="{% url 'checklists:complete_checklist' pk=checklist.pk %}" class="btn btn-primary" >Complete</a>
                         </div>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>  

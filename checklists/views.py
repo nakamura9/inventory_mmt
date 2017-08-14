@@ -15,8 +15,15 @@ from .forms import CheckListCreateForm
 from django.forms import widgets
 from  common_base.models import  Account
 from django.contrib.auth import authenticate
+import json
 
 class ChecklistListView(ListView):
+    """
+    The List view acts as an inbox for artisans which divides maintenance tasks
+    into checklists, planned and unplanned jobs.
+    The page has a login form for resolvers as well as a welcome and login status message 
+    """
+
     model = Checklist
     template_name = os.path.join("checklists","checklist_listview.html")
 
@@ -33,44 +40,47 @@ class ChecklistListView(ListView):
         if not user:
             context["message"] = "No user logged in" 
             return context
-        
+
         if not authenticate(username=user, password=self.request.GET["pwd"]):
             context["message"] = "Wrong password"
             return context
 
         user = Account.objects.get(username= user)
+        context["message"] = "Hello %s." % user.username
         context["jobs"] = Breakdown.objects.filter(resolver = user)
         context["planned"] = PlannedJob.objects.filter(resolver = user)
         context["checklists"] = Checklist.objects.filter(resolver = user)
 
         return context
 
-    def get_queryset(self, *args, **kwargs):
-        queryset = super(ChecklistListView, self).get_queryset(*args, **kwargs)
-        user =self.request.GET.get("username", None)
-        if user:
-            queryset = queryset.filter(resolver=user)
-        else:
-            return []
-        return [checklist for checklist in queryset if checklist.is_open]
-        
-
 
 class ChecklistDetailView(DetailView):
+    """
+    Page for viewing the details of a checklist without being able to complete it
+    """
+
+
     template_name = os.path.join("checklists","checklist_detailview.html")
     model = Checklist
 
 class ChecklistCompleteView(DetailView):
+    """"
+    If a checklist is open the page is available to the appropriate artisan for 
+    completion. The model uses a custom form as very few fields are needed and 
+    the page updates an existing checklist, hence the length of the post method.
+    """
+    
     template_name = os.path.join("checklists","checklist_actionview.html")
     model = Checklist
 
     def get_context_data(self, *args, **kwargs):
         context = super(ChecklistCompleteView, self).get_context_data(*args, **kwargs)
-        context["users"] = Account.objects.all()
+        context["users"] = Account.objects.all()# might filter by artisan later
         return context
 
     def post(self, *args, **kwargs):
         checklist = self.get_object()
+
         if checklist.resolver.username != self.request.POST["user"]:
             return HttpResponse(render(self.request, self.template_name,
                      context={"message":"The authenticated user is not the checklist resovler.",
@@ -99,20 +109,26 @@ class ChecklistCompleteView(DetailView):
 
 
 class ChecklistCreateView(CreateView):
+    """
+    Form for creating new checklists by admin staff. 
+    """
     template_name = os.path.join("checklists","checklist_createview.html")
     form_class = CheckListCreateForm
     success_url = reverse_lazy("checklists:inbox")
 
     def get(self, *args, **kwargs):
+        """The list of tasks that will be populated by Ajax requests"""
         self.request.session["tasks"] = []
         return super(ChecklistCreateView, self).get(*args, **kwargs)
 
     
     def post(self, *args, **kwargs):
         resp = super(ChecklistCreateView, self).post(*args, **kwargs)
+        #makes sure there is at least one task in the session
         if len(self.request.session.get("tasks")) == 0:
             return HttpResponseRedirect(reverse("checklists:create_checklist"))
         
+        print self.request.POST["title"]
         for id, task in enumerate(self.request.session["tasks"]):
             Task(checklist =Checklist.objects.get(title= self.request.POST["title"]) ,
                 task_number = id,
@@ -124,19 +140,14 @@ class ChecklistCreateView(CreateView):
 
 class ChecklistUpdateView(UpdateView):
     template_name = os.path.join("checklists","checklist_updateview.html")
+    form_class = CheckListCreateForm
     model = Checklist
-    fields = ["title", "creation_date","machine", "subunit", "resolver", "category", "frequency"]
     success_url = reverse_lazy("checklists:inbox")
 
     def get(self, *args, **kwargs):
         self.request.session["tasks"] = []
         return super(ChecklistUpdateView, self).get(*args, **kwargs)
 
-    def get_form(self, *args):
-        form = super(ChecklistUpdateView, self).get_form(*args)
-        form.fields["creation_date"].widget = DateInput()
-        return form
-    
 
     def post(self, *args, **kwargs):
         resp = super(ChecklistUpdateView, self).post(*args, **kwargs)
@@ -155,8 +166,12 @@ class ChecklistUpdateView(UpdateView):
         return resp
 
 def delete_checklist(request, pk):
-    Checklist.objects.get(pk=pk).delete()
-    return HttpResponseRedirect(reverse("client:planned_maintenance"))
+    try:
+        Checklist.objects.get(pk=pk).delete()
+    except:
+        return Http404()
+    else:
+        return HttpResponseRedirect(reverse("client:planned_maintenance"))
 
 
 @csrf_exempt
@@ -176,13 +191,21 @@ def add_task(request):
 def hold_checklist(request, pk):
     if not request.is_ajax():
         return Http404()
-    
+    print request.POST
+    if not authenticate(username=request.POST["username"],
+                password=request.POST["password"]):
+        return HttpResponse(json.dumps({"authenticated":False}), 
+                            content_type="application/json")
+
     chk = Checklist.objects.get(pk=pk)
     auth = chk.resolver
+    chk.on_hold = True
+    chk.save()
     Comment(author=auth,
             checklist = chk,
             content="HOLD:" + request.POST["reason"]).save()
-    return HttpResponse("0")
+    return HttpResponse(json.dumps({"authenticated":True}), 
+                            content_type="application/json")
 
 @csrf_exempt
 def remove_task(request):
@@ -201,10 +224,3 @@ def remove_task(request):
         return Http404()
 
     return HttpResponse("0")
-
-@csrf_exempt
-def validate_user(request):
-    # check the user name password combineation for a match 
-    return HttpResponse("0")
-    
-

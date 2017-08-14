@@ -27,7 +27,7 @@ class Checklist(models.Model):
 
 
     title = models.CharField(max_length= 64, 
-                            unique=True)
+                            unique=True, primary_key=True)
     creation_date = models.DateField()
     last_completed_date = models.DateField(blank = True, null=True)
     estimated_time= models.CharField(max_length=4, choices = [("00%d" % i, "00%d" % i)for i in range(10, 60, 5)] + [("0%d00" % i, "0%d00" % i) for i in range(1, 8)], default = now)
@@ -49,9 +49,13 @@ class Checklist(models.Model):
                                     ("quarterly", "Every 3 Months"),
                                     ("bi-annually", "Every 6 Months"), 
                                     ("yearly", "Yearly")])
+    on_hold = models.BooleanField(default=False)
 
     @property
     def is_open(self):
+        if self.on_hold:
+            return False
+        
         if self.last_completed_date is None:
             return True
         else:

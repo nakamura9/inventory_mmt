@@ -6,6 +6,7 @@ from inv import models as inv_models
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 import json
+from django.contrib.auth import authenticate
 
 @csrf_exempt
 def update_subunit(request):
@@ -49,3 +50,14 @@ def update_components(request):
     return HttpResponse(json.dumps(
             {"components": components}),
                 content_type="application/json")
+
+
+@csrf_exempt
+def ajaxAuthenticate(request):
+    if authenticate(username=request.POST["username"], 
+            password=request.POST["password"]):
+        return HttpResponse(json.dumps({"authenticated":True}),
+                            content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({"authenticated":False}),
+                            content_type="application/json")

@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.test import Client
 from django.shortcuts import reverse
 from common_base.tests import TestDataMixin
+from common_base.models import Account
 import json
 
 class selectAjaxCalls(TestCase, TestDataMixin):
@@ -22,6 +23,7 @@ class selectAjaxCalls(TestCase, TestDataMixin):
     def setUpTestData(cls):
         super(selectAjaxCalls, cls).setUpTestData()
         cls.create_test_inventory_models()
+        cls.create_dummy_accounts()
 
     def test_update_subunit(self):
         response = self.client.post(reverse("ajax:update_subunit"),
@@ -48,3 +50,11 @@ class selectAjaxCalls(TestCase, TestDataMixin):
         
         
         self.assertContains(response, "components")
+
+    def test_ajaxAuthenticate(self):
+        response = self.client.post(reverse("ajax:ajax-authenticate"),
+                                    {"username": "Test User",
+                                    "password": "test123"},
+                                    HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        
+        self.assertEqual(json.loads(response.content)["authenticated"], False)

@@ -23,8 +23,6 @@ urlpatterns = [
     name="hold_checklist"),
     url(r'^remove_task/?$', ch_views.remove_task,
     name="remove_task"),
-    url(r'^validate_user/?$', ch_views.validate_user,
-    name="validate_user"),
 
    
 ]

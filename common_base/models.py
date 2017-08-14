@@ -12,4 +12,4 @@ roles = [("admin", "Admin"),
 class Account(User):
     role = models.CharField(max_length=128, choices= roles)
     def __str__(self):
-        return self.username
+        return self.username + " -> " + self.role

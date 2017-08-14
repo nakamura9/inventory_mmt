@@ -41,3 +41,18 @@ function updateSubAssemblies(django_url, unit, subassembly){
         });
 
     }
+
+// reuse if necessary
+function ajaxAuthenticate(django_url, user, pwd){
+    $.ajax({
+            method: "POST",
+            url: django_url, 
+            data: {
+                    "username": $("#user").val(),
+                    "password":$("#password").val(),
+                },
+                success: function(result){
+                    return result["authenticated"]
+                }
+            }); 
+    }

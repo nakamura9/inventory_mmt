@@ -28,6 +28,26 @@ class TestDataMixin(object):
                     subunit=inv_models.SubUnit.objects.get(pk="T_S",
                     machine=inv_models.Machine.objects.get(pk="T_M"))).save()
 
+
+    @classmethod
+    def create_test_checklist(cls):
+        cls.create_test_inventory_models()
+        cls._checklist_data = {
+            "title": "Test Checklist",
+            "creation_date": datetime.date.today(),
+            "last_completed_date": None,
+            "estimated_time": "0030",
+            "start_time": "0900",
+            "machine": inv_models.Machine.objects.get(pk="T_M"),
+            "subunit": inv_models.SubUnit.objects.get(pk="T_S"),
+            "subassembly": None,
+            "resolver": Account.objects.first(),
+            "category": "electrical",
+            "frequency": "daily"
+        }
+        ch_models.Checklist(**cls._checklist_data).save()
+
+
     @classmethod
     def create_dummy_accounts(cls):
         Account(username= "Test User",
