@@ -16,9 +16,10 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from inv import views as inv_views
-from inv.views import sign_up, logout, login
+from common_base.views import sign_up, logout, login
 from inv import urls as inv_urls
 from inv.views import *
+
 
 
 urlpatterns = [
@@ -33,5 +34,6 @@ urlpatterns = [
     url(r'^machine-learning/', include("machine_learning.urls", namespace="machine-learning")),
     url(r'^rca/', include("rca.urls", namespace="rca")),
     url(r'^production-calendar/', include("production_calendar.urls", namespace="production-calendar")),
-    url(r'^inventory_control/', include("inv_control.urls", namespace = "control_forms"))
+    url(r'^inventory_control/', include("inv_control.urls", namespace = "control_forms")),
+    url(r'^ajax/', include("ajax.urls", namespace = "ajax"))
 ]

@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from inv.models import *
-from inv.models import Account
+from common_base.models import Account
 from django.utils import timezone
 import time 
 import datetime
@@ -15,7 +15,7 @@ class AbstractJob(models.Model):
     description = models.TextField()
     creation_epoch = models.DateTimeField(default = timezone.now)
     number = models.CharField(max_length = 12 )
-    resolver = models.ForeignKey("inv.Account")
+    resolver = models.ForeignKey("common_base.Account")
     estimated_time = models.CharField(max_length=4)
     completed = models.BooleanField(default = False)
     machine = models.ForeignKey("inv.Machine", null=True)
@@ -24,7 +24,7 @@ class AbstractJob(models.Model):
     component = models.ForeignKey("inv.Component", null=True)
 
 class Breakdown(AbstractJob):
-    requested_by = models.ForeignKey("inv.Account")
+    requested_by = models.ForeignKey("common_base.Account")
     
 
 

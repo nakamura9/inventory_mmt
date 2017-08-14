@@ -11,7 +11,7 @@ def now():
 
 class Comment(models.Model):
     checklist = models.ForeignKey("checklist")
-    author = models.ForeignKey(" inv.Account")
+    author = models.ForeignKey("common_base.Account")
     content = models.CharField(max_length=1024)
     authored_date = models.DateField(default = timezone.now)
 
@@ -37,7 +37,7 @@ class Checklist(models.Model):
                 null=True, on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("inv.SubAssembly", 
                 null=True, on_delete=models.SET_NULL)
-    resolver = models.ForeignKey(" inv.Account")
+    resolver = models.ForeignKey("common_base.Account")
     category = models.CharField(max_length = 64,
                     choices=[("electrical", "Electrical"),
                     ("mechanical", "Mechanical")])

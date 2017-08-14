@@ -1,19 +1,7 @@
 from django import forms
 from inv.models import *
 from .models import Category, InventoryItem, Order
-
-# research mixins
-class BootstrapMixin(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(BootstrapMixin, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            field = self.fields.get(field)
-            field.widget.attrs['class'] ="form-control"
-            if isinstance(field.widget, forms.TextInput) or \
-                isinstance(field.widget, forms.NumberInput):
-                field.widget.attrs['placeholder'] =field.label
-                field.label = ""
-
+from common_base.forms import BootstrapMixin
 
 class CategoryForm(forms.ModelForm, BootstrapMixin): 
     class Meta:

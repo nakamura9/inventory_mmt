@@ -1,4 +1,4 @@
-<{% extends "window.html" %}
+{% extends "window.html" %}
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -26,37 +26,21 @@
 {% endblock %}
 {% block body_script %}
     $("#id_creation_date").datepicker();
-        var num_tasks = 0;
+    
+    var num_tasks = 0;
 
-
-    function updateSubUnits(){
-        $.post("{% url 'jobcards:update_subunit' %}", {"machine":$("#id_machine").val()}, function(data){
-        
-        var units =  "<option value='None'>------</option> ";
-
-        for(i in data.units){
-            units += "<option value='*'>".replace('*', data.units[i][0]) + data.units[i][1] + "</option>";
-            
-        }
-        var subunit = $("#id_subunit");
-        subunit.html(units); // that is its children
-        
-    });
+    function prepSubUnitUpdate(){
+        var url = "{% url 'ajax:update_subunit' %}";
+        var machine = $('#id_machine').val();
+        var subunit = $('#id_subunit');
+        updateSubUnits(url, machine, subunit);
     }
-
-
-    function updateSubAssemblies(){
-         $.post("{% url 'jobcards:update_subassembly' %}", data={"unit":$("#id_subunit").val()}, function(data){
-        var units = "<option value='None'>------</option> ";
-
-        for(i in data.subassemblies){
-            units += "<option value='*'>".replace('*', data.subassemblies[i][0]) + data.subassemblies[i][1] + "</option>";
-            
-        }
-        
-        $("#id_subassembly").html(units);
-        
-    });
+    
+    function prepSubAssemblyUpdate(){
+        var url = "{% url 'ajax:update_subassembly' %}";
+        var subunit = $('#id_subunit').val();
+        var subassembly = $('#id_subassembly');
+        updateSubAssemblies(url, subunit, subassembly);
     }
 
 
@@ -66,9 +50,8 @@
     }
 
     function editTasks(data){
-        console.log(data);
         $("#tasklist").append(
-            "<p>" + $("#task").val() + "</p>"
+            "<p>" + num_tasks +". "+ $("#task").val() + "</p>"
         );
         $("#task").val("");
         num_tasks += 1;

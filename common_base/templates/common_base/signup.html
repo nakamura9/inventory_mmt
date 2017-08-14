@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block _title %}
+Sign Up
+{% endblock %}
+{% block _content %}
+<div class="jumbotron">
+    <h1>Create an account</h1>
+    <p>Fill in the form to create an account with the inventory management software</p>
+    <p>Already have an account? <a href="{% url 'login' %}">Login here.</a>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4">
+            <p style="color:red;">{{message}}</p>
+            <form method="POST" action="{% url 'sign_up' %}" class="form-group">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary" type="submit">Sign Up</button>
+            </form>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+</div>
+
+{% endblock %}

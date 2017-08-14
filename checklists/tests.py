@@ -3,25 +3,15 @@ from django.test import Client
 from checklists import models
 import datetime
 from inv import models as inv_models
+from common_base.models import Account
+from common_base.tests import TestDataMixin
 
-class ModelTests(TestCase):
+class ModelTests(TestCase, TestDataMixin):
     @classmethod
     def setUpTestData(cls):
-        inv_models.objects.create(machine_name="Checklist Test Machine",
-                                unique_id="C_T_M",
-                                manufacturer="Langston",
-                                estimated_value="200000",
-                                commissioning_date=datetime.date.today() - datetime.timedelta(years=5),
-                                )
-        inv_models.SubUnit.objects.create(unique_id="C_T_S",
-                                        unit_name="Checklist Test SubUnit",
-                                        machine=inv_models.Machine.objects.get(pk="C_T_M"))
-
-        inv_models.SubAssembly.objects.create(unique_id="C_T_SA",
-                                            unit_name="Checklist_Test_SubAssembly",
-                                            subunit=inv_models.SubUnit.objects.get(pk="C_T_S",
-                                            machine=inv_models.Machine.objects.get(pk="C_T_M")))
-
+        super(ModelTests, cls).setUpTestData()
+        cls.create_test_inventory_models()
+        cls.create_dummy_accounts()
 
         cls._checklist_data = {
             "title": "Test Checklist",
@@ -29,34 +19,36 @@ class ModelTests(TestCase):
             "last_completed_date": None,
             "estimated_time": "0030",
             "start_time": "0900",
-            "machine": inv_models.objects.get("C_T_M"),
-            "subunit": inv_models.objects.get("C_T_S"),
+            "machine": inv_models.Machine.objects.get(pk="T_M"),
+            "subunit": inv_models.SubUnit.objects.get(pk="T_S"),
             "subassembly": None,
-            "resolver": inv_models.Account.objects.first(),
+            "resolver": Account.objects.first(),
             "category": "electrical",
             "frequency": "daily"
         }
-        models.Checklist.objects.create(**cls._checklist_data)
+        models.Checklist(**cls._checklist_data).save()
 
     def test_create_comment(self):
-        models.Comment.objects.create(
+        comment = models.Comment.objects.create(
             checklist=models.Checklist.objects.get(title="Test Checklist"),
-            author=inv_models.Account.objects.first(),
+            author=Account.objects.first(),
             content="Test Comment"
         )
+        self.assertIsInstance(comment, models.Comment)
 
 
     def test_create_checklist(self):
         self._checklist_data["title"] = "Unit Test Checklist"
-        models.Checklist(**self._checklist_data).save()
-        self.assertTrue(isinstance(
-            models.Checklist.objects.get(title="Unit Test Checklist"), 
-            models.Checklist))
+        check = models.Checklist.objects.create(**self._checklist_data)
+        self.assertIsInstance(check, models.Checklist)
 
     def test_create_task(self):
-        models.Task(checklist=models.Checklist.objects.get(title="Test Checklist"),
-                    task_number=1,
-                    description="A Test Checklist Task")
+        task = models.Task.objects.create(
+                checklist=models.Checklist.objects.get(title="Test Checklist"),
+                    task_number=1, description="A Test Checklist Task")
+        self.assertIsInstance(task, models.Task)
+
+
 
     """def test_tasks_associated_with_checklists(self):
         pass

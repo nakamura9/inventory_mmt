@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'maintenance_calendar',
     'production_calendar',
     'machine_learning',
-    
+    'common_base',
+    'ajax',   
 ]
 
 MIDDLEWARE = [

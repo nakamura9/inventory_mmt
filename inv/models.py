@@ -6,20 +6,6 @@ from django.db import models
 from datetime import timedelta
 from django.utils import timezone
 
-# Create your models here.
-from django.contrib.auth.models import User
-
-
-# Create your models here.
-roles = [("admin", "Admin"),
-        ("artisan", "Artisan"),
-        ("operator","Operator")]
-
-class Account(User):
-    role = models.CharField(max_length=128, choices= roles)
-    def __str__(self):
-        return self.username
-
         
 class Plant(models.Model):
     plant_name= models.CharField(max_length = 128)

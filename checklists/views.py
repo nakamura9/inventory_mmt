@@ -11,9 +11,9 @@ import os
 import datetime
 from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
-from .forms import *
+from .forms import CheckListCreateForm
 from django.forms import widgets
-from  inv.models import  Account
+from  common_base.models import  Account
 from django.contrib.auth import authenticate
 
 class ChecklistListView(ListView):
@@ -24,7 +24,10 @@ class ChecklistListView(ListView):
         context = super(ChecklistListView, self).get_context_data(*args, **kwargs)
         context["message"] = ""
         context["users"] =widgets.Select(attrs= {"class": "form-control"},
-                                    choices= ((u.username, u.username) for u in Account.objects.all())).render("username", "None")
+                                    choices= ((u.username, u.username) \
+                                    for u in Account.objects.all())).render(
+                                        "username", "None")
+                                        
         user =self.request.GET.get("username", None)
         
         if not user:
@@ -63,7 +66,7 @@ class ChecklistCompleteView(DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ChecklistCompleteView, self).get_context_data(*args, **kwargs)
-        context["users"] = inv.models.Account.objects.all()
+        context["users"] = Account.objects.all()
         return context
 
     def post(self, *args, **kwargs):
@@ -72,7 +75,8 @@ class ChecklistCompleteView(DetailView):
             return HttpResponse(render(self.request, self.template_name,
                      context={"message":"The authenticated user is not the checklist resovler.",
             "object": self.get_object(),
-            "users":inv.models.Account.objects.all()}))
+            "users":Account.objects.all()}))
+
         user = authenticate(username= \
                 self.request.POST["user"],
                 password= self.request.POST["password"])
@@ -91,28 +95,18 @@ class ChecklistCompleteView(DetailView):
         else:
             return HttpResponse(render(self.request, self.template_name, context={"message":"Failed to authenticate properly",
             "object": self.get_object(),
-            "users":inv.models.Account.objects.all()}))
+            "users":Account.objects.all()}))
 
 
 class ChecklistCreateView(CreateView):
     template_name = os.path.join("checklists","checklist_createview.html")
-    model = Checklist
-    fields = ["title", "creation_date", 'estimated_time', 'start_time',"machine", "subunit", "subassembly", "resolver", "category", "frequency"]
+    form_class = CheckListCreateForm
     success_url = reverse_lazy("checklists:inbox")
 
     def get(self, *args, **kwargs):
         self.request.session["tasks"] = []
         return super(ChecklistCreateView, self).get(*args, **kwargs)
 
-    def get_form(self, *args):
-        form = super(ChecklistCreateView, self).get_form(*args)
-        for field in form.fields:
-            form.fields[field].widget.attrs["class"] ="form-control"
-
-        form.fields["machine"].widget.attrs["onchange"] ="updateSubUnits()"
-        form.fields["subunit"].widget.attrs["onchange"] ="updateSubAssemblies()"
-        return form
-    
     
     def post(self, *args, **kwargs):
         resp = super(ChecklistCreateView, self).post(*args, **kwargs)

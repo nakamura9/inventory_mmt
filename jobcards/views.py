@@ -12,7 +12,7 @@ import os
 from django.urls import reverse, reverse_lazy
 import json
 from .forms import DateInput, TimeInput, UnplannedJobForm, PlannedJobForm
-from inv.models import Account
+from common_base.models import Account
 from django import forms
 import datetime
 from django.forms import widgets
@@ -153,49 +153,7 @@ def complete_job(request, planned):
     obj.save()
     return HttpResponseRedirect(reverse("client:planned_maintenance"))
 
-@csrf_exempt
-def update_subunit(request):
-    
-    if not request.is_ajax() and \
-        request.POST["machine"] == "":
-        return Http404()
-    
-    machine =Machine.objects.get(pk= \
-                        request.POST["machine"])
-    units = [[unit[0],unit[1]] for unit in machine.subunit_set.values_list()]
-    return HttpResponse(json.dumps(
-            {"units": units}),
-                content_type="application/json")
 
-
-@csrf_exempt
-def update_subassembly(request):
-    if not request.is_ajax() and \
-        request.POST.get("unit", None) ==None:
-        return Http404()
-    
-    subunit =SubUnit.objects.get(
-                    pk= request.POST["unit"])
-    
-    subassemblies= [[assy[0], assy[1]] for assy in subunit.subassembly_set.values_list()]
-    return HttpResponse(json.dumps(
-            {"subassemblies": subassemblies}),
-                content_type="application/json")
-
-
-@csrf_exempt
-def update_components(request):
-    if not request.is_ajax() and \
-        request.POST["subassy"] == "":
-        return Http404()
-    
-    subassy =SubAssembly.objects.get(
-                    pk= request.POST["subassy"])
-    
-    components= [[comp[0],comp[1]] for comp in subassy.component_set.values_list()]
-    return HttpResponse(json.dumps(
-            {"components": components}),
-                content_type="application/json")
 
 @csrf_exempt
 def get_resolvers(request):

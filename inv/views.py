@@ -3,54 +3,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 import os
 import checklists
 import jobcards
-from .forms import userForm
 from .models import *
-from inv.models import Account
+from common_base.models import Account
 from django.views.generic import DetailView, ListView, TemplateView
 from checklists.models import Checklist
 from jobcards.models import Breakdown, PlannedJob
 from collections import namedtuple
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
 
-def login(request):
-    if request.method == "GET":
-       return render(request, os.path.join("inv", "login.html"))
-    else:
-        name = request.POST["name"]
-        pwd = request.POST["pwd"]
-        user= authenticate(username=name, password=pwd)
-        if user:
-            auth_login(request, user)
-            return HttpResponseRedirect(reverse("client:browse"))
-        else:
-            return HttpResponseRedirect(reverse("login"))
-
-
-def sign_up(request):
-    if request.method == "GET":
-        form = userForm()
-        return render(request, os.path.join("inv", "signup.html"), context={"form": form})
-    else:
-        form = userForm(request.POST)
-        if form.is_valid():
-            try:
-                new_user = Account.objects.create_user(**form.cleaned_data)
-                new_user.save()
-            except Exception as e:
-                return render(request, os.path.join("inv", "signup.html"), context={"form": form})
-
-            else:
-                return HttpResponseRedirect(reverse("login"))
-        else:
-            return render(request, os.path.join("inv", "signup.html"), context={"form": form})
-
-def logout(request):
-    if request.user.is_authenticated:
-        auth_logout(request)
-
-    return HttpResponseRedirect(reverse("login"))
 
 
 
