@@ -63,21 +63,16 @@ class TestViews(TestCase, TestDataMixin):
         super(TestViews, cls).setUpClass()
         cls.client = Client()
 
+
     @classmethod
     def setUpTestData(cls):
         super(TestViews, cls).setUpTestData()
         cls.create_dummy_accounts()
         cls.create_test_checklist()
 
-    def test_inbox(self):
-        response = self.client.get(reverse("checklists:inbox"))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["message"], "No user logged in")
-
 
     """def test_inbox_with_user(self):
-        print Account.objects.all()
-        response = self.client.get(reverse("checklists:inbox"), 
+        response = self.client.get(reverse("maintenance:inbox"), 
                                     {"username": "Test User",
                                     "pwd":"test123"})
         self.assertEqual(response.status_code, 200)
@@ -116,6 +111,7 @@ class TestViews(TestCase, TestDataMixin):
 
         self.assertEqual(response.status_code, 200)
     
+
     def test_get_checklist_updateview(self):
         response = self.client.get(reverse("checklists:update_checklist",
                                  kwargs={"pk":"Test Checklist"}))
@@ -133,6 +129,7 @@ class TestViews(TestCase, TestDataMixin):
 
         self.assertEqual(response.status_code, 200)
     
+
     def test_delete_checklist(self):
         response = self.client.get(reverse("checklists:delete_checklist",
                                             kwargs={"pk": "Test Checklist"}))
@@ -146,6 +143,7 @@ class AjaxRequestsTests(TestCase, TestDataMixin):
         super(AjaxRequestsTests, cls).setUpTestData()
         cls.create_dummy_accounts()
         cls.create_test_checklist()
+
 
     @classmethod
     def setUpClass(cls):
@@ -168,6 +166,7 @@ class AjaxRequestsTests(TestCase, TestDataMixin):
         #need to learn how to set up a session
         pass
     
+
     def test_hold_checklist(self):
         response = self.client.post(reverse("checklists:hold_checklist",
                                     kwargs={"pk": "Test Checklist"}), 

@@ -42,6 +42,26 @@ function updateSubAssemblies(django_url, unit, subassembly){
 
     }
 
+function updateComponents(django_url, subassembly, component){
+    $.ajax({
+            method: "POST",
+            url: django_url,
+            subassembly: subassembly,
+            data: {
+                "subassy": subassembly,
+            },
+            success: function(result){
+                var units =  "<option value='None'>-Select Component-</option> ";
+
+        for(i in result.components){
+            units += "<option value='*'>".replace('*', result.components[i][0]) + result.components[i][1] + "</option>";
+            
+        }
+        this.component.html(units); // that is its children
+            }
+        });
+
+    }
 // reuse if necessary
 function ajaxAuthenticate(django_url, user, pwd){
     $.ajax({

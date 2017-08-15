@@ -23,7 +23,7 @@ class PlannedJobForm(forms.ModelForm, BootstrapMixin):
     def __init__(self, *args, **kwargs):
         super(PlannedJobForm, self).__init__(*args, **kwargs)
         self.fields["estimated_time"].widget = DurationInput()
-        self.fields["machine"].widget.attrs["onchange"] = "getSubUnits()"
+        self.fields["machine"].widget.attrs["onchange"] = "prepSubUnitUpdate()"
 
 
 class UnplannedJobForm(forms.ModelForm, BootstrapMixin):
@@ -33,5 +33,5 @@ class UnplannedJobForm(forms.ModelForm, BootstrapMixin):
  
     def __init__(self, *args, **kwargs):
         super(UnplannedJobForm, self).__init__(*args, **kwargs)
-        self.fields["machine"].widget.attrs["onchange"] = "updateSubUnit()"
+        self.fields["machine"].widget.attrs["onchange"] = "prepSubUnitUpdate()"
         self.fields["estimated_time"].widget = DurationInput()

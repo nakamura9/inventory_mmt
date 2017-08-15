@@ -32,11 +32,11 @@
 
                     </style>
                 <center>
-                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_plant' %}">Add Plant</a>
-                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_machine' %}">Add Machine</a>
-                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_subunit' %}">Add SubUnit</a>
-                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_subassembly' %}">Add Sub Assembly</a>
-                    <a class="btn btn-primary roomy" href="{% url 'control_forms:add_component' %}">Add Component</a>
+                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_plant' %}">Add Plant</a>
+                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_machine' %}">Add Machine</a>
+                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_subunit' %}">Add SubUnit</a>
+                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_subassembly' %}">Add Sub Assembly</a>
+                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_component' %}">Add Component</a>
                 </center>
                 
                 <hr />
@@ -46,9 +46,9 @@
                     <li><div class="_item" onclick = "reveal('#{{machine.unique_id|slugify}}')" >
                             {{machine}} 
                             <span style="float: right;">
-                                <a href="{% url 'client:machine_details' machine.pk %}">Details</a> |
-                                <a href="{% url 'control_forms:edit_machine' pk=machine.pk %}" >Edit</a> | 
-                                <a href="{% url 'control_forms:delete_machine' machine.pk %}">Delete</a>
+                                <a href="{% url 'inventory:machine_details' machine.pk %}">Details</a> |
+                                <a href="{% url 'inventory:edit_machine' pk=machine.pk %}" >Edit</a> | 
+                                <a href="{% url 'inventory:delete_machine' machine.pk %}">Delete</a>
                             </span>
                         </div>
                     <ul id="{{machine.unique_id|slugify}}" style="display: none;" >
@@ -56,9 +56,9 @@
                             <li><div class = "_item" onclick = "reveal('#{{unit.unique_id|slugify}}')">
                                     {{unit.unit_name}}  
                                     <span style="float: right;">
-                                        <a href="{% url 'client:subunit_details' pk=unit.unique_id %}">Details</a> |
-                                        <a href="{% url 'control_forms:edit_subunit' pk=unit.unique_id %}">Edit</a> |
-                                        <a href="{% url 'control_forms:delete_subunit' unit.unique_id %}">Delete</a>
+                                        <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a> |
+                                        <a href="{% url 'inventory:edit_subunit' pk=unit.unique_id %}">Edit</a> |
+                                        <a href="{% url 'inventory:delete_subunit' unit.unique_id %}">Delete</a>
                                     </span>
                                 </div>
                                 <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
@@ -66,9 +66,9 @@
                                         <li><div class="_item" onclick = "reveal('#{{sub.unique_id|slugify}}')">
                                                 {{sub.unit_name}} 
                                                 <span style="float: right;">
-                                                    <a href="{% url 'client:subassembly_details' sub.unique_id %}">Details</a> |
-                                                    <a href="{% url 'control_forms:edit_subassembly' pk=sub.unique_id %}">Edit</a> |
-                                                    <a href="{% url 'control_forms:delete_subassembly' sub.unique_id %}">Delete</a>
+                                                    <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a> |
+                                                    <a href="{% url 'inventory:edit_subassembly' pk=sub.unique_id %}">Edit</a> |
+                                                    <a href="{% url 'inventory:delete_subassembly' sub.unique_id %}">Delete</a>
                                                 </span>
                                             </div>
                                             
@@ -77,9 +77,9 @@
                                                 <li><div class="_item">
                                                         {{component.component_name}} 
                                                         <span style="float: right;">
-                                                            <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a> |
-                                                            <a href="{% url 'control_forms:edit_component' pk=component.unique_id %}">Edit</a> |
-                                                            <a href="{% url 'control_forms:delete_component' component.unique_id %}">Delete</a>
+                                                            <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a> |
+                                                            <a href="{% url 'inventory:edit_component' pk=component.unique_id %}">Edit</a> |
+                                                            <a href="{% url 'inventory:delete_component' component.unique_id %}">Delete</a>
                                                         </span>
                                                         </div>
                                                 </li>

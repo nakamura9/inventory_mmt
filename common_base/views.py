@@ -20,7 +20,7 @@ def login(request):
         user= authenticate(username=name, password=pwd)
         if user:
             auth_login(request, user)
-            return HttpResponseRedirect(reverse("client:browse"))
+            return HttpResponseRedirect(reverse("maintenance:machine-overview"))
         else:
             return HttpResponseRedirect(reverse("login"))
 

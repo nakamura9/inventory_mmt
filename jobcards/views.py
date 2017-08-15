@@ -23,7 +23,7 @@ from django.views.generic.edit import UpdateView
 class NewUnplannedJobView(FormView): 
     form_class = UnplannedJobForm
     template_name = os.path.join("jobcards", "breakdown.html")
-    success_url = reverse_lazy("client:browse")
+    success_url = reverse_lazy("inventory:inventory-home")
 
     fields = ["requested_by", "resolver", "machine", "description", "estimated_time"]
 
@@ -43,14 +43,14 @@ class EditUnPlannedJob(UpdateView):
     template_name = os.path.join("jobcards", "breakdown.html")
     form_class = UnplannedJobForm
     model = Breakdown
-    success_url = reverse_lazy("client:planned_maintenance")
+    success_url = reverse_lazy("maintenance:planned-maintenance")
 
 
 class NewPlannedJobView(CreateView):
     template_name = os.path.join("jobcards", "planned_job.html")
     form_class = PlannedJobForm
     
-    success_url = reverse_lazy("client:planned_maintenance")
+    success_url = reverse_lazy("maintenance:planned-maintenance")
 
 class JobCardsList(ListView):
         model = Breakdown
@@ -93,14 +93,14 @@ class JobCardsList(ListView):
 def delete_planned_job(request, pk=None):
     job = get_object_or_404(PlannedJob, pk=pk)
     job.delete()
-    return HttpResponseRedirect(reverse("client:planned_maintenance"))
+    return HttpResponseRedirect(reverse("maintenance:planned-maintenance"))
 
 class EditPlannedJob(UpdateView):
     template_name = os.path.join("jobcards", "planned_job.html")
     form_class = UnplannedJobForm
     model = PlannedJob
     
-    success_url = reverse_lazy("client:planned_maintenance")
+    success_url = reverse_lazy("maintenance:planned-maintenance")
 
 
 class JobActionView(DetailView):
@@ -126,7 +126,7 @@ def complete_job(request, breakdown):
     obj.breakdown.completed = True
     obj.completion_epoch = timezone.now()
     obj.save()
-    return HttpResponseRedirect(reverse("client:planned_maintenance")) 
+    return HttpResponseRedirect(reverse("maintenance:planned-maintenance")) 
 
 
 class PlannedJobActionView(DetailView):
@@ -151,7 +151,7 @@ def complete_job(request, planned):
     obj.planned_job.completed = True
     obj.completion_epoch = timezone.now()
     obj.save()
-    return HttpResponseRedirect(reverse("client:planned_maintenance"))
+    return HttpResponseRedirect(reverse("maintenance:planned-maintenance"))
 
 
 

@@ -40,14 +40,14 @@ INSTALLED_APPS = [
     'inv',
     'inventory_mmt',
     'jobcards',
-    'inv_control',
     'checklists',
     'rca',
     'maintenance_calendar',
     'production_calendar',
     'machine_learning',
     'common_base',
-    'ajax',   
+    'ajax',
+    'maintenance',
 ]
 
 MIDDLEWARE = [

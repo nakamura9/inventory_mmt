@@ -1,25 +1,24 @@
-{% extends "window.html" %}
+<{% extends "window.html" %}
 {% block content %}
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-4"></div>
         <div class="col-sm-4 well ">
-            <h3>Planned Job Card</h3>
-            <form class="form-group" method="POST" action="" >
+            <h3>Sub-assembly Form:</h3>
+            <form class="form form-group" method="POST" action="" >
                 {% csrf_token %}
                 <table>
                 {{form.as_table}}
                 </table>
-            <button type="submit" class="btn btn-primary">Create Planned Job</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
         <div class="col-sm-4"></div>
     </div>
 </div>
 {% endblock %}
-{% block body_script %}
-    function prepSubUnitUpdate(){
+{%block body_script %}
+function prepSubUnitUpdate(){
         var url = "{% url 'ajax:update_subunit' %}";
         var machine = $('#id_machine').val();
         var subunit = $('#id_subunit');

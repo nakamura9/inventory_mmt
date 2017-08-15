@@ -17,41 +17,7 @@ from  common_base.models import  Account
 from django.contrib.auth import authenticate
 import json
 
-class ChecklistListView(ListView):
-    """
-    The List view acts as an inbox for artisans which divides maintenance tasks
-    into checklists, planned and unplanned jobs.
-    The page has a login form for resolvers as well as a welcome and login status message 
-    """
 
-    model = Checklist
-    template_name = os.path.join("checklists","checklist_listview.html")
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(ChecklistListView, self).get_context_data(*args, **kwargs)
-        context["message"] = ""
-        context["users"] =widgets.Select(attrs= {"class": "form-control"},
-                                    choices= ((u.username, u.username) \
-                                    for u in Account.objects.all())).render(
-                                        "username", "None")
-                                        
-        user =self.request.GET.get("username", None)
-        
-        if not user:
-            context["message"] = "No user logged in" 
-            return context
-
-        if not authenticate(username=user, password=self.request.GET["pwd"]):
-            context["message"] = "Wrong password"
-            return context
-
-        user = Account.objects.get(username= user)
-        context["message"] = "Hello %s." % user.username
-        context["jobs"] = Breakdown.objects.filter(resolver = user)
-        context["planned"] = PlannedJob.objects.filter(resolver = user)
-        context["checklists"] = Checklist.objects.filter(resolver = user)
-
-        return context
 
 
 class ChecklistDetailView(DetailView):
@@ -100,7 +66,7 @@ class ChecklistCompleteView(DetailView):
                 Comment(author=auth,
                 checklist = chk,
                         content=self.request.POST["comment"]).save()
-            return HttpResponseRedirect(reverse("client:browse"))
+            return HttpResponseRedirect(reverse("inventory:inventory-home"))
 
         else:
             return HttpResponse(render(self.request, self.template_name, context={"message":"Failed to authenticate properly",
@@ -114,7 +80,7 @@ class ChecklistCreateView(CreateView):
     """
     template_name = os.path.join("checklists","checklist_createview.html")
     form_class = CheckListCreateForm
-    success_url = reverse_lazy("checklists:inbox")
+    success_url = reverse_lazy("maintenance:inbox")
 
     def get(self, *args, **kwargs):
         """The list of tasks that will be populated by Ajax requests"""
@@ -128,7 +94,7 @@ class ChecklistCreateView(CreateView):
         if len(self.request.session.get("tasks")) == 0:
             return HttpResponseRedirect(reverse("checklists:create_checklist"))
         
-        print self.request.POST["title"]
+        
         for id, task in enumerate(self.request.session["tasks"]):
             Task(checklist =Checklist.objects.get(title= self.request.POST["title"]) ,
                 task_number = id,
@@ -142,7 +108,7 @@ class ChecklistUpdateView(UpdateView):
     template_name = os.path.join("checklists","checklist_updateview.html")
     form_class = CheckListCreateForm
     model = Checklist
-    success_url = reverse_lazy("checklists:inbox")
+    success_url = reverse_lazy("maintenance:inbox")
 
     def get(self, *args, **kwargs):
         self.request.session["tasks"] = []
@@ -171,7 +137,7 @@ def delete_checklist(request, pk):
     except:
         return Http404()
     else:
-        return HttpResponseRedirect(reverse("client:planned_maintenance"))
+        return HttpResponseRedirect(reverse("maintenance:planned-maintenance"))
 
 
 @csrf_exempt
@@ -191,7 +157,6 @@ def add_task(request):
 def hold_checklist(request, pk):
     if not request.is_ajax():
         return Http404()
-    print request.POST
     if not authenticate(username=request.POST["username"],
                 password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":False}), 

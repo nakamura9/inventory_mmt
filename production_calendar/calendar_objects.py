@@ -1,5 +1,5 @@
 import datetime
-from inv_control.models import Order
+from inv.models import Order
 from jobcards.models import PlannedJob
 from checklists.models import Checklist
 import calendar

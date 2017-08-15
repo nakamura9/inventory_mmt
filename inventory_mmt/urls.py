@@ -24,7 +24,7 @@ from inv.views import *
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^client/', include(inv_urls, namespace="client")),
+    url(r'^inventory/', include(inv_urls, namespace="inventory")),
     url(r'^logout/$', logout, name="logout"),
     url(r'^login/$', login, name="login"),
     url(r'^sign_up/?$', sign_up, name="sign_up"),
@@ -34,6 +34,6 @@ urlpatterns = [
     url(r'^machine-learning/', include("machine_learning.urls", namespace="machine-learning")),
     url(r'^rca/', include("rca.urls", namespace="rca")),
     url(r'^production-calendar/', include("production_calendar.urls", namespace="production-calendar")),
-    url(r'^inventory_control/', include("inv_control.urls", namespace = "control_forms")),
-    url(r'^ajax/', include("ajax.urls", namespace = "ajax"))
+    url(r'^ajax/', include("ajax.urls", namespace = "ajax")),
+    url(r'^maintenance/', include("maintenance.urls", namespace="maintenance")),
 ]

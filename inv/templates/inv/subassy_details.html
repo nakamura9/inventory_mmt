@@ -22,7 +22,7 @@
             <div class="col-sm-4">
                 <ul>
                     {% for component in object.component_set.all %}
-                        <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
+                        <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
                     {% endfor %}
                 </ul>
             </div>

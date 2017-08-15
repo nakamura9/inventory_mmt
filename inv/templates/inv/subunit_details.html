@@ -23,10 +23,10 @@
                 <h3>Children:</h3>
                 <ul>
                     {% for sub in object.subassembly_set.all %}
-                        <li><span class="btn btn-info" onclick = "reveal('#{{sub.unique_id|slugify}}')">{{sub.unit_name}} | <a href="{% url 'client:subassembly_details' sub.unique_id %}">Details</a></span>
+                        <li><span class="btn btn-info" onclick = "reveal('#{{sub.unique_id|slugify}}')">{{sub.unit_name}} | <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a></span>
                             <ul id="{{sub.unique_id|slugify}}" style="display:none;">
                             {% for component in sub.component_set.all %}
-                                <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
+                                <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
                             {% endfor %}
                             </ul>
                         </li>
@@ -100,7 +100,7 @@
                     <option value="2">The Last Month</option>
                     <option value="3">The Last Six Months</option>
                 </select>
-                <button onclick="show()" class="btn btn-primary">Show</button>
+                <button class="btn btn-primary">Show</button>
                 <div id="id_reliability_window"></div>
             </div>
             
@@ -116,9 +116,5 @@
         }   
     }
 
-    function show(){
-    $.post({% url 'control_forms:show'  %}, data={"period": $("#id_period").value()}, function(response){
-        $("#id_reliability_window").html(reponse);
-    });
-};
+
 {% endblock %}

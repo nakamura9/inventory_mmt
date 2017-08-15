@@ -5,8 +5,7 @@ app_name = "checklists"
 
 urlpatterns = [
     
-    url(r'^inbox/?$', ch_views.ChecklistListView.as_view(),
-    name="inbox"),
+    
     url(r'^create_checklist/?$', ch_views.ChecklistCreateView.as_view(),
     name="create_checklist"),
     url(r'^complete_checklist/(?P<pk>[\w ]+)/?$', ch_views.ChecklistCompleteView.as_view(),

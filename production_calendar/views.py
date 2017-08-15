@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.views.generic import TemplateView
 import os
-from inv_control.models import Order
+from inv.models import Order
 from django.utils import timezone
 import datetime
 import calendar_objects

@@ -10,7 +10,7 @@
     {% for machine in object_list %}
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3>{{machine.machine_name}} | <a href="{% url 'client:machine_details' pk=machine.pk %}">Details</a></h3>
+                <h3>{{machine.machine_name}} | <a href="{% url 'inventory:machine_details' pk=machine.pk %}">Details</a></h3>
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -89,7 +89,7 @@
                             <li><div class = "subunit" onclick = "reveal('#{{unit.unique_id|slugify}}')">
                                     {{unit.unit_name}}  
                                     <span style="float: right;">
-                                        <a href="{% url 'client:subunit_details' pk=unit.unique_id %}">Details</a>
+                                        <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a>
                                     </span>
                                 </div>
                                 <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
@@ -97,7 +97,7 @@
                                         <li><div class="subassy" onclick = "reveal('#{{sub.unique_id|slugify}}')">
                                                 {{sub.unit_name}} 
                                                 <span style="float: right;">
-                                                    <a href="{% url 'client:subassembly_details' sub.unique_id %}">Details</a>
+                                                    <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a>
                                                 </span>
                                             </div>
                                             
@@ -106,7 +106,7 @@
                                                 <li><div class="components">
                                                         {{component.component_name}} 
                                                         <span style="float: right;">
-                                                            <a href="{% url 'client:component_details' component.unique_id %}" style="color: white;">Details</a>
+                                                            <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a>
                                                         </span>
                                                         </div>
                                                 </li>

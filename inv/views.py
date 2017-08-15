@@ -1,29 +1,115 @@
 from django.shortcuts import render, reverse
+from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
 import os
 import checklists
 import jobcards
 from .models import *
+from .forms import *
+
 from common_base.models import Account
 from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
 from checklists.models import Checklist
 from jobcards.models import Breakdown, PlannedJob
 from collections import namedtuple
 
 
-
-
 class invHome(TemplateView):
+    """
+    Landing page for all inventory related content
+    """
     template_name = os.path.join("inv", "inv_home.html")
     
-class PlantView(ListView):            
+class EngineeringInventoryView(TemplateView):
+    """
+    Main page for all engineering inventory adjustments.
+    """
+    template_name = os.path.join("inv", "browse.html")
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(browseView, self).get_context_data(*args, **kwargs)
+        context["machines"] = Machine.objects.all()
+        return context
+
+
+###############################################################################
+#                      Engineering Inventory Creation                         #
+###############################################################################
+
+
+class machineView(CreateView):
+    template_name = os.path.join("inv", "addmachine.html") 
     model = Machine
-    template_name = os.path.join("inv", "plantview.html")
+    form_class = MachineForm
+    success_url = reverse_lazy("inventory:inventory-home")
+    
+
+class subunitView(CreateView):
+    template_name = os.path.join("inv", "addsubunit.html")
+    model = SubUnit
+    form_class = SubUnitForm
+    
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class subassyView(CreateView):
+    template_name = os.path.join("inv", "addsubassy.html")
+    model = SubAssembly
+    form_class = SubAssyForm
+    
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class plantView(CreateView):
+    template_name = os.path.join("inv", "addplant.html")
+    model = Plant
+    fields = ["plant_name"]
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class componentView(CreateView):
+    template_name = os.path.join("inv", "addcomponent.html")
+    model = Component
+    form_class = ComponentForm
+    
+    success_url = reverse_lazy("inventory:inventory-home")
+
+
+class componentEditView(UpdateView):
+    model = Component
+    template_name = os.path.join("inv", "addcomponent.html")
+    form_class = ComponentForm
+
+
+class machineEditView(UpdateView):
+    model = Machine
+    template_name = os.path.join("inv", "addmachine.html")
+    form_class = MachineForm
+    success_url = reverse_lazy("inventory:inventory-home")
+
+
+class subassyEditView(UpdateView):
+    model = SubAssembly
+    form_class = SubAssyForm
+    template_name = os.path.join("inv", "addsubassy.html")
+    
+
+class subunitEditView(UpdateView):
+    model = SubUnit
+    form_class = SubUnitForm
+    template_name = os.path.join("inv", "addsubunit.html")
+
+
+###############################################################################
+#                      Engineering Inventory Details                          #
+###############################################################################
+
 
 class MachineView(DetailView):
+    """
+    Provides in depth information regarding the requested machine
+    """
     template_name = os.path.join("inv", "machine_details.html")
     model = Machine 
-    ##start here finish of the context regarding the planned and unplanned jobs for a 
      
     def get_context_data(self, *args, **kwargs):
         context = super(MachineView, self).get_context_data(*args, **kwargs)
@@ -52,7 +138,13 @@ class MachineView(DetailView):
 
         
         return context
+
+
 class SubUnitView(DetailView):
+    """
+    Provides data concerning a particular subunit
+    """
+
     template_name = os.path.join("inv", "subunit_details.html")
     model = SubUnit
 
@@ -83,22 +175,113 @@ class SubUnitView(DetailView):
 
 
 class ComponentView(DetailView):
+    """
+    Provides data concerning components
+    """
     template_name = os.path.join("inv", "component_details.html")
     model = Component
 
 
 class SubAssyView(DetailView):
+    """
+    Provides data concerning subassemblies
+    """
     template_name = os.path.join("inv", "subassy_details.html")
     model = SubAssembly
     
     
-class MaintenanceView(TemplateView):
-    template_name = os.path.join("inv", "planned_maintenance_view.html")
+###############################################################################
+#                      Production inventory                                   #
+###############################################################################
+
+
+class CategoryList(ListView):
+    model = Category
+    context_object_name = 'categories'
+    template_name=os.path.join("inv", "raw_materials.html")
+
+
+class categoryForm(CreateView):
+    template_name = os.path.join("inv", "category_form.html")
+    form_class = CategoryForm
+    success_url = reverse_lazy("inventory:raw-materials")
+
+
+class inventoryItemUpdateView(UpdateView):
+    model = InventoryItem
+    template_name = os.path.join("inv", "inventory_item.html")
+    success_url = reverse_lazy("inventory:raw-materials")
+    form_class = InventoryItemForm
+
+
+class inventoryItemFormView(CreateView):
+    model = InventoryItem
+    form_class = InventoryItemForm
+    template_name = os.path.join("inv", "inventory_item.html")
+    success_url = reverse_lazy("inventory:raw-materials")
+
+
+class inventoryItemDetailView(DetailView):
+    model = InventoryItem
+    template_name= os.path.join("inv", "inventory_item_details.html")
+    
+
+class inventoryListView(TemplateView):
+    template_name = os.path.join("inv","inventory_list.html")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(MaintenanceView, self).get_context_data(*args, **kwargs)
-        
-        context["checklists"] = checklists.models.Checklist.objects.all()
-        context["planned_jobs"] = jobcards.models.PlannedJob.objects.all()
+        context = super(inventoryListView, self).get_context_data(*args, **kwargs)
+        category = Category.objects.get(name=self.kwargs["filter"])
+        context["items"] = InventoryItem.objects.filter(category = category)
+        context["category"] = category 
         return context
 
+
+class OrderCreateView(CreateView):
+    form_class = OrderForm
+    success_url = reverse_lazy("inventory:raw-materials")
+    template_name = os.path.join("inv", "order_form.html")
+
+
+class OrderUpdateView(UpdateView):
+    form_class = OrderForm
+    success_url = reverse_lazy("inventory:raw-materials")
+    template_name = os.path.join("inv", "order_form.html")
+    model = Order
+
+class OrderList(ListView):
+    model = Order
+    template_name= os.path.join("inv", "orders_list.html")
+
+
+class OrderDetailView(DetailView):
+    model = Order
+    template_name = os.path.join("inv", "orders_detailview.html")
+
+
+###############################################################################
+#                               Delete Views                                  #                              
+###############################################################################
+
+
+def delete_component(request, pk):
+    Component.objects.get(pk=pk).delete()
+    return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
+
+def delete_subassembly(request, pk):    
+    SubAssembly.objects.get(pk=pk).delete()
+    return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
+
+
+def delete_subunit(request, pk):    
+    SubUnit.objects.get(pk=pk).delete()
+    return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
+
+
+def delete_machine(request, pk):
+    Machine.objects.get(pk=pk).delete()
+    return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
+
+def delete_order(request, pk):
+    Order.objects.get(pk=pk).delete()
+    return HttpResponseRedirect(reverse("inventory:engineering-inventory"))

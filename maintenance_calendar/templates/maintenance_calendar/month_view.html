@@ -73,10 +73,10 @@
                                             <a href="{% url 'maintenance-calendar:day'  year=month.year month=month.month day=day.date.day %}"><text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text></a>
                                         {% endif %}
                                         {% if day.agenda.length > 1 %}
-                                            <a href="{% url 'client:planned_maintenance' %}"><polygon points="10,0 10,50 15,40 20,50 20,0" style="fill:rgb(0,255,0);stroke:rgb(0,255,0);stroke-width:1;" /></a>
+                                            <a href="{% url 'maintenance:planned-maintenance' %}"><polygon points="10,0 10,50 15,40 20,50 20,0" style="fill:rgb(0,255,0);stroke:rgb(0,255,0);stroke-width:1;" /></a>
                                         {% endif %}
                                         {% if day.agenda.length > 3 %}
-                                            <a href="{% url 'checklists:inbox' %}"><polygon points="30,0 30,50 35,40 40,50 40,0" style="fill:rgb(255,255,0);stroke:rgb(255,255,0);stroke-width:1;" /><a>
+                                            <a href="{% url 'maintenance:inbox' %}"><polygon points="30,0 30,50 35,40 40,50 40,0" style="fill:rgb(255,255,0);stroke:rgb(255,255,0);stroke-width:1;" /><a>
                                         {% endif %}
                                         
                                     </svg>
