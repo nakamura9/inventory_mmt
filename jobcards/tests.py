@@ -24,7 +24,6 @@ class ViewTests(TestCase, TestDataMixin):
     def setUp(self):
         self.common_data = {"description": "Test Description",
                     "creation_epoch": datetime.date.today(),
-                    "number":"1",
                     "resolver": Account.objects.first(),
                     "estimated_time": "0030",
                     "completed": False,
@@ -32,7 +31,6 @@ class ViewTests(TestCase, TestDataMixin):
                     "subunit": SubUnit.objects.first()
                     }
         planned_data = self.common_data
-        #planned_data["scheduled_for"] = datetime.datetime.now()
     
         p = PlannedJob(**planned_data)
         p.scheduled_for = timezone.now()
@@ -40,7 +38,7 @@ class ViewTests(TestCase, TestDataMixin):
 
         breakdown_data = self.common_data
         breakdown_data["requested_by"] = Account.objects.first()
-        Breakdown(**breakdown_data).save()        
+        Breakdown(**breakdown_data).save()     
     
     
     def test_get_new_planned_job_view(self):
@@ -48,18 +46,21 @@ class ViewTests(TestCase, TestDataMixin):
 
         self.assertEqual(response.status_code, 200)
 
-    """def test_post_new_planned_job_view(self):
+
+    def test_post_new_planned_job_view(self):
         data = self.common_data
-        data["number"] = "2"
+        data["description"] = "2"
         data["resolver"] = Account.objects.first().pk
         data["machine"] = Machine.objects.first().pk
-        data["requested_by"] = Account.objects.first().pk
+        data["subunit"] = SubUnit.objects.first().pk
+        data["scheduled_for"] = datetime.date.today()
 
         response = self.client.post(reverse("jobcards:new_planned_job"),
                                     data = data)
 
-        self.assertIsInstance(PlannedJob.objects.get(pk="2"), PlannedJob)
-    """
+
+        self.assertIsInstance(PlannedJob.objects.get(description="2"), PlannedJob)
+
 
     def test_get_edit_planned_job_view(self):
         response = self.client.get(reverse("jobcards:edit_planned_job",
@@ -72,12 +73,14 @@ class ViewTests(TestCase, TestDataMixin):
         data = self.common_data
         data["resolver"] = Account.objects.first().pk
         data["machine"] = Machine.objects.first().pk
-        data["requested_by"] = Account.objects.first().pk
+        data["subunit"] = SubUnit.objects.first().pk
         data["description"] = "Test Edited Description"
+        data["scheduled_for"] = datetime.date.today()
 
         response = self.client.post(reverse("jobcards:edit_planned_job",
-                                    kwargs={"pk":"1"}), data = data)
-
+                                    kwargs={"pk":PlannedJob.objects.first().pk}), 
+                                    data = data)
+        
         self.assertEqual(response.status_code, 302)#redirects
 
 
@@ -87,14 +90,15 @@ class ViewTests(TestCase, TestDataMixin):
 
         self.assertEqual(response.status_code, 302)
 
+
     def test_get_new_unplanned_job_view(self):
         response = self.client.get(reverse("jobcards:new_unplanned_job"))
 
         self.assertEqual(response.status_code, 200)
 
+
     def test_post_new_unplanned_job_view(self):
         data = self.common_data
-        data["number"] = "2"
         data["resolver"] = "Test User"
         data["machine"] = Machine.objects.first().pk
         data["scheduled_for"] = datetime.date.today()
@@ -102,31 +106,35 @@ class ViewTests(TestCase, TestDataMixin):
         response = self.client.post(reverse("jobcards:new_unplanned_job"),
                                     data = data)
 
-        print response.content
         self.assertEqual(response.status_code, 200)
+
 
     def test_get_edit_unplanned_job_view(self):
         response = self.client.get(reverse("jobcards:edit_unplanned_job",
-                                            kwargs={"pk":"1"}))
+                                            kwargs={"pk": Breakdown.objects.first().pk}))
 
         self.assertEqual(response.status_code, 200)
+
 
     def test_post_edit_unplanned_job_view(self):
         data = self.common_data
         data["resolver"] = Account.objects.first().pk
+        data["requested_by"] = Account.objects.first().pk
         data["machine"] = Machine.objects.first().pk
+        data["subunit"] = SubUnit.objects.first().pk
         data["scheduled_for"] = datetime.date.today() + datetime.timedelta(days=3)
         data["description"] = "Test Edited Description"
 
         response = self.client.post(reverse("jobcards:edit_unplanned_job",
-                                    kwargs={"pk":"1"}), data = data)
+                                    kwargs={"pk":Breakdown.objects.first().pk}), 
+                                    data = data)
 
-        self.assertEqual(response.status_code, 200)
+        print response.content
+        self.assertEqual(response.status_code, 302)
 
     def test_delete_unplanned_job_view(self):
         response = self.client.get(reverse("jobcards:delete_unplanned_job",
-                                            kwargs={"pk":"1"}))
-
+                                            kwargs={"pk":Breakdown.objects.first().pk}))
         self.assertEqual(response.status_code, 302)
 
     def test_get_job_list_view(self):

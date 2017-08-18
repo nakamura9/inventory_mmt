@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'common_base',
     'ajax',
     'maintenance',
+    'planning',
 ]
 
 MIDDLEWARE = [

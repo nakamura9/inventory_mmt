@@ -11,7 +11,6 @@ class ModelTests(TestCase, TestDataMixin):
     @classmethod
     def setUpTestData(cls):
         super(ModelTests, cls).setUpTestData()
-        cls.create_test_inventory_models()
         cls.create_dummy_accounts()
         cls.create_test_checklist()
       
@@ -47,7 +46,7 @@ class ModelTests(TestCase, TestDataMixin):
 
     def test_checklist_properties(self):
         check = models.Checklist.objects.get(title="Test Checklist")
-        
+        print check
         self.assertTrue(check.is_open)
         check.last_completed_date = datetime.date.today()
         #check if the checklist remains open
@@ -134,7 +133,6 @@ class TestViews(TestCase, TestDataMixin):
         response = self.client.get(reverse("checklists:delete_checklist",
                                             kwargs={"pk": "Test Checklist"}))
         self.assertEqual(response.status_code, 302)#because the page redirects
-        self.create_test_checklist()
 
 
 class AjaxRequestsTests(TestCase, TestDataMixin):

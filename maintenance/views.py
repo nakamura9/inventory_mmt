@@ -19,7 +19,7 @@ class PlantOverView(ListView):
 
 
 class PlannedMaintenanceView(TemplateView):
-    template_name = os.path.join("inv", "planned_maintenance_view.html")
+    template_name = os.path.join("maintenance", "planned_maintenance_view.html")
 
     def get_context_data(self, *args, **kwargs):
         context = super(PlannedMaintenanceView, self).get_context_data(*args, **kwargs)
@@ -37,7 +37,7 @@ class MaintenanceInbox(ListView):
     """
 
     model = Checklist
-    template_name = os.path.join("checklists","checklist_listview.html")
+    template_name = os.path.join("maintenance","inbox.html")
 
     def get_context_data(self, *args, **kwargs):
         context = super(MaintenanceInbox, self).get_context_data(*args, **kwargs)

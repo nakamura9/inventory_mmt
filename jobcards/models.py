@@ -14,7 +14,7 @@ import datetime
 class AbstractJob(models.Model):
     description = models.TextField()
     creation_epoch = models.DateTimeField(default = timezone.now)
-    number = models.CharField(max_length = 32, unique=True, primary_key=True )
+    number = models.AutoField(primary_key=True)
     resolver = models.ForeignKey("common_base.Account")
     estimated_time = models.CharField(max_length=4)
     completed = models.BooleanField(default = False)
@@ -42,7 +42,7 @@ class Breakdown(AbstractJob):
         return ret_value
 
 class PlannedJob(AbstractJob):
-    scheduled_for = models.DateTimeField()
+    scheduled_for = models.DateField()
 
 
 
@@ -53,7 +53,7 @@ class JobCard(models.Model):
     # create response time fields
     breakdown = models.OneToOneField("Breakdown", null=True)
     planned_job = models.OneToOneField("PlannedJob", null=True)
-    number = models.CharField(max_length = 12, primary_key=True)
+    number = models.AutoField(primary_key=True)
     components_requested = models.CharField(max_length = 128)
     resolver_action = models.TextField()
     root_cause = models.TextField()

@@ -19,6 +19,9 @@
 </div>
 {% endblock %}
 {% block body_script %}
+    
+    $("#id_scheduled_for").datepicker();
+
     function prepSubUnitUpdate(){
         var url = "{% url 'ajax:update_subunit' %}";
         var machine = $('#id_machine').val();

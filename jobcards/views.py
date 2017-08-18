@@ -3,7 +3,6 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from .models import Breakdown, JobCard, PlannedJob
 from django.views import View
-from django.views.generic.edit import FormView
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
 from django.views.decorators.csrf import csrf_exempt
@@ -20,12 +19,12 @@ from django.utils import timezone
 import pytz
 from django.views.generic.edit import UpdateView
 
-class NewUnplannedJobView(FormView): 
+class NewUnplannedJobView(CreateView): 
     form_class = UnplannedJobForm
     template_name = os.path.join("jobcards", "breakdown.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
-    fields = ["requested_by", "resolver", "machine", "description", "estimated_time"]
+    
 
     def form_valid(self, form, *args, **kwargs):
         obj = form.save(commit = False)
@@ -98,7 +97,7 @@ def delete_planned_job(request, pk=None):
 
 class EditPlannedJob(UpdateView):
     template_name = os.path.join("jobcards", "planned_job.html")
-    form_class = UnplannedJobForm
+    form_class = PlannedJobForm
     model = PlannedJob
     
     success_url = reverse_lazy("maintenance:planned-maintenance")
@@ -137,8 +136,8 @@ class PlannedJobActionView(DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super(PlannedJobActionView, self).get_context_data(*args, **kwargs)
        
-        delta = self.get_object().scheduled_for - timezone.now()
-        context["interval"] = "%d day(s), %d hour(s)" % (delta.days, delta.seconds/3600)
+        delta = self.get_object().scheduled_for - datetime.date.today()
+        context["interval"] = "%d day(s)" % (delta.days)
 
         return context
 

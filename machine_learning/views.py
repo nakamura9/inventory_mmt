@@ -19,6 +19,3 @@ class ClassificationView(TemplateView):
 class ClusterView(TemplateView):
     template_name = os.path.join("machine_learning", "cluster.html")
 
-
-class GraphView(TemplateView):
-    pass

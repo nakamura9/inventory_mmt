@@ -44,7 +44,7 @@ class selectAjaxCalls(TestCase, TestDataMixin):
 
 
     def test_update_components(self):
-        response = self.client.post(reverse("ajax:update_components"),
+        response = self.client.post(reverse("ajax:update_component"),
                          {"subassy": "T_SA"}, 
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         

@@ -42,8 +42,8 @@
                     <td>{{job.description | truncatechars:40}}</td>
                     <td>
                         <a href="#">Details</a> |
-                        <a href="{% url 'jobcards:delete_planned_job' pk=job.pk %}">Delete</a> |
-                        <a href="{% url 'jobcards:edit_planned_job' pk=job.pk %}">Edit</a>
+                        <a href="{% url 'jobcards:delete_planned_job' pk=job.number %}">Delete</a> |
+                        <a href="{% url 'jobcards:edit_planned_job' pk=job.number %}">Edit</a>
                     </td>
                 </tr>
             {% endfor %}

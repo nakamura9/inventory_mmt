@@ -8,20 +8,7 @@
             <form class="form form-group" method="POST" action="{% url 'jobcards:new_unplanned_job' %}" >
                 {% csrf_token %}
                 <table class="table">
-                {% for field in form %}
-                {% if forloop.counter == 4 %}
-                    <tr><td><label>Sub-Unit</label></td><td><div id="subunits"><select class="form-control" name="units"><option value="None">---------</option></select></div></td></tr>
-                    <tr><td><label>Sub-Assembly</label></td><td><div id="subassembly"><select class="form-control" name="subassembly"><option value="None">---------</option></select></div></td></tr>
-                    <tr><td><label>Component</label></td><td><div id="component"><select class="form-control" name="component"><option value="None">---------</option></select></div></td></tr>
-                {% endif %}
-                    <div class="fieldWrapper">
-        {{ field.errors }}
-        <tr>
-        <td>{{ field.label_tag }}</td> <td>{{ field }}</td></tr>
-        {% if field.help_text %}
-        <p class="help">{{ field.help_text|safe }}</p>
-        {% endif %}
-                {% endfor %}
+                {{form.as_table}}
                 </table>
             <button type="submit" class="btn btn-primary">Create JobCard</button>
             </form>
@@ -38,21 +25,5 @@
         var subunit = $('#id_subunit');
         updateSubUnits(url, machine, subunit);
     }
-
-    unction prepSubAssemblyUpdate(){
-        var url = "{% url 'ajax:update_subassembly' %}";
-        var subunit = $('#id_subunit').val();
-        var subassembly = $('#id_subassembly');
-        updateSubAssemblies(url, subunit, subassembly);
-    }
-
-
-    unction prepComponentUpdate(){
-        var url = "{% url 'ajax:update_component' %}";
-        var subassembly = $('#id_subassembly').val();
-        var component = $('#id_component');
-        updateSubAssemblies(url, subassembly, component);
-    }
-
     
 {% endblock %}
