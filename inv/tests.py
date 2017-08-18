@@ -189,7 +189,15 @@ class ViewTests(TestCase, TestDataMixin):
         
         self.assertIsInstance(Order.objects.get(pk="101"), Order)
 
+        response = self.client.get(reverse("inventory:order-delete", 
+                                            kwargs={"pk":"101"}))
+                                            
+        self.assertEqual(response.status_code, 302)#redirects
+
+
     def test_post_check_and_delete_inventory_form(self):
+        #delete view for inventory not yet implemented
+        #  
         response = self.client.post(reverse("inventory:new-inventory-item"),
                                     data={"serial_number":"101",
                                         "name":"Test Inventory Item",
@@ -208,6 +216,7 @@ class ViewTests(TestCase, TestDataMixin):
 
 
     def test_post_check_and_delete_category(self):
+        #delete view for category not yet implemented
         response = self.client.post(reverse("inventory:new-category"),
                                     data={"name":"Posted Test Category",
                                         "description": "Posted Test Description"

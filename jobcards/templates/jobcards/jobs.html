@@ -72,12 +72,12 @@
                         <tr>
                             <td>{{job.date}}</td>
                             <td>{{job.time}}</td>
-                            <td>{{job.id}}</td>
+                            <td>{{job.pk}}</td>
                             <td>{{job.resolver}}</td>
                             <td>{{job.requested_by}}</td>
                             <td>{{job.machine}}</td>
                             <td>{{job.description |truncatechars:40}}</td>
-                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:job_detail' pk=job.id %}">View</a></td>
+                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:job_detail' pk=job.pk %}">View</a></td>
                         </tr>
                     {% endfor %}        
                 </tbody>

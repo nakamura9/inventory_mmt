@@ -6,14 +6,14 @@
             <div class="col-sm-8 well">
                 <p></p>
                 <h4>Job Card</h4>
-                <form method="POST" action="{% url 'jobcards:complete_job' object.id %}">
+                <form method="POST" action="{% url 'jobcards:complete_job' object.pk %}">
                     {% csrf_token %}
                 <table class="table">
                     <thead></thead>
                     <tbody>
                         <tr>
                             <td><label>Jobcard ID:</label></td>
-                            <td>{{object.id}}</td>
+                            <td>{{object.pk}}</td>
                             <td><label>Date created:</label></td>
                             <td>{{object.date}}</td>
                         </tr>

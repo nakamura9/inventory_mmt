@@ -5,6 +5,10 @@ from django.shortcuts import render
 from django.views.generic import ListView, TemplateView
 from inv.models import Machine
 from checklists.models import Checklist
+from django.forms import widgets
+from common_base.models import Account
+from django.contrib.auth import authenticate
+from jobcards.models import Breakdown, PlannedJob
 
 
 import os
@@ -18,10 +22,10 @@ class PlannedMaintenanceView(TemplateView):
     template_name = os.path.join("inv", "planned_maintenance_view.html")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(MaintenanceView, self).get_context_data(*args, **kwargs)
+        context = super(PlannedMaintenanceView, self).get_context_data(*args, **kwargs)
         
-        context["checklists"] = checklists.models.Checklist.objects.all()
-        context["planned_jobs"] = jobcards.models.PlannedJob.objects.all()
+        context["checklists"] = Checklist.objects.all()
+        context["planned_jobs"] = PlannedJob.objects.all()
         return context
 
 
@@ -36,7 +40,7 @@ class MaintenanceInbox(ListView):
     template_name = os.path.join("checklists","checklist_listview.html")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(ChecklistListView, self).get_context_data(*args, **kwargs)
+        context = super(MaintenanceInbox, self).get_context_data(*args, **kwargs)
         context["message"] = ""
         context["users"] =widgets.Select(attrs= {"class": "form-control"},
                                     choices= ((u.username, u.username) \

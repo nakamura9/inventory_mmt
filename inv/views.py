@@ -29,7 +29,7 @@ class EngineeringInventoryView(TemplateView):
     template_name = os.path.join("inv", "browse.html")
     
     def get_context_data(self, *args, **kwargs):
-        context = super(browseView, self).get_context_data(*args, **kwargs)
+        context = super(EngineeringInventoryView, self).get_context_data(*args, **kwargs)
         context["machines"] = Machine.objects.all()
         return context
 

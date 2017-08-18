@@ -38,6 +38,7 @@ class NewUnplannedJobView(FormView):
 def delete_unplanned_job(request, pk=None):
     job = get_object_or_404(Breakdown, pk=pk)
     job.delete()
+    return HttpResponseRedirect(reverse("jobcards:jobs"))
 
 class EditUnPlannedJob(UpdateView):
     template_name = os.path.join("jobcards", "breakdown.html")
@@ -122,7 +123,7 @@ def complete_job(request, breakdown):
     form_data.pop("csrfmiddlewaretoken")
     obj = JobCard(**form_data)
     obj.breakdown = Breakdown.objects.get(pk=breakdown)
-    obj.number = obj.breakdown.id
+    obj.number = obj.breakdown.pk
     obj.breakdown.completed = True
     obj.completion_epoch = timezone.now()
     obj.save()
@@ -147,7 +148,7 @@ def complete_job(request, planned):
     form_data.pop("csrfmiddlewaretoken")
     obj = JobCard(**form_data)
     obj.planned_job = PlannedJob.objects.get(pk=planned)
-    obj.number = obj.planned_job.id
+    obj.number = obj.planned_job.pk
     obj.planned_job.completed = True
     obj.completion_epoch = timezone.now()
     obj.save()
