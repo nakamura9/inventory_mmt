@@ -1,0 +1,102 @@
+{% extends 'window.html' %}
+{% block content %}
+<style>
+    .heading {
+        margin:5px;
+        padding: 5px;
+        min-width: 150px;
+        min-height: 50px;
+    }
+    .week {
+        min-height: 75px;
+        min-width: 75px;
+        background-color: grey;
+        color: white;
+        text-align: center;
+        border-bottom: 10px solid white;
+    }
+
+    .week > a{
+        color: white;
+    }
+</style>
+
+            <div class="btn-toolbar" role="toolbar">
+                
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-sm-3 well">
+            <h2>Month View:</h2>
+            <hr />
+            <h3>Select view.</h3>
+            <hr />
+            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:month' year=month.year month=month.month %}" >Month</a>
+            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:week' year=month.year month=month.month week=1 %}">Week</a>
+            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:day' year=month.year month=month.month day=1 %}">Day</a>
+            <h4>Select Date.</h4>
+            <hr />
+            <select class="form-control"  id="month_select">
+                {% for i in "xxxxxxxxxxxx" %}
+                <option value="{{forloop.counter}}">{{forloop.counter}}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" onclick="selectMonth()">Select Month</button>
+        </div>
+        <div class="col-sm-9">
+            <table>
+                <tr>
+                    <td></td>
+                    <td class="bg-primary heading">Monday</td>
+                    <td class="bg-primary heading">Tuesday</td>
+                    <td class="bg-primary heading">Wednesday</td>
+                    <td class="bg-primary heading">Thursday</td>
+                    <td class="bg-primary heading">Friday</td>
+                    <td class="bg-primary heading">Saturday</td>
+                    <td class="bg-primary heading">Sunday</td>
+                </tr>
+                <tr>
+                    {% for week in month.month_matrix %}
+                        <tr>
+                            <td class="week"><a href="{% url 'maintenance-calendar:week' year=month.year month=month.month week=forloop.counter %}"><h4>Week {{forloop.counter}}<h4></a></td>
+                            {% for day in week %}
+                                <td>
+                                    <svg width="150" height="75">
+                                        
+                                        
+                                        <rect width="150" height="75" style="fill:rgb(0,126,255);fill-opacity:0.7;stroke-width:3;stroke:rgb(255,255,255);" />
+                                        {% if day.day == "..." %}
+                                            <text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text>
+                                        {% else %}
+                                            <a href="{% url 'maintenance-calendar:day'  year=month.year month=month.month day=day.date.day %}"><text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text></a>
+                                        {% endif %}
+                                        {% if day.agenda.length > 1 %}
+                                            <a href="{% url 'maintenance:planned-maintenance' %}"><polygon points="10,0 10,50 15,40 20,50 20,0" style="fill:rgb(0,255,0);stroke:rgb(0,255,0);stroke-width:1;" /></a>
+                                        {% endif %}
+                                        {% if day.agenda.length > 3 %}
+                                            <a href="{% url 'maintenance:inbox' %}"><polygon points="30,0 30,50 35,40 40,50 40,0" style="fill:rgb(255,255,0);stroke:rgb(255,255,0);stroke-width:1;" /><a>
+                                        {% endif %}
+                                        
+                                    </svg>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block body_script %}
+    $("#month_select").datepicker();
+
+    function selectMonth(){
+        var data_list = $("#month_select").val().split("/");
+        console.log(data_list);
+        var arg_string = "year=" + data_list[2] + " month=" + data_list[0];
+        window.location = "maintenance-calendar/month/" + data_list[2] + "/" +data_list[0]
+       
+    }
+{% endblock %}

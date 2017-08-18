@@ -1,0 +1,62 @@
+{% extends 'window.html' %}
+{% block content %}
+<style>
+    .time {
+        background-color: #337ab7;; 
+        color:white; 
+        padding:5px; 
+        margin:2px;
+        min-width: 100px;
+        min-height: 20px;
+        text-align: center;
+        border-bottom: 1px solid white;
+    }
+
+    .task {
+        border: 1px solid blue;
+        min-width: 400px;
+        text-align: center;
+    }
+</style>
+    <div class="row">
+        <div class="col-sm-3 well">
+            <h2>Day View:</h2><hr />
+            <h4>Select view</h4>
+            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:month' year=day.date.year month=day.date.month %}" >Month</a>
+            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:week' year=day.date.year month=day.date.month week=1 %}">Week</a>
+            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-primary">
+                <div class="panel-heading ">
+                    <h3>{{day.weekday.1}}, {{day.date}}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if day.agenda.length == 0 %}
+                        <p>There are no tasks scheduled for this day</p>
+                    {% else %}
+                        
+                            <table>
+                                <col width="50">
+                                <col width="300">
+                                <thead>
+                                    <tr>
+                                        <th class="time">Item #</th>
+                                        <th class="time">Resolver/Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for task in day.agenda %}
+                                    <tr>
+                                        <td class="time">{{forloop.counter}}</td>
+                                        <td class="task">{{task|truncatechars:60}}.</td>        
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
