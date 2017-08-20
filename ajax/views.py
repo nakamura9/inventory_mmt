@@ -9,14 +9,29 @@ import json
 from django.contrib.auth import authenticate
 
 @csrf_exempt
-def update_subunit(request):
+def update_section(request):
     if not request.is_ajax() and \
         request.POST.get("machine", None) == None:
         return Http404()
     
     machine =inv_models.Machine.objects.get(pk= \
                         request.POST["machine"])
-    units = [[unit[0],unit[1]] for unit in machine.subunit_set.values_list()]
+    sections = [[section[0], section[1]] for section in machine.section_set.values_list()]
+    return HttpResponse(json.dumps(
+            {"sections": sections}),
+                content_type="application/json")
+
+
+@csrf_exempt
+def update_subunit(request):
+    print request.POST
+    if not request.is_ajax() and \
+        request.POST.get("section", None) == None:
+        return Http404()
+    
+    section =inv_models.Section.objects.get(pk= \
+                        request.POST["section"])
+    units = [[unit[0],unit[1]] for unit in section.subunit_set.values_list()]
     return HttpResponse(json.dumps(
             {"units": units}),
                 content_type="application/json")

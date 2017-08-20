@@ -18,7 +18,7 @@ class MonthView(TemplateView):
         month = calendar_objects.Month(int(self.args[0]), 
                             int(self.args[1]), calendar_objects.ProductionDay)
         month.get_month_agenda()
-        context["month"] = month.month_matrix
+        context["month"] = month.month_agenda
         return context
 
 

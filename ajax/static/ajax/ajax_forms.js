@@ -1,10 +1,33 @@
-function updateSubUnits(django_url, machine, subunit){
+function updateSections(django_url, machine, section){
+    $.ajax({
+        method: "POST",
+        url: django_url,
+        section: section, //custom variable
+        data: {
+            "machine": machine,
+        },
+        success: function(result){
+            var sections =  "<option value='None'>-Select Section-</option> ";
+
+    for(i in result.sections){
+        units += "<option value='*'>".replace('*', result.sections[i][0]) + result.sections[i][1] + "</option>";
+        
+    }
+
+    this.section.html(units); // custom variable 
+        }
+    });
+
+}
+
+
+function updateSubUnits(django_url, section, subunit){
         $.ajax({
             method: "POST",
             url: django_url,
-            subunit: subunit, //custom variable
+            subunit:subunit, //custom variable
             data: {
-                "machine": machine,
+                "section": section,
             },
             success: function(result){
                 var units =  "<option value='None'>-Select SubUnit-</option> ";

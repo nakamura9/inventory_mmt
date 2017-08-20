@@ -10,8 +10,8 @@ class Day(object):
         """Day object that stores a reference of its date as week as 
         other features"""
         day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        assert(isinstance(date, datetime.date))
         
+        assert(isinstance(date, datetime.date))
         self.date = date
         self.weekday = (date.weekday(), day_names[date.weekday()])
         self.agenda = []
@@ -38,33 +38,40 @@ class ProductionDay(Day):
     def get_agenda(self):
         """Production days look out for manufacture days and 
         delivery dates"""
-        self.agenda = ["%s: %s" %(order.order_number, order.description) \
+        self.agenda = [order \
                      for order in Order.objects.filter(manufacture_date = self.date)]
         
         for order in Order.objects.filter(delivery_date = self.date):
-            self.agenda.append("%s: %s" %(order.order_number, order.description))
+            self.agenda.append(order)
 
 
 class MaintenanceDay(Day):
     def get_agenda(self):
         """Maintenance days look out for planned jobs and checklists"""
 
-        self.agenda = ["%s: %s" %(job.resolver, job.description) \
-                        for job in PlannedJob.objects.filter(scheduled_for = self.date)]
+        self.agenda = [job for job in \
+                        PlannedJob.objects.filter(scheduled_for = self.date)]
+
         for check in Checklist.objects.all():
             if check.is_open:
                 if check.frequency == "daily" and not self.is_weekend:
-                    self.agenda.append("%s: %s" %(check.resolver, check.title))
+                    self.agenda.append(check)
                 
                 if check.frequency != "daily" and check.creation_date.weekday() == \
                     self.weekday[0]:
-                    self.agenda.append("%s: %s" %(check.resolver, check.title))
+                    self.agenda.append(check)
                     
 
 class Week(object):
+    """
+    A generic week class that takes a year month and week of the ni\\month 
+    and returns a 7 day week starting from moday. It is generic in the sense
+    that it can handle production or maintenance weeks by specifying the type
+    of day the object deals with
+    """
     def __init__(self, year, month, week, day):
         self.days = []
-        self.Day = day
+        self.day_type = day
         self.week_agenda = []
         self.year = year
         self.month = month
@@ -87,16 +94,22 @@ class Week(object):
         if self.days == []:
             self.get_week_days()
         for day in self.days:
-            _day =self.Day(day)
+            _day =self.day_type(day)
             _day.get_agenda()
             self.week_agenda.append(_day)        
         
 
 class Month(object):
+    """
+    A generic month class that takes a year and month 
+    and returns a month agenda as a 2 dimensional matrix of individual days. 
+    It is generic in the sense that it can handle production or maintenance 
+    months by specifying the type of day the object deals with
+    """
     def __init__(self, year, month, day):
         self.days = None
-        self.Day = day
-        self.month_matrix = []
+        self.day_type = day
+        self.month_agenda = []
         self.year = year
         self.month = month
 
@@ -112,8 +125,8 @@ class Month(object):
 
         
         for row in self.days:
-            self.month_matrix.append([])
+            self.month_agenda.append([])
             for col in row:
-                day = self.Day(col)
+                day = self.day_type(col)
                 day.get_agenda()
-                self.month_matrix[-1].append(day)
+                self.month_agenda[-1].append(day)

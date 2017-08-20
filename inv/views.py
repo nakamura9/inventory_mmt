@@ -53,6 +53,35 @@ class subunitView(CreateView):
     
     success_url = reverse_lazy("inventory:inventory-home")
 
+
+class sectionView(CreateView):
+    template_name = os.path.join("inv", "add_inventory_item.html")
+    model = Section
+    form_class = SectionForm
+    
+    success_url = reverse_lazy("inventory:inventory-home")
+
+    def get_context_data(self):
+        context = super(sectionView, self).get_context_data()
+        context["title"] = "Section"
+        return context
+
+
+class sectionUpdateView(UpdateView):
+    template_name = os.path.join("inv", "add_inventory_item.html")
+    model = Section
+    form_class = SectionForm
+    
+    success_url = reverse_lazy("inventory:inventory-home")
+
+    def get_context_data(self):
+        context = super(sectionUpdateView, self).get_context_data()
+        context["title"] = "Section"
+        return context
+
+
+        
+
 class subassyView(CreateView):
     template_name = os.path.join("inv", "addsubassy.html")
     model = SubAssembly
@@ -174,6 +203,38 @@ class SubUnitView(DetailView):
         return context
 
 
+class sectionDetailView(DetailView):
+    model = Section
+    template_name = os.path.join("inv", "section_details.html")
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(sectionDetailView, self).get_context_data(*args, **kwargs)
+        Planned = namedtuple("Planned", "date resolver est_time type")
+        planned_for_machine =PlannedJob.objects.filter(section=self.object, 
+                                                    completed=False)
+        context["planned_jobs"] = [Planned(job.creation_epoch, job.resolver,
+                                        job.estimated_time, "Planned Job") \
+                                        for job in planned_for_machine]
+
+        checklist_on_machine = Checklist.objects.filter(section = self.object)
+        
+        for check in checklist_on_machine:
+            if check.is_open:
+                context["planned_jobs"].append(Planned(check.creation_date, 
+                                                        check.resolver, 
+                                                        check.estimated_time,
+                                                        "Checklist"))
+
+        UnPlanned = namedtuple("UnPlanned", "date resolver description status")
+
+        unplanned_job_on_machine = Breakdown.objects.filter(section = self.object)
+                
+        context["unplanned_jobs"] = [UnPlanned(b.creation_epoch, b.resolver, b.description, b.completed) \
+                                    for b in unplanned_job_on_machine]
+
+        return context
+
+
 class ComponentView(DetailView):
     """
     Provides data concerning components
@@ -272,6 +333,9 @@ def delete_subassembly(request, pk):
     SubAssembly.objects.get(pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
+def delete_section(request, pk):    
+    Section.objects.get(pk=pk).delete()
+    return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
 def delete_subunit(request, pk):    
     SubUnit.objects.get(pk=pk).delete()

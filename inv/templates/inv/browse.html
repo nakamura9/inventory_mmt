@@ -32,11 +32,14 @@
 
                     </style>
                 <center>
-                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_plant' %}">Add Plant</a>
-                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_machine' %}">Add Machine</a>
-                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_subunit' %}">Add SubUnit</a>
-                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_subassembly' %}">Add Sub Assembly</a>
-                    <a class="btn btn-primary roomy" href="{% url 'inventory:add_component' %}">Add Component</a>
+                    <div class="btn-group">
+                            <a class="btn btn-primary roomy" href="{% url 'inventory:add_plant' %}">Add Plant</a>
+                            <a class="btn btn-primary roomy" href="{% url 'inventory:add_machine' %}">Add Machine</a>
+                            <a class="btn btn-primary roomy" href="{% url 'inventory:add_section' %}">Add Section</a>
+                            <a class="btn btn-primary roomy" href="{% url 'inventory:add_subunit' %}">Add SubUnit</a>
+                            <a class="btn btn-primary roomy" href="{% url 'inventory:add_subassembly' %}">Add Sub Assembly</a>
+                            <a class="btn btn-primary roomy" href="{% url 'inventory:add_component' %}">Add Component</a>
+                    </div>
                 </center>
                 
                 <hr />
@@ -52,47 +55,62 @@
                             </span>
                         </div>
                     <ul id="{{machine.unique_id|slugify}}" style="display: none;" >
-                        {% for unit in machine.subunit_set.all %}
-                            <li><div class = "_item" onclick = "reveal('#{{unit.unique_id|slugify}}')">
-                                    {{unit.unit_name}}  
-                                    <span style="float: right;">
-                                        <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a> |
-                                        <a href="{% url 'inventory:edit_subunit' pk=unit.unique_id %}">Edit</a> |
-                                        <a href="{% url 'inventory:delete_subunit' unit.unique_id %}">Delete</a>
+                            {% for section in machine.section_set.all %}
+                            <li>
+                                <div class="_item" onclick="reveal('#{{section.unique_id|slugify}}')">
+                                    {{section}}
+                                    <span style="float:right;">
+                                            <a href="{% url 'inventory:section_details' section.pk %}">Details</a> |
+                                            <a href="{% url 'inventory:edit_section' pk=section.pk %}" >Edit</a> | 
+                                            <a href="{% url 'inventory:delete_section' section.pk %}">Delete</a>
                                     </span>
                                 </div>
-                                <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
-                                    {% for sub in unit.subassembly_set.all %}
-                                        <li><div class="_item" onclick = "reveal('#{{sub.unique_id|slugify}}')">
-                                                {{sub.unit_name}} 
+                                <ul id="{{section.unique_id|slugify}}" style="display:none;">
+                                        {% for unit in section.subunit_set.all %}
+                                        <li><div class = "_item" onclick = "reveal('#{{unit.unique_id|slugify}}')">
+                                                {{unit.unit_name}}  
                                                 <span style="float: right;">
-                                                    <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a> |
-                                                    <a href="{% url 'inventory:edit_subassembly' pk=sub.unique_id %}">Edit</a> |
-                                                    <a href="{% url 'inventory:delete_subassembly' sub.unique_id %}">Delete</a>
+                                                    <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a> |
+                                                    <a href="{% url 'inventory:edit_subunit' pk=unit.unique_id %}">Edit</a> |
+                                                    <a href="{% url 'inventory:delete_subunit' unit.unique_id %}">Delete</a>
                                                 </span>
                                             </div>
-                                            
-                                            <ul id="{{sub.unique_id|slugify}}" style="display:none;">
-                                            {% for component in sub.component_set.all %}
-                                                <li><div class="_item">
-                                                        {{component.component_name}} 
-                                                        <span style="float: right;">
-                                                            <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a> |
-                                                            <a href="{% url 'inventory:edit_component' pk=component.unique_id %}">Edit</a> |
-                                                            <a href="{% url 'inventory:delete_component' component.unique_id %}">Delete</a>
-                                                        </span>
+                                            <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
+                                                {% for sub in unit.subassembly_set.all %}
+                                                    <li><div class="_item" onclick = "reveal('#{{sub.unique_id|slugify}}')">
+                                                            {{sub.unit_name}} 
+                                                            <span style="float: right;">
+                                                                <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a> |
+                                                                <a href="{% url 'inventory:edit_subassembly' pk=sub.unique_id %}">Edit</a> |
+                                                                <a href="{% url 'inventory:delete_subassembly' sub.unique_id %}">Delete</a>
+                                                            </span>
                                                         </div>
-                                                </li>
-                                            {% endfor %}
+                                                        
+                                                        <ul id="{{sub.unique_id|slugify}}" style="display:none;">
+                                                        {% for component in sub.component_set.all %}
+                                                            <li><div class="_item">
+                                                                    {{component.component_name}} 
+                                                                    <span style="float: right;">
+                                                                        <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a> |
+                                                                        <a href="{% url 'inventory:edit_component' pk=component.unique_id %}">Edit</a> |
+                                                                        <a href="{% url 'inventory:delete_component' component.unique_id %}">Delete</a>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        {% endfor %}
+                                                        </ul>
+                                                    </li>
+                                                {% endfor%}    
                                             </ul>
                                         </li>
-                                    {% endfor%}    
+                                    {% endfor %}
                                 </ul>
                             </li>
                         {% endfor %}
+                        
                     </ul>
-        </li>
-    {% endfor %}
+                    </li>
+                {% endfor %}
 </ul>
 </div>
 <div class="col-sm-3"></div>

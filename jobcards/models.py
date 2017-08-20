@@ -19,6 +19,7 @@ class AbstractJob(models.Model):
     estimated_time = models.CharField(max_length=4)
     completed = models.BooleanField(default = False)
     machine = models.ForeignKey("inv.Machine", null=True)
+    section = models.ForeignKey("inv.Section", null=True)
     subunit = models.ForeignKey("inv.SubUnit", null=True)
     subassembly = models.ForeignKey("inv.SubAssembly", null=True)
     component = models.ForeignKey("inv.Component", null=True)

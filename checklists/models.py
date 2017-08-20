@@ -30,9 +30,16 @@ class Checklist(models.Model):
                             unique=True, primary_key=True)
     creation_date = models.DateField()
     last_completed_date = models.DateField(blank = True, null=True)
-    estimated_time= models.CharField(max_length=4, choices = [("00%d" % i, "00%d" % i)for i in range(10, 60, 5)] + [("0%d00" % i, "0%d00" % i) for i in range(1, 8)], default = now)
-    start_time = models.CharField(max_length = 5, choices = [("0%d00" % i, "%d:00" % i) for i in range(6, 9)] + [("%d00" % i, "%d:00" % i) for i in range(10, 17)] )
+    estimated_time= models.CharField(max_length=4, choices = [
+                ("00%d" % i, "00%d" % i)for i in range(10, 60, 5)] \
+                + [("0%d00" % i, "0%d00" % i) for i in range(1, 8)], 
+                default = now)
+    start_time = models.CharField(max_length = 5, choices = [
+                ("0%d00" % i, "%d:00" % i) for i in range(6, 9)] \
+                 + [("%d00" % i, "%d:00" % i) for i in range(10, 17)] )
     machine = models.ForeignKey("inv.Machine")
+    section = models.ForeignKey("inv.Section", 
+                null=True, on_delete=models.SET_NULL)
     subunit = models.ForeignKey("inv.SubUnit", 
                 null=True, on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("inv.SubAssembly", 

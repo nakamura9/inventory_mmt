@@ -4,7 +4,7 @@ from django.shortcuts import reverse
 from .models import PlannedJob, Breakdown, JobCard
 import datetime
 from common_base.models import Account
-from inv.models import Machine, SubUnit, SubAssembly, Component
+from inv.models import Machine, Section, SubUnit, SubAssembly, Component
 from django.utils import timezone
 
 
@@ -28,6 +28,7 @@ class ViewTests(TestCase, TestDataMixin):
                     "estimated_time": "0030",
                     "completed": False,
                     "machine": Machine.objects.first(),
+                    "section": Section.objects.first(),
                     "subunit": SubUnit.objects.first()
                     }
         planned_data = self.common_data

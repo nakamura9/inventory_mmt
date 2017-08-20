@@ -41,11 +41,21 @@ subassembly_urls = [
     url(r'^subassembly_details/(?P<pk>[ -~]+)/?$', views.SubAssyView.as_view(), 
             name="subassembly_details"),
     url(r'^add_subassembly/?$', views.subassyView.as_view(), name="add_subassembly"),
-    url(r'edit_subassembly/(?P<pk>[ -~]+)/?$', views.subassyEditView.as_view(), 
+    url(r'^edit_subassembly/(?P<pk>[ -~]+)/?$', views.subassyEditView.as_view(), 
             name="edit_subassembly"),
-    url(r'delete_subassembly/([ -~]+)/?$', views.delete_subassembly, 
+    url(r'^delete_subassembly/([ -~]+)/?$', views.delete_subassembly, 
             name="delete_subassembly"),
 
+]
+
+section_urls = [
+    url(r'^add_section/$', views.sectionView.as_view(), name="add_section"),
+    url(r'^edit_section/(?P<pk>[ -~]+)/$', views.sectionUpdateView.as_view(), 
+    name="edit_section"),
+    url(r'^section_details/(?P<pk>[ -~]+)/$', views.sectionDetailView.as_view(), 
+    name="section_details"),
+    url(r'^delete_section/([ -~]+)/$', views.delete_section, 
+    name="delete_section"),
 ]
 
 order_urls = [
@@ -82,4 +92,4 @@ urlpatterns = [
     url(r'^new-category/?$', views.categoryForm.as_view(), name='new-category'),
 
 ] + component_urls + machine_urls + subassembly_urls + subunit_urls + order_urls + \
-    production_inventory_urls
+    production_inventory_urls + section_urls

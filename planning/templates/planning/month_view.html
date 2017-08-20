@@ -58,7 +58,7 @@
                     <td class="bg-primary heading">Sunday</td>
                 </tr>
                 <tr>
-                    {% for week in month.month_matrix %}
+                    {% for week in month.month_agenda %}
                         <tr>
                             <td class="week"><a href="{% url 'maintenance-calendar:week' year=month.year month=month.month week=forloop.counter %}"><h4>Week {{forloop.counter}}<h4></a></td>
                             {% for day in week %}

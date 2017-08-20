@@ -7,6 +7,8 @@ class CheckListCreateForm(forms.ModelForm, BootstrapMixin):
     def __init__(self, *args , **kwargs):
         super(CheckListCreateForm, self).__init__(*args, **kwargs)
         self.fields["machine"].widget.attrs["onchange"] = \
+                "prepSectionUpdate()"
+        self.fields["section"].widget.attrs["onchange"] = \
                 "prepSubUnitUpdate()"
         self.fields["subunit"].widget.attrs["onchange"] = \
                 "prepSubAssemblyUpdate()"
@@ -14,5 +16,5 @@ class CheckListCreateForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model= Checklist
         fields = ["title", "creation_date", 'estimated_time', 'start_time',
-                    "machine", "subunit", "subassembly", "resolver", 
+                    "machine", "section","subunit", "subassembly", "resolver", 
                     "category", "frequency"]

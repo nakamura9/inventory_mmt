@@ -71,12 +71,21 @@ class Machine(models.Model):
         if n_assys + n_units  != 0:
             return ((n_assys_covered + n_units_covered) / (n_assys + n_units)) * 100
 
-        
+class Section(models.Model):
+    unique_id = models.CharField(max_length=24, primary_key=True)
+    section_name = models.CharField(max_length=64)
+    machine= models.ForeignKey("Machine", null=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self. section_name
+
+
 class SubUnit(models.Model):
     unique_id = models.CharField(max_length=24, primary_key=True)
     unit_name = models.CharField(max_length=128)
     machine = models.ForeignKey("Machine", null=True, on_delete=models.SET_NULL)
-
+    section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
+    
     def __str__(self):
         return self.unit_name
     
@@ -84,6 +93,7 @@ class SubAssembly(models.Model):
     unique_id = models.CharField(max_length=24, primary_key=True)
     unit_name = models.CharField(max_length=128, verbose_name="Sub-Assembly")
     subunit = models.ForeignKey("SubUnit", null=True, on_delete=models.SET_NULL)
+    section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
     machine = models.ForeignKey("Machine", null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
@@ -93,6 +103,7 @@ class Component(models.Model):
     unique_id = models.CharField(max_length=24, primary_key=True)
     component_name = models.CharField(max_length = 128)
     machine = models.ForeignKey("Machine", null=True, on_delete=models.SET_NULL)
+    section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
     subunit = models.ForeignKey("SubUnit", null=True, on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("SubAssembly", null=True, on_delete=models.SET_NULL)
 
@@ -112,6 +123,9 @@ class InventoryItem(models.Model):
     unit_price = models.FloatField()
     min_stock_level = models.IntegerField()
     reorder_quantity = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
 
 class Category(models.Model):
@@ -167,3 +181,6 @@ class Order(models.Model):
             return "Undelivered"
         else:
             return self.actual_delivery_epoch.strftime("%d/%m/%Y")
+
+    def __str__(self):
+        return "%s: %s" % (self.order_number, self.description)

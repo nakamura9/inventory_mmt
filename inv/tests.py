@@ -25,6 +25,13 @@ class ViewTests(TestCase, TestDataMixin):
         self.assertEqual(response.status_code, 200)
 
 
+    def test_get_section_details(self):
+        response = self.client.get(reverse("inventory:section_details", 
+                                    kwargs={"pk": "T_SE"}))
+        
+        self.assertEqual(response.status_code, 200)
+
+
     def test_get_machine_details(self):
         response = self.client.get(reverse("inventory:machine_details", 
                                     kwargs={"pk": "T_M"}))
@@ -73,6 +80,12 @@ class ViewTests(TestCase, TestDataMixin):
         
         self.assertEqual(response.status_code, 200)
 
+    
+    def test_get_section_form(self):
+        response = self.client.get(reverse("inventory:add_section"))
+        
+        self.assertEqual(response.status_code, 200)
+
     #test get inventory forms
     def test_get_raw_materials(self):
         response = self.client.get(reverse("inventory:raw-materials"))
@@ -117,6 +130,7 @@ class ViewTests(TestCase, TestDataMixin):
                                     data={"unique_id":"P_T_C",
                                             "component_name": "Posted Test Component",
                                             "machine": "T_M",
+                                            "section": "T_SE",
                                             "subunit": "T_S",
                                             "subassembly":"T_SA"})
         
@@ -126,6 +140,21 @@ class ViewTests(TestCase, TestDataMixin):
                                             args=["P_T_C"]))
 
         self.assertEqual(response.status_code, 302)#redirects
+
+
+    def test_post_check_and_delete_component_form(self):
+        self.client.post(reverse("inventory:add_section"),
+                                    data={"unique_id":"P_T_SE",
+                                            "section_name": "Posted Test Component",
+                                            "machine": "T_M",})
+        
+        self.assertIsInstance(Section.objects.get(pk="P_T_SE"), Section)
+        
+        response = self.client.get(reverse("inventory:delete_section", 
+                                            args=["P_T_SE"]))
+
+        self.assertEqual(response.status_code, 302)#redirects
+
 
     def test_post_check_and_delete_machine_form(self):
         response = self.client.post(reverse("inventory:add_machine"),
@@ -147,6 +176,7 @@ class ViewTests(TestCase, TestDataMixin):
         response = self.client.post(reverse("inventory:add_subunit"),
                                     data={"unique_id":"P_T_S",
                                             "unit_name": "Posted Test SubUnit",
+                                            "section": "T_SE",
                                             "machine": "T_M"})
         
         self.assertIsInstance(SubUnit.objects.get(pk="P_T_S"), SubUnit)
@@ -161,6 +191,7 @@ class ViewTests(TestCase, TestDataMixin):
                                     data={"unique_id":"P_T_SA",
                                             "unit_name": "Posted Test SubAssembly",
                                             "machine": "T_M",
+                                            "section": "T_SE",
                                             "subunit": "T_S"})
         
         self.assertIsInstance(SubAssembly.objects.get(pk="P_T_SA"), SubAssembly)

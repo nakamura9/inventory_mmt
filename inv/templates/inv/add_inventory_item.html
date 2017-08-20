@@ -1,0 +1,34 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 well ">
+            <h3>{{title}} Form:</h3>
+            <form class="form form-group" method="POST" action="" >
+                {% csrf_token %}
+                <table>
+                {{form.as_table}}
+                </table>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+</div>
+{% endblock %}
+{% block body_script %}
+    function prepSubUnitUpdate(){
+        var url = "{% url 'ajax:update_subunit' %}";
+        var machine = $('#id_machine').val();
+        var subunit = $('#id_subunit');
+        updateSubUnits(url, machine, subunit);
+    }
+    
+    function prepSubAssemblyUpdate(){
+        var url = "{% url 'ajax:update_subassembly' %}";
+        var subunit = $('#id_subunit').val();
+        var subassembly = $('#id_subassembly');
+        updateSubAssemblies(url, subunit, subassembly);
+    }
+{% endblock %}

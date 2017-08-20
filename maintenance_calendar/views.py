@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 import os
 import datetime
-from production_calendar import calendar_objects
+from planning import calendar_objects
 
 
 class MonthView(TemplateView):
@@ -13,7 +13,6 @@ class MonthView(TemplateView):
         _month = calendar_objects.Month(int(self.kwargs["year"]), int(self.kwargs["month"]),
                                     calendar_objects.MaintenanceDay)
         _month.get_month_agenda()
-        print _month.month_matrix
         context["month"] = _month
         return context
 

@@ -25,9 +25,17 @@ class selectAjaxCalls(TestCase, TestDataMixin):
         cls.create_test_inventory_models()
         cls.create_dummy_accounts()
 
+    def test_update_section(self):
+        response = self.client.post(reverse("ajax:update_section"),
+                         {"machine": "T_M"}, 
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        
+        self.assertContains(response, "sections")
+    
     def test_update_subunit(self):
         response = self.client.post(reverse("ajax:update_subunit"),
-                         {"machine": "T_M"}, 
+                         {"section": "T_SE"}, 
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         
         

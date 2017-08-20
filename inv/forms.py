@@ -32,20 +32,26 @@ class MachineForm(forms.ModelForm, BootstrapMixin):
                 "estimated_value", "manufacturer", 
                 "unique_id"]
 
+class SectionForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = Section
+        fields = [ "section_name", "machine", "unique_id"]
+
+
 class SubUnitForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = SubUnit
-        fields = [ "unit_name", "machine", "unique_id"]
+        fields = [ "unit_name", "machine", "section", "unique_id"]
 
 
 class SubAssyForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = SubAssembly
-        fields = ["unit_name", "machine","subunit", "unique_id"]
+        fields = ["unit_name", "machine", "section", "subunit", "unique_id"]
     
 class ComponentForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Component
         fields = ["component_name", 
-                "machine", "subunit", "subassembly", "unique_id"]
+                "machine", "section", "subunit", "subassembly", "unique_id"]
     
