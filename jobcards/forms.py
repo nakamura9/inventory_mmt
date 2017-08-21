@@ -20,7 +20,7 @@ class DurationInput(forms.Select):
 class PlannedJobForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = PlannedJob
-        fields = ["scheduled_for","resolver", "machine", "subunit",
+        fields = ["scheduled_for","resolver", "machine","section", "subunit",
             "description",  "estimated_time"]
 
     def __init__(self, *args, **kwargs):
@@ -33,7 +33,7 @@ class PlannedJobForm(forms.ModelForm, BootstrapMixin):
 class UnplannedJobForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Breakdown
-        fields = ["requested_by", "resolver", "machine", "subunit", "description", 
+        fields = ["requested_by", "resolver", "machine","section", "subunit", "description", 
                     "estimated_time"]
  
     def __init__(self, *args, **kwargs):

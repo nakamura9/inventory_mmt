@@ -32,9 +32,9 @@
         <hr />
         <h3>Select View:</h3>
         <hr />
-        <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:month' year=week.year month=week.month %}" >Month</a>
-        <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:week' year=week.year month=week.month week=1 %}">Week</a>
-        <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:day' year=week.year month=week.month day=1 %}">Day</a>
+        <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=week.year month=week.month %}" >Month</a>
+        <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=week.year month=week.month week=1 %}">Week</a>
+        <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=week.year month=week.month day=1 %}">Day</a>
     </div>
     <div class="col-sm-9">
         <table>

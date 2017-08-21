@@ -33,9 +33,9 @@
             <hr />
             <h3>Select view.</h3>
             <hr />
-            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:month' year=month.year month=month.month %}" >Month</a>
-            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:week' year=month.year month=month.month week=1 %}">Week</a>
-            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:day' year=month.year month=month.month day=1 %}">Day</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=month.year month=month.month %}" >Month</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=month.year month=month.month week=1 %}">Week</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=month.year month=month.month day=1 %}">Day</a>
             <h4>Select Date.</h4>
             <hr />
             <select class="form-control"  id="month_select">
@@ -60,7 +60,7 @@
                 <tr>
                     {% for week in month.month_agenda %}
                         <tr>
-                            <td class="week"><a href="{% url 'maintenance-calendar:week' year=month.year month=month.month week=forloop.counter %}"><h4>Week {{forloop.counter}}<h4></a></td>
+                            <td class="week"><a href="{% url 'planning:maintenance-week' year=month.year month=month.month week=forloop.counter %}"><h4>Week {{forloop.counter}}<h4></a></td>
                             {% for day in week %}
                                 <td>
                                     <svg width="150" height="75">
@@ -70,7 +70,7 @@
                                         {% if day.day == "..." %}
                                             <text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text>
                                         {% else %}
-                                            <a href="{% url 'maintenance-calendar:day'  year=month.year month=month.month day=day.date.day %}"><text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text></a>
+                                            <a href="{% url 'planning:maintenance-day'  year=month.year month=month.month day=day.date.day %}"><text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text></a>
                                         {% endif %}
                                         {% if day.agenda.length > 1 %}
                                             <a href="{% url 'maintenance:planned-maintenance' %}"><polygon points="10,0 10,50 15,40 20,50 20,0" style="fill:rgb(0,255,0);stroke:rgb(0,255,0);stroke-width:1;" /></a>
@@ -96,7 +96,7 @@
         var data_list = $("#month_select").val().split("/");
         console.log(data_list);
         var arg_string = "year=" + data_list[2] + " month=" + data_list[0];
-        window.location = "maintenance-calendar/month/" + data_list[2] + "/" +data_list[0]
+        window.location = "planning/production-month/" + data_list[2] + "/" +data_list[0]
        
     }
 {% endblock %}

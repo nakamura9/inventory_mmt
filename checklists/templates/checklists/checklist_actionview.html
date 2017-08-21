@@ -77,7 +77,7 @@
                         success: function(result){
                             if(result["authenticated"]==true){
                                 holdCount = 0;
-                            window.location.href = "{% url 'checklists:inbox' %}";
+                            window.location.href = "{% url 'maintenance:inbox' %}";
                             }else{
                                 alert("The Authentication failed. Unable to Hold Checklist");
                             }

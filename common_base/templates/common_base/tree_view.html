@@ -1,0 +1,72 @@
+{% block tree_view %}
+<ul>
+{%for machine in machines %}
+    <li><div class="_item" onclick = "reveal('#{{machine.unique_id|slugify}}')" >
+            {{machine}} 
+                            <span style="float: right;">
+                                <a href="{% url 'inventory:machine_details' machine.pk %}">Details</a> |
+                                <a href="{% url 'inventory:edit_machine' pk=machine.pk %}" >Edit</a> | 
+                                <a href="{% url 'inventory:delete_machine' machine.pk %}">Delete</a>
+                            </span>
+                        </div>
+                    <ul id="{{machine.unique_id|slugify}}" style="display: none;" >
+                            {% for section in machine.section_set.all %}
+                            <li>
+                                <div class="_item" onclick="reveal('#{{section.unique_id|slugify}}')">
+                                    {{section}}
+                                    <span style="float:right;">
+                                            <a href="{% url 'inventory:section_details' section.pk %}">Details</a> |
+                                            <a href="{% url 'inventory:edit_section' pk=section.pk %}" >Edit</a> | 
+                                            <a href="{% url 'inventory:delete_section' section.pk %}">Delete</a>
+                                    </span>
+                                </div>
+                                <ul id="{{section.unique_id|slugify}}" style="display:none;">
+                                        {% for unit in section.subunit_set.all %}
+                                        <li><div class = "_item" onclick = "reveal('#{{unit.unique_id|slugify}}')">
+                                                {{unit.unit_name}}  
+                                                <span style="float: right;">
+                                                    <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a> |
+                                                    <a href="{% url 'inventory:edit_subunit' pk=unit.unique_id %}">Edit</a> |
+                                                    <a href="{% url 'inventory:delete_subunit' unit.unique_id %}">Delete</a>
+                                                </span>
+                                            </div>
+                                            <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
+                                                {% for sub in unit.subassembly_set.all %}
+                                                    <li><div class="_item" onclick = "reveal('#{{sub.unique_id|slugify}}')">
+                                                            {{sub.unit_name}} 
+                                                            <span style="float: right;">
+                                                                <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a> |
+                                                                <a href="{% url 'inventory:edit_subassembly' pk=sub.unique_id %}">Edit</a> |
+                                                                <a href="{% url 'inventory:delete_subassembly' sub.unique_id %}">Delete</a>
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <ul id="{{sub.unique_id|slugify}}" style="display:none;">
+                                                        {% for component in sub.component_set.all %}
+                                                            <li><div class="_item">
+                                                                    {{component.component_name}} 
+                                                                    <span style="float: right;">
+                                                                        <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a> |
+                                                                        <a href="{% url 'inventory:edit_component' pk=component.unique_id %}">Edit</a> |
+                                                                        <a href="{% url 'inventory:delete_component' component.unique_id %}">Delete</a>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        {% endfor %}
+                                                        </ul>
+                                                    </li>
+                                                {% endfor%}    
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                        
+                    </ul>
+                    </li>
+                {% endfor %}
+</ul>
+
+
+{% endblock %}

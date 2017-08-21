@@ -24,15 +24,6 @@ class NewUnplannedJobView(CreateView):
     template_name = os.path.join("jobcards", "breakdown.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
-    
-
-    def form_valid(self, form, *args, **kwargs):
-        obj = form.save(commit = False)
-        obj.component_id = self.request.POST["component"]
-        obj.subassembly_id = self.request.POST["subassembly"]
-        obj.subunit_id = self.request.POST["units"]
-        obj.save()
-        return super(NewUnplannedJobView, self).form_valid(form, *args, **kwargs)
         
 def delete_unplanned_job(request, pk=None):
     job = get_object_or_404(Breakdown, pk=pk)

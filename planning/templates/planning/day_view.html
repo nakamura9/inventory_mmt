@@ -22,9 +22,9 @@
         <div class="col-sm-3 well">
             <h2>Day View:</h2><hr />
             <h4>Select view</h4>
-            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:month' year=day.date.year month=day.date.month %}" >Month</a>
-            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:week' year=day.date.year month=day.date.month week=1 %}">Week</a>
-            <a  class="btn btn-primary" href = "{% url 'maintenance-calendar:day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=day.date.year month=day.date.month %}" >Month</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=day.date.year month=day.date.month week=1 %}">Week</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
         </div>
         <div class="col-sm-9">
             <div class="panel panel-primary">

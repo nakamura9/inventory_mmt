@@ -30,10 +30,9 @@ urlpatterns = [
     url(r'^sign_up/?$', sign_up, name="sign_up"),
     url(r'^jobcards/', include("jobcards.urls")),
     url(r'^checklists/', include("checklists.urls")),
-    url(r'^maintenance-calendar/', include("maintenance_calendar.urls", namespace="maintenance-calendar")),
     url(r'^machine-learning/', include("machine_learning.urls", namespace="machine-learning")),
     url(r'^rca/', include("rca.urls", namespace="rca")),
-    url(r'^production-calendar/', include("production_calendar.urls", namespace="production-calendar")),
+    url(r'^planning/', include("planning.urls", namespace="planning")),
     url(r'^ajax/', include("ajax.urls", namespace = "ajax")),
     url(r'^maintenance/', include("maintenance.urls", namespace="maintenance")),
 ]

@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'jobcards',
     'checklists',
     'rca',
-    'maintenance_calendar',
-    'production_calendar',
     'machine_learning',
     'common_base',
     'ajax',
