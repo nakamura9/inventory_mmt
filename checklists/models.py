@@ -17,6 +17,10 @@ class Comment(models.Model):
 
 
 class Checklist(models.Model):
+
+    def __str__(self):
+        return self.title
+    
     mapping =  {"daily": 1,
         "weekly": 7,
         "fortnightly": 14,

@@ -13,8 +13,13 @@
                 </table>
             <button type="submit" class="btn btn-primary">Create Planned Job</button>
             </form>
+        </div>            
+        <div class="col-sm-4">
+            <h4>Tasks:</h4>
+            <div id="tasklist"></div>
+            <p><textarea id="task" rows="3" cols="48"></textarea></p>
+            <button type="button" onclick="addTask()" class="btn btn-warning">+ Add Task</button>
         </div>
-        <div class="col-sm-4"></div>
     </div>
 </div>
 {% endblock %}
@@ -35,5 +40,10 @@
         var section = $('#id_section').val();
         var subunit = $('#id_subunit');
         updateSubUnits(url, section, subunit);
+    }
+
+    function addTask(){
+        $.post("{% url 'checklists:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+
     }
 {% endblock %}

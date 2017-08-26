@@ -1,3 +1,4 @@
+
 {% extends 'window.html' %}
 {% block content %}
 <style>
@@ -6,12 +7,15 @@
         padding: 5px;
         min-width: 150px;
         min-height: 50px;
+        font-size: 24px;
+        text-align: center;
     }
     .week {
         min-height: 75px;
-        min-width: 75px;
+        width: 100x;
         background-color: grey;
-        color: white;
+        color: white;   
+        font-size: 24px;
         text-align: center;
         border-bottom: 10px solid white;
     }
@@ -31,14 +35,25 @@
         <div class="col-sm-3 well">
             <h2>Month View:</h2>
             <hr />
+            <h4>Key:</h4>
+            <p><span style="color:white; background-color:green; min-width:30px;">__n__</span> - Checklists</p>
+            <p><span style="color:white; background-color:yellow; min-width:30px;">__n__</span> - Planned Jobs</p>
             <h3>Select view.</h3>
             <hr />
+            {% if mode == "maintenance" %}
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=month.year month=month.month %}" >Month</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=month.year month=month.month week=1 %}">Week</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=month.year month=month.month day=1 %}">Day</a>
+            {% else %}
+            <a  class="btn btn-primary" href = "{% url 'planning:production-month' year=month.year month=month.month %}" >Month</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:production-week' year=month.year month=month.month week=1 %}">Week</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:production-day' year=month.year month=month.month day=1 %}">Day</a>
+            {% endif %}
+
             <h4>Select Date.</h4>
             <hr />
             <select class="form-control"  id="month_select">
+                    
                 {% for i in "xxxxxxxxxxxx" %}
                 <option value="{{forloop.counter}}">{{forloop.counter}}</option>
                 {% endfor %}
@@ -63,21 +78,38 @@
                             <td class="week"><a href="{% url 'planning:maintenance-week' year=month.year month=month.month week=forloop.counter %}"><h4>Week {{forloop.counter}}<h4></a></td>
                             {% for day in week %}
                                 <td>
-                                    <svg width="150" height="75">
+                                    <svg width="150" height="100">
                                         
                                         
-                                        <rect width="150" height="75" style="fill:rgb(0,126,255);fill-opacity:0.7;stroke-width:3;stroke:rgb(255,255,255);" />
-                                        {% if day.day == "..." %}
-                                            <text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text>
-                                        {% else %}
-                                            <a href="{% url 'planning:maintenance-day'  year=month.year month=month.month day=day.date.day %}"><text x="120" y="70" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text></a>
-                                        {% endif %}
-                                        {% if day.agenda.length > 1 %}
-                                            <a href="{% url 'maintenance:planned-maintenance' %}"><polygon points="10,0 10,50 15,40 20,50 20,0" style="fill:rgb(0,255,0);stroke:rgb(0,255,0);stroke-width:1;" /></a>
-                                        {% endif %}
-                                        {% if day.agenda.length > 3 %}
-                                            <a href="{% url 'maintenance:inbox' %}"><polygon points="30,0 30,50 35,40 40,50 40,0" style="fill:rgb(255,255,0);stroke:rgb(255,255,0);stroke-width:1;" /><a>
-                                        {% endif %}
+                                        <rect width="150" height="100" style="fill:rgb(0,126,255);fill-opacity:0.7;stroke-width:3;stroke:rgb(255,255,255);" />
+                                            <a href="{% url 'planning:maintenance-day'  year=day.date.year month=day.date.month day=day.date.day %}">
+                                                {% if day.date.month != month.month %}
+                                                    <text x="120" y="95" style="font-size: 24px;fill:rgb(200,200,200)">{{day.date.day}}</text>
+                                                {% else %}
+                                                    <text x="120" y="95" style="font-size: 24px;fill:rgb(255,255,255)">{{day.date.day}}</text>
+                                                {% endif %}
+                                            </a>
+
+                                            {% if day.checklist_count > 0 %}
+                                            <a href="{% url 'maintenance:planned-maintenance' %}">
+                                                <polygon points="10,0 10,50 20,40 30,50 30,0" style="fill:rgb(0,255,0);stroke:rgb(0,255,0);stroke-width:1;" />
+                                                <text x="10" y="40" style="font-size: 24px;fill:rgb(0,0,255)">{{day.checklist_count}}</text>
+                                            </a>
+                                            {% endif %}
+
+                                            {% if day.job_count > 0 %}
+                                                <a href="{% url 'maintenance:inbox' %}">
+                                                    <polygon points="40,0 40,50 50,40 60,50 60,0" style="fill:rgb(255,255,0);stroke:rgb(255,255,0);stroke-width:1;" />
+                                                    <text x="40" y="40" style="font-size: 24px;fill:rgb(0,0,255)">{{day.job_count}}</text>
+                                                <a>
+                                            {% endif %}
+                                        
+                                            {% if day.order_count > 0 %}
+                                                <a href="{% url 'inventory:order-list' %}">
+                                                    <polygon points="10,0 10,50 20,40 30,50 30,0" style="fill:rgb(0,255,255);stroke:rgb(0,255,255);stroke-width:1;" />
+                                                    <text x="10" y="40" style="font-size: 24px;fill:rgb(0,0,255)">{{day.order_count}}</text>
+                                                <a>
+                                            {% endif %}
                                         
                                     </svg>
                                 </td>

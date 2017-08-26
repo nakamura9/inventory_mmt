@@ -15,6 +15,7 @@ class Day(object):
         self.date = date
         self.weekday = (date.weekday(), day_names[date.weekday()])
         self.agenda = []
+        
     
 
     @property
@@ -44,8 +45,21 @@ class ProductionDay(Day):
         for order in Order.objects.filter(delivery_date = self.date):
             self.agenda.append(order)
 
+    @property
+    def order_count(self):
+        return len(self.agenda)
+
+
 
 class MaintenanceDay(Day):
+    @property
+    def checklist_count(self):
+        return len([item for item in self.agenda if isinstance(item, Checklist)])
+
+    @property
+    def job_count(self):
+        return len([item for item in self.agenda if isinstance(item, PlannedJob)])
+    
     def get_agenda(self):
         """Maintenance days look out for planned jobs and checklists"""
 
@@ -53,7 +67,7 @@ class MaintenanceDay(Day):
                         PlannedJob.objects.filter(scheduled_for = self.date)]
 
         for check in Checklist.objects.all():
-            if check.is_open:
+            if check.is_open and (self.date > check.creation_date):
                 if check.frequency == "daily" and not self.is_weekend:
                     self.agenda.append(check)
                 

@@ -12,6 +12,10 @@ import datetime
 
 #people = [(a.username,a.username) for a in Account.objects.all()]
 class AbstractJob(models.Model):
+    def __str__(self):
+        return self.description
+
+    
     description = models.TextField()
     creation_epoch = models.DateTimeField(default = timezone.now)
     number = models.AutoField(primary_key=True)

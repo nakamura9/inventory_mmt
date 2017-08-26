@@ -15,6 +15,8 @@ class maintenanceMonthView(TemplateView):
         _month = calendar_objects.Month(int(self.kwargs["year"]), int(self.kwargs["month"]),
                                     calendar_objects.MaintenanceDay)
         _month.get_month_agenda()
+        print _month.month_agenda[4][3].agenda
+        context["mode"] = "maintenance"
         context["month"] = _month
         return context
 
@@ -28,6 +30,7 @@ class maintenanceWeekView(TemplateView):
                     int(self.kwargs["week"]), calendar_objects.MaintenanceDay)
         week.get_week_agenda()
         context["week"] = week
+        context["mode"] = "maintenance"
         return context
 
 
@@ -42,6 +45,7 @@ class maintenanceDayView(TemplateView):
         day = calendar_objects.MaintenanceDay(_day)
         day.get_agenda()
         context["day"] =day 
+        context["mode"] = "maintenance"
         return context
 
 
@@ -54,6 +58,7 @@ class productionMonthView(TemplateView):
                                     calendar_objects.ProductionDay)
         _month.get_month_agenda()
         context["month"] = _month
+        context["mode"] = "production"
         return context
 
 
@@ -66,6 +71,7 @@ class productionWeekView(TemplateView):
                     int(self.kwargs["week"]), calendar_objects.ProductionDay)
         week.get_week_agenda()
         context["week"] = week
+        context["mode"] = "production"
         return context
 
 
@@ -79,5 +85,6 @@ class productionDayView(TemplateView):
                                         int(self.kwargs["day"]))
         day = calendar_objects.ProductionDay(_day)
         day.get_agenda()
-        context["day"] =day 
+        context["day"] =day
+        context["mode"] = "production"
         return context
