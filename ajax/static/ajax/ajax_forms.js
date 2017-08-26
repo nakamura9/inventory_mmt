@@ -10,11 +10,11 @@ function updateSections(django_url, machine, section){
             var sections =  "<option value='None'>-Select Section-</option> ";
 
     for(i in result.sections){
-        units += "<option value='*'>".replace('*', result.sections[i][0]) + result.sections[i][1] + "</option>";
+        sections += "<option value='*'>".replace('*', result.sections[i][0]) + result.sections[i][1] + "</option>";
         
     }
 
-    this.section.html(units); // custom variable 
+    this.section.html(sections); // custom variable 
         }
     });
 

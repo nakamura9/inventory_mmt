@@ -17,3 +17,13 @@
     </div>
 </div>
 {% endblock %}
+{% block body_script %}
+
+function prepSectionUpdate(){
+    var url = "{% url 'ajax:update_section' %}";
+    var machine = $('#id_machine').val();
+    var section = $('#id_section');
+    updateSections(url, machine, section);
+}
+
+{% endblock %}

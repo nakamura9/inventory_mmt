@@ -43,15 +43,37 @@ class SubUnitForm(forms.ModelForm, BootstrapMixin):
         model = SubUnit
         fields = [ "unit_name", "machine", "section", "unique_id"]
 
+    def __init__(self, *args , **kwargs):
+        super(SubUnitForm, self).__init__(*args, **kwargs)
+        self.fields["machine"].widget.attrs["onchange"] = \
+                "prepSectionUpdate()"
 
 class SubAssyForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = SubAssembly
         fields = ["unit_name", "machine", "section", "subunit", "unique_id"]
     
+    
+    def __init__(self, *args , **kwargs):
+        super(SubAssyForm, self).__init__(*args, **kwargs)
+        self.fields["machine"].widget.attrs["onchange"] = \
+                "prepSectionUpdate()"
+        self.fields["section"].widget.attrs["onchange"] = \
+                "prepSubUnitUpdate()"
+
+
 class ComponentForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Component
         fields = ["component_name", 
                 "machine", "section", "subunit", "subassembly", "unique_id"]
     
+    def __init__(self, *args , **kwargs):
+        super(ComponentForm, self).__init__(*args, **kwargs)
+        self.fields["machine"].widget.attrs["onchange"] = \
+                "prepSectionUpdate()"
+        self.fields["section"].widget.attrs["onchange"] = \
+                "prepSubUnitUpdate()"
+
+        self.fields["subunit"].widget.attrs["onchange"] = \
+                "prepSubAssemblyUpdate()"

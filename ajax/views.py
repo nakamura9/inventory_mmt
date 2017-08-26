@@ -24,7 +24,6 @@ def update_section(request):
 
 @csrf_exempt
 def update_subunit(request):
-    print request.POST
     if not request.is_ajax() and \
         request.POST.get("section", None) == None:
         return Http404()
