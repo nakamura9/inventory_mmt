@@ -53,12 +53,13 @@ class ViewTests(TestCase, TestDataMixin):
         data["description"] = "2"
         data["resolver"] = Account.objects.first().pk
         data["machine"] = Machine.objects.first().pk
+        data["section"] = Section.objects.first().pk
         data["subunit"] = SubUnit.objects.first().pk
         data["scheduled_for"] = datetime.date.today()
 
         response = self.client.post(reverse("jobcards:new_planned_job"),
                                     data = data)
-
+        
 
         self.assertIsInstance(PlannedJob.objects.get(description="2"), PlannedJob)
 
@@ -74,6 +75,7 @@ class ViewTests(TestCase, TestDataMixin):
         data = self.common_data
         data["resolver"] = Account.objects.first().pk
         data["machine"] = Machine.objects.first().pk
+        data["section"] = Section.objects.first().pk
         data["subunit"] = SubUnit.objects.first().pk
         data["description"] = "Test Edited Description"
         data["scheduled_for"] = datetime.date.today()
@@ -122,6 +124,7 @@ class ViewTests(TestCase, TestDataMixin):
         data["resolver"] = Account.objects.first().pk
         data["requested_by"] = Account.objects.first().pk
         data["machine"] = Machine.objects.first().pk
+        data["section"] = Section.objects.first().pk
         data["subunit"] = SubUnit.objects.first().pk
         data["scheduled_for"] = datetime.date.today() + datetime.timedelta(days=3)
         data["description"] = "Test Edited Description"
@@ -130,7 +133,7 @@ class ViewTests(TestCase, TestDataMixin):
                                     kwargs={"pk":Breakdown.objects.first().pk}), 
                                     data = data)
 
-        print response.content
+
         self.assertEqual(response.status_code, 302)
 
     def test_delete_unplanned_job_view(self):

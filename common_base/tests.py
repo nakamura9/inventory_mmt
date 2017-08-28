@@ -108,6 +108,7 @@ class TestDataMixin(object):
             "estimated_time": "0030",
             "start_time": "0900",
             "machine": inv_models.Machine.objects.get(pk="T_M"),
+            "section": inv_models.Section.objects.get(pk="T_SE"),
             "subunit": inv_models.SubUnit.objects.get(pk="T_S"),
             "subassembly": None,
             "resolver": Account.objects.first(),
@@ -131,6 +132,7 @@ class TestDataMixin(object):
                     "estimated_time": "0030",
                     "completed": False,
                     "machine": inv_models.Machine.objects.first(),
+                    "section": inv_models.Section.objects.get(pk="T_SE"),
                     "subunit": inv_models.SubUnit.objects.first()
                     }
         planned_data = common_data

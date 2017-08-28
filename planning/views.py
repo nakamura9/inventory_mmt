@@ -15,7 +15,6 @@ class maintenanceMonthView(TemplateView):
         _month = calendar_objects.Month(int(self.kwargs["year"]), int(self.kwargs["month"]),
                                     calendar_objects.MaintenanceDay)
         _month.get_month_agenda()
-        print _month.month_agenda[4][3].agenda
         context["mode"] = "maintenance"
         context["month"] = _month
         return context

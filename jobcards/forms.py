@@ -2,6 +2,8 @@ from .models import Breakdown, JobCard, PlannedJob
 from django import forms
 from django.utils import timezone
 from common_base.forms import BootstrapMixin
+from common_base.models import Account
+from inv.models import Machine
 
 class DateInput(forms.DateInput):
     input_type = "text"
@@ -42,3 +44,12 @@ class UnplannedJobForm(forms.ModelForm, BootstrapMixin):
         self.fields["machine"].widget.attrs["onchange"] = "prepSectionUpdate()"
         self.fields["section"].widget.attrs["onchange"] = "prepSubUnitUpdate()"
         self.fields["estimated_time"].widget = DurationInput()
+
+
+class JobListFilterForm(forms.Form):
+    start_date = forms.DateField()
+    end_date = forms.DateField()
+    resolver = forms.ChoiceField(choices = [(acc.pk, acc.username) \
+                                    for acc in Account.objects.all()])
+    machine = forms.ChoiceField(choices = [(mach.pk, mach.machine_name) \
+                                                for mach in Machine.objects.all()])

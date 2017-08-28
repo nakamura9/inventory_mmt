@@ -21,7 +21,7 @@ class CalendarObjectsTests(TestCase, TestDataMixin):
     def test_maintenance_day_agenda(self):
         day = MaintenanceDay(datetime.date.today())
         day.get_agenda()
-        self.assertTrue(Checklist.objects.first() in day.agenda)
+        self.assertFalse(Checklist.objects.first() in day.agenda)
         self.assertTrue(PlannedJob.objects.first() in day.agenda)
 
     def test_week(self):

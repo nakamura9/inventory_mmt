@@ -9,6 +9,7 @@ from django.forms import widgets
 from common_base.models import Account
 from django.contrib.auth import authenticate
 from jobcards.models import Breakdown, PlannedJob
+from .forms import PlannedMaintenanceFilterForm
 
 
 import os
@@ -23,7 +24,7 @@ class PlannedMaintenanceView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(PlannedMaintenanceView, self).get_context_data(*args, **kwargs)
-        
+        context["form"] = PlannedMaintenanceFilterForm()
         context["checklists"] = Checklist.objects.all()
         context["planned_jobs"] = PlannedJob.objects.all()
         return context

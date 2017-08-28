@@ -1,57 +1,25 @@
 {% extends "window.html" %}
 {% block content %}
-<div class="container-fluid">
     <div class="row">
-        <h4>Filters</h4>
-        <form method="GET" action="{% url 'jobcards:jobs' %}">
-        <div class="col-sm-3">
-                <table>
-                    <tr>
-                        <td>Start Date:</td>
-                    </tr>
-                    <tr>
-                        <td><input type="text" id="start_date" name="start_date" class="form-control"></td>
-                    </tr>
-                </table>
-        </div>
-        <div class="col-sm-3">
-                <table>
-                    <tr>
-                        <td>End Date:</td>
-                    </tr>
-                    <tr>
-                        <td><input type="text" name="end_date" id="end_date" class="form-control"></td>
-                    </tr>
-                </table>
-        </div>
-        
-        <div class="col-sm-3">
-                <table>
-                    <tr>
-                        <td>Resolver:</td>
-                    </tr>
-                    <tr>
-                        <td>{{resolver}}</td>
-                    </tr>
-                </table>
-        </div>
-        <div class="col-sm-3">
-                <table>
-                    <tr>
-                        <td>Machine:</td>
-                    </tr>
-                    <tr>
-                        <td>{{machine}}</td>
-                    </tr>
-                </table>
-        </div>
-        
-                <button style="margin: 5px;" class="btn btn-primary">Filter</button>
+        <div class="col-sm-3 well">
+            
+            <form action="" method="GET" role="form">
+                <legend>Filters</legend>
+            
+                <div class="form-group">
+                    {% csrf_token %}
+                    <table>
+                        {{form.as_table}}    
+                    </table> 
+                </div>
+            
+                
+            
+                <button type="submit" class="btn btn-primary">Filter</button>
             </form>
+            
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12 well ">
+        <div class="col-sm-9">
             <h3>Open Jobs:</h3>
             <a class="btn btn-primary" href="{% url 'jobcards:new_unplanned_job' %}"> New Unplanned Job</a>
             <table  class="table table-striped">
@@ -85,9 +53,8 @@
             
         </div>
     </div>
-</div>
 {% endblock %}
 {% block body_script %}
-$("#start_date").datepicker();
-$("#end_date").datepicker();
+$("#id_start_date").datepicker();
+$("#id_end_date").datepicker();
 {% endblock %}

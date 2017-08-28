@@ -46,7 +46,6 @@ class ModelTests(TestCase, TestDataMixin):
 
     def test_checklist_properties(self):
         check = models.Checklist.objects.get(title="Test Checklist")
-        print check
         self.assertTrue(check.is_open)
         check.last_completed_date = datetime.date.today()
         #check if the checklist remains open

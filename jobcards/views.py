@@ -10,7 +10,7 @@ from inv.models import *
 import os
 from django.urls import reverse, reverse_lazy
 import json
-from .forms import DateInput, TimeInput, UnplannedJobForm, PlannedJobForm
+from .forms import *
 from common_base.models import Account
 from django import forms
 import datetime
@@ -49,6 +49,7 @@ class JobCardsList(ListView):
 
         def get_context_data(self, *args, **kwargs):
             context = super(JobCardsList, self).get_context_data(*args, **kwargs)
+            context["form"] = JobListFilterForm()
             context["machine"] = widgets.Select(attrs= {"class": "form-control"},
                                     choices= ((m.unique_id, m.machine_name) for m in Machine.objects.all())).render("machine", "None")
             context["resolver"] = widgets.Select(attrs= {"class": "form-control"},
