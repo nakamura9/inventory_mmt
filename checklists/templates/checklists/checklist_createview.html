@@ -54,7 +54,7 @@
 
 
     function addTask(){
-        $.post("{% url 'checklists:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+        $.post("{% url 'ajax:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
 
     }
 

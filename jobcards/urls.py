@@ -11,8 +11,8 @@ urlpatterns = [
     url(r"^edit_unplanned_job/(?P<pk>[\w]+)/?$", jc_views.EditUnPlannedJob.as_view(), name="edit_unplanned_job"),
     url(r"^delete_unplanned_job/(?P<pk>[\w]+)/?$", jc_views.delete_unplanned_job, name="delete_unplanned_job"),
     url(r"jobs/?$", jc_views.JobCardsList.as_view(), name="jobs"),
-    url(r'^job_detail/(?P<pk>[\w]+)/?$', jc_views.JobActionView.as_view(), name="job_detail"),
-    url(r'^planned_job_detail/(?P<pk>[\w]+)/?$', jc_views.PlannedJobActionView.as_view(), name="planned_job_detail"),
+    url(r"^job_detail/(?P<pk>[\w]+)/?$", jc_views.JobActionView.as_view(), name="job_detail"),
+    url(r"^planned_job_detail/(?P<pk>[\w]+)/?$", jc_views.PlannedJobActionView.as_view(), name="planned_job_detail"),
     url(r"^complete_job/([\w ]+)/?$", jc_views.complete_job, name="complete_job"),
     url(r"^get_resolvers/?$", jc_views.get_resolvers, name="get_resolvers"),
 ]

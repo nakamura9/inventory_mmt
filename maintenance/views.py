@@ -10,6 +10,7 @@ from common_base.models import Account
 from django.contrib.auth import authenticate
 from jobcards.models import Breakdown, PlannedJob
 from .forms import PlannedMaintenanceFilterForm
+from common_base.utilities import filter_by_dates
 
 
 import os
@@ -24,9 +25,48 @@ class PlannedMaintenanceView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(PlannedMaintenanceView, self).get_context_data(*args, **kwargs)
-        context["form"] = PlannedMaintenanceFilterForm()
-        context["checklists"] = Checklist.objects.all()
-        context["planned_jobs"] = PlannedJob.objects.all()
+        jobs = self.request.GET.get("planned_jobs", None)
+        checks  = self.request.GET.get("checklists", None)
+        resolver  = self.request.GET.get("resolver", None)
+        machine  = self.request.GET.get("machine", None)
+        start  = self.request.GET.get("start_date", None)
+        stop  = self.request.GET.get("end_date", None)
+
+        context["form"] = PlannedMaintenanceFilterForm(initial={
+            "checklists": "True",
+            "planned_jobs": "True",
+        })
+
+        if not self.request.GET.get("resolver", None):
+            context["checklists"] = Checklist.objects.all()
+            context["planned_jobs"] = PlannedJob.objects.all()
+            
+        if checks:
+            checklist_queryset = Checklist.objects.all()
+            if resolver:
+                checklist_queryset = checklist_queryset.filter(
+                                                        resolver=resolver)
+            if machine:
+                checklist_queryset = checklist_queryset.filter(
+                                                        machine=machine)
+                
+            checklist_queryset = filter_by_dates(checklist_queryset, start, 
+                                                stop)
+
+            context["checklists"] = checklist_queryset
+
+        if jobs:
+            jobs_queryset = PlannedJob.objects.all()
+
+            if resolver:
+                jobs_queryset = jobs_queryset.filter(resolver = resolver)
+            if machine:
+                jobs_queryset = jobs_queryset.filter(machine = machine)
+
+            jobs_queryset = filter_by_dates(jobs_queryset, start, stop)
+
+            context["planned_jobs"] = jobs_queryset
+        
         return context
 
 

@@ -11,7 +11,7 @@
     <hr />
    
     <div class="row">
-        <div class="col-sm-3 well" >
+        <div class="col-sm-3 bg-info" >
             
             <form action="" method="GET" role="form">
                 <legend>Filters</legend>
@@ -55,7 +55,7 @@
                     <td>{{job.machine}}</td>
                     <td>{{job.description | truncatechars:40}}</td>
                     <td>
-                        <a href="#">Details</a> |
+                        <a href="{% url 'jobcards:planned_job_detail' pk=job.number %}">Details</a> |
                         <a href="{% url 'jobcards:delete_planned_job' pk=job.number %}">Delete</a> |
                         <a href="{% url 'jobcards:edit_planned_job' pk=job.number %}">Edit</a>
                     </td>
@@ -66,5 +66,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block body_script %}
+$("#id_start_date").datepicker();
+$("#id_end_date").datepicker();
 {% endblock %}
             

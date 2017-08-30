@@ -1,7 +1,7 @@
 {% extends "window.html" %}
 {% block content %}
     <div class="row">
-        <div class="col-sm-3 well">
+        <div class="col-sm-3 bg-info">
             
             <form action="" method="GET" role="form">
                 <legend>Filters</legend>
@@ -38,8 +38,8 @@
                 <tbody>
                     {% for job in object_list %}
                         <tr>
-                            <td>{{job.date}}</td>
-                            <td>{{job.time}}</td>
+                            <td>{{job.creation_epoch.date}}</td>
+                            <td>{{job.creation_epoch.time}}</td>
                             <td>{{job.pk}}</td>
                             <td>{{job.resolver}}</td>
                             <td>{{job.requested_by}}</td>

@@ -24,7 +24,7 @@
 </div>
 {% endblock %}
 {% block body_script %}
-    
+    var num_tasks = 0;    
     $("#id_scheduled_for").datepicker();
 
     function prepSectionUpdate(){
@@ -42,8 +42,24 @@
         updateSubUnits(url, section, subunit);
     }
 
-    function addTask(){
-        $.post("{% url 'checklists:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+    function validateForm(){
+        if(num_tasks == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
 
+    function addTask(){
+        $.post("{% url 'ajax:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+
+    }
+
+    function editTasks(data){
+        $("#tasklist").append(
+            "<p>" + num_tasks +". "+ $("#task").val() + "</p>"
+        );
+        $("#task").val("");
+        num_tasks += 1;
     }
 {% endblock %}

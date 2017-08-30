@@ -126,8 +126,9 @@ class ChecklistUpdateView(UpdateView):
             Task(checklist =Checklist.objects.get(title= self.request.POST["title"]) ,
                 task_number = id,
                 description=task).save()
-            self.request.session["tasks"] = []
-            self.request.session.modified = True
+        
+        self.request.session["tasks"] = []
+        self.request.session.modified = True
         
         return resp
 
@@ -140,17 +141,7 @@ def delete_checklist(request, pk):
         return HttpResponseRedirect(reverse("maintenance:planned-maintenance"))
 
 
-@csrf_exempt
-def add_task(request):
-    if request.is_ajax():
-        if request.POST != "":
-            request.session["tasks"].append(request.POST["task"])
-            request.session.modified = True
-            return HttpResponse("0")
-        else:
-            return HttpResponse("-1")
-    else:
-        return Http404()
+
     
 
 @csrf_exempt
@@ -172,20 +163,4 @@ def hold_checklist(request, pk):
     return HttpResponse(json.dumps({"authenticated":True}), 
                             content_type="application/json")
 
-@csrf_exempt
-def remove_task(request):
-    if not request.is_ajax:
-        return Http404()
-    if request.POST == "" or \
-        "tasks" not in request.session:
-        return HttpResponse("-1")
 
-    if request.POST["task"] in request.session["tasks"]:
-        request.session["tasks"].pop(request.POST["task"])
-        request.session.modified = True
-    try:
-        Task.objects.get(description=request.POST["task"]).delete()
-    except:
-        return Http404()
-
-    return HttpResponse("0")

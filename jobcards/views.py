@@ -18,8 +18,13 @@ from django.forms import widgets
 from django.utils import timezone
 import pytz
 from django.views.generic.edit import UpdateView
+from common_base.utilities import filter_by_dates
+from common_base.models import Task
 
-class NewUnplannedJobView(CreateView): 
+class NewUnplannedJobView(CreateView):
+    """
+    The view for creating unplanned jobs a.k.a work orders
+    """
     form_class = UnplannedJobForm
     template_name = os.path.join("jobcards", "breakdown.html")
     success_url = reverse_lazy("inventory:inventory-home")
@@ -38,12 +43,38 @@ class EditUnPlannedJob(UpdateView):
 
 
 class NewPlannedJobView(CreateView):
+    """
+    View for creating planned jobs with a description and task list
+    a.k.a scheduled maintenance.
+    """
     template_name = os.path.join("jobcards", "planned_job.html")
     form_class = PlannedJobForm
     
     success_url = reverse_lazy("maintenance:planned-maintenance")
 
+    def get(self, *args, **kwargs):
+        self.request.session["tasks"] = []
+
+        return super(NewPlannedJobView, self).get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        resp = super(NewPlannedJobView,self).post(*args, **kwargs)
+        if len(self.request.session.get("tasks")) == 0:
+            return HttpResponseRedirect("jobcards:new_planned_job")
+
+        for id, task in enumerate(self.request.session.get("tasks")):
+            Task(task_number=id,
+            description=task).save()
+
+        self.request.session["tasks"] = []
+        self.request.session.modified = True
+        
+        return resp
+
 class JobCardsList(ListView):
+        """
+        List of all unplanned Jobs in the works summary
+        """
         model = Breakdown
         template_name = os.path.join("jobcards", "jobs.html")
 
@@ -58,28 +89,20 @@ class JobCardsList(ListView):
 
         
         def get_queryset(self, *args, **kwargs):
-            self.request.GET
             queryset = self.model.objects.all()
             start_date = self.request.GET.get("start_date", None)
             end_date = self.request.GET.get("end_date", None)
-            end_date = self.request.GET.get("end_date", None)
             machine = self.request.GET.get("machine", None)
             resolver = self.request.GET.get("resolver", None)
-            date_format = "%m/%d/%Y"
-            if start_date:
-                start_date = datetime.datetime.strptime(start_date, date_format)
-                start_date = pytz.timezone("Africa/Harare").localize(start_date)
-                queryset = queryset.filter(creation_epoch__lte = start_date)
-            if end_date:
-                end_date = datetime.datetime.strptime(end_date, date_format)
-                end_date = pytz.timezone("Africa/Harare").localize(end_date)
-                queryset = queryset.filter(creation_epoch__gte = end_date)
+            
+            queryset = filter_by_dates(queryset, start_date, end_date)
 
             if machine:
-                queryset = queryset.filter(machine= Machine.objects.get(unique_id=machine))
+                queryset = queryset.filter(machine= machine)
 
             if resolver:
-                queryset = queryset.filter(resolver = Account.objects.get(id= resolver))
+                queryset = queryset.filter(resolver = resolver)
+
             return queryset
         
 def delete_planned_job(request, pk=None):

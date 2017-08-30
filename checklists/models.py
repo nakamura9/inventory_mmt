@@ -83,9 +83,13 @@ class Checklist(models.Model):
         return self.last_completed_date + \
             datetime.timedelta(days=self.mapping[self.frequency])
 
+    @property
+    def get_type(self):
+        return "checklist"
+
 class Task(models.Model):
     checklist = models.ForeignKey("CheckList")
     task_number = models.IntegerField()
-    description = models.CharField(max_length = 1024, unique=True)
+    description = models.CharField(max_length = 1024)
     
     

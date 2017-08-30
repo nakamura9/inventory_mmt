@@ -16,12 +16,10 @@ urlpatterns = [
     name="update_checklist"),
     url(r'^delete_checklist/(?P<pk>[\w ]+)/?$', ch_views.delete_checklist,
     name="delete_checklist"),
-    url(r'^add_task/?$', ch_views.add_task,
-    name="add_task"),
+    
     url(r'^hold_checklist/(?P<pk>[\w ]+)/??$', ch_views.hold_checklist,
     name="hold_checklist"),
-    url(r'^remove_task/?$', ch_views.remove_task,
-    name="remove_task"),
+    
 
    
 ]

@@ -32,12 +32,12 @@
 {% block body_script %}
 
     function addTask(){
-        $.post("{% url 'checklists:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+        $.post("{% url 'ajax:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
     }
 
     function deleteTask(task){
         var taskContent = task.parentElement.textContent.replace(" Delete", "");
-        $.post("{% url 'checklists:remove_task' %}", data={"task": taskContent});
+        $.post("{% url 'ajax:remove_task' %}", data={"task": taskContent});
         $("p:contains('*')".replace("*", taskContent)).remove();
     }
     function editTasks(data){

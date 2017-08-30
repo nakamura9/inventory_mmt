@@ -49,7 +49,9 @@ class Breakdown(AbstractJob):
 class PlannedJob(AbstractJob):
     scheduled_for = models.DateField()
 
-
+    @property
+    def get_type(self):
+        return "job"
 
 class JobCard(models.Model):
     completion_epoch = models.DateTimeField()

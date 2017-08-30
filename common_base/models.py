@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils import timezone
 
 from django.contrib.auth.models import User
 
@@ -13,3 +14,14 @@ class Account(User):
     role = models.CharField(max_length=128, choices= roles)
     def __str__(self):
         return self.username + " -> " + self.role
+
+
+class Task(models.Model):
+    task_number = models.IntegerField()
+    description = models.CharField(max_length=1024)
+
+"""class Comment(models.Model):
+    parent = models.
+    author = models.ForeignKey("Account")
+    content = models.CharField(max_length = 1024)
+    authored_date = models.DateField(default=timezone.now) """

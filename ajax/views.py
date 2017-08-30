@@ -75,3 +75,34 @@ def ajaxAuthenticate(request):
     else:
         return HttpResponse(json.dumps({"authenticated":False}),
                             content_type="application/json")
+
+
+@csrf_exempt
+def add_task(request):
+    if request.is_ajax():
+        if request.POST != "":
+            request.session["tasks"].append(request.POST["task"])
+            request.session.modified = True
+            return HttpResponse("0")
+        else:
+            return HttpResponse("-1")
+    else:
+        return Http404()
+
+@csrf_exempt
+def remove_task(request):
+    if not request.is_ajax:
+        return Http404()
+    if request.POST == "" or \
+        "tasks" not in request.session:
+        return HttpResponse("-1")
+
+    if request.POST["task"] in request.session["tasks"]:
+        request.session["tasks"].pop(request.POST["task"])
+        request.session.modified = True
+    try:
+        Task.objects.get(description=request.POST["task"]).delete()
+    except:
+        return Http404()
+
+    return HttpResponse("0")

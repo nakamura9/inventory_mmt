@@ -36,8 +36,9 @@
             <h2>Month View:</h2>
             <hr />
             <h4>Key:</h4>
-            <p><span style="color:white; background-color:green; min-width:30px;">__n__</span> - Checklists</p>
-            <p><span style="color:white; background-color:yellow; min-width:30px;">__n__</span> - Planned Jobs</p>
+            <p><span style="color:white; background-color:#0f0; min-width:50px; display:inline-block;">.</span> - Checklists</p>
+            <p><span style="color:white; background-color:yellow; min-width:50px; display:inline-block;">.</span> - Planned Jobs</p>
+            <p><span style="color:white; background-color:grey; min-width:50px; display:inline-block;">.</span> - Orders</p>
             <h3>Select view.</h3>
             <hr />
             {% if mode == "maintenance" %}
@@ -50,15 +51,18 @@
             <a  class="btn btn-primary" href = "{% url 'planning:production-day' year=month.year month=month.month day=1 %}">Day</a>
             {% endif %}
 
-            <h4>Select Date.</h4>
-            <hr />
-            <select class="form-control"  id="month_select">
-                    
-                {% for i in "xxxxxxxxxxxx" %}
-                <option value="{{forloop.counter}}">{{forloop.counter}}</option>
-                {% endfor %}
-            </select>
-            <button class="btn btn-primary" onclick="selectMonth()">Select Month</button>
+        <div class="bg-info">
+            <form action="" method="GET" role="form">
+                <legend>Filters</legend>
+            
+                <div class="form-group">
+                    <table>
+                        {{form.as_table}}
+                    </table>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
         </div>
         <div class="col-sm-9">
             <table>

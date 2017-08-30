@@ -21,13 +21,31 @@
     <div class="row">
         <div class="col-sm-3 well">
             <h2>Day View:</h2><hr />
-            <h4>Select view</h4>
+            <h3>Select view</h3>
+            {% if mode == "maintenance" %}
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=day.date.year month=day.date.month %}" >Month</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=day.date.year month=day.date.month week=1 %}">Week</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
+            {% else %}
+            <a  class="btn btn-primary" href = "{% url 'planning:production-month' year=day.date.year month=day.date.month %}" >Month</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:production-week' year=day.date.year month=day.date.month week=1 %}">Week</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:production-day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
+            {% endif %}
+            <div class="bg-info">
+                <form action="" method="GET" role="form">
+                    <legend>Filters</legend>
+                
+                    <div class="form-group">
+                        <table>
+                            {{form.as_table}}
+                        </table>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
+            </div>
         </div>
-        <div class="col-sm-9">
-            <div class="panel panel-primary">
+        <div class="col-sm-6">
+            <div class="panel panel-primary" >
                 <div class="panel-heading ">
                     <h3>{{day.weekday.1}}, {{day.date}}</h3>
                 </div>
@@ -36,7 +54,7 @@
                         <p>There are no tasks scheduled for this day</p>
                     {% else %}
                         
-                            <table>
+                            <table class="table-striped">
                                 <col width="50">
                                 <col width="300">
                                 <thead>
@@ -49,7 +67,12 @@
                                 {% for task in day.agenda %}
                                     <tr>
                                         <td class="time">{{forloop.counter}}</td>
-                                        <td class="task">{{task|truncatechars:60}}.</td>        
+                                        {% if task.get_type == 'checklist' %}
+                                        <td class="task"><a href="{% url 'checklists:checklist_details' pk=task.pk %}">{{task|truncatechars:60}}</a></td>
+                                        {% elif task.get_type == 'job' %}
+                                        <td class="task"><a href="{% url 'jobcards:planned_job_detail' pk=task.pk %}">{{task|truncatechars:60}}</a></td>
+                                        {% endif %} 
+                                              
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -58,5 +81,9 @@
                 </div>
             </div>
         </div>
+        <div class="col-sm-3"></div>
     </div>
+{% endblock %}
+{% block body_script %}
+$("#id_date").datepicker();
 {% endblock %}

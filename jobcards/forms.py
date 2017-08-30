@@ -47,9 +47,18 @@ class UnplannedJobForm(forms.ModelForm, BootstrapMixin):
 
 
 class JobListFilterForm(forms.Form):
-    start_date = forms.DateField()
-    end_date = forms.DateField()
+    def __init__(self, *args, **kwargs):
+        super(JobListFilterForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            field = self.fields.get(field)
+            field.widget.attrs['class'] ="form-control"
+ 
+ 
+    start_date = forms.DateField(required = False)
+    end_date = forms.DateField(required = False)
     resolver = forms.ChoiceField(choices = [(acc.pk, acc.username) \
-                                    for acc in Account.objects.all()])
+                                    for acc in Account.objects.all()],
+                                    required = False)
     machine = forms.ChoiceField(choices = [(mach.pk, mach.machine_name) \
-                                                for mach in Machine.objects.all()])
+                                        for mach in Machine.objects.all()],
+                                        required = False)
