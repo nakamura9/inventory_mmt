@@ -17,11 +17,32 @@ class Account(User):
 
 
 class Task(models.Model):
+    created_for = models.CharField(max_length=24, choices=[
+                            ("checklist", "Checklist"),
+                            ("work_order", "Work Order"),
+                            ("preventative_task", "Preventative Task")
+    ])
     task_number = models.IntegerField()
     description = models.CharField(max_length=1024)
 
-"""class Comment(models.Model):
-    parent = models.
+class Comment(models.Model):
+    created_for = models.CharField(max_length=24, choices=[
+                            ("checklist", "Checklist"),
+                            ("work_order", "Work Order"),
+                            ("preventative_task", "Preventative Task")
+    ])
     author = models.ForeignKey("Account")
     content = models.CharField(max_length = 1024)
-    authored_date = models.DateField(default=timezone.now) """
+    authored_date = models.DateField(default=timezone.now) 
+
+class Category(models.Model):
+    created_for = models.CharField(max_length=24, choices=[
+                            ("checklist", "Checklist"),
+                            ("work_order", "Work Order"),
+                            ("preventative_task", "Preventative Task")
+    ])
+    name = models.CharField(max_length= 32, unique=True)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name

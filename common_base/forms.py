@@ -1,5 +1,5 @@
 from django import forms
-from .models import Account
+from .models import Account, Category
 
 class BootstrapMixin(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -19,3 +19,9 @@ class userForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Account
         fields = ["username", "role","first_name", "last_name", "password"]
+
+
+class CategoryForm(forms.ModelForm, BootstrapMixin): 
+    class Meta:
+        model = Category
+        fields = ["name", "description"]

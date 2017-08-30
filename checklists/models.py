@@ -8,14 +8,6 @@ import datetime
 def now():
     return datetime.datetime.now().strftime("%H%M")
 
-
-class Comment(models.Model):
-    checklist = models.ForeignKey("checklist")
-    author = models.ForeignKey("common_base.Account")
-    content = models.CharField(max_length=1024)
-    authored_date = models.DateField(default = timezone.now)
-
-
 class Checklist(models.Model):
 
     def __str__(self):
@@ -52,7 +44,7 @@ class Checklist(models.Model):
     category = models.CharField(max_length = 64,
                     choices=[("electrical", "Electrical"),
                     ("mechanical", "Mechanical")])
-    frequency = models.CharField(max_length = 64, 
+    frequency = models.CharField(max_length = 16, 
                         choices = [("daily", "Daily"),
                                     ("weekly", "Weekly"),
                                     ("fortnightly", "Every 2 weeks"),
@@ -61,7 +53,9 @@ class Checklist(models.Model):
                                     ("bi-annually", "Every 6 Months"), 
                                     ("yearly", "Yearly")])
     on_hold = models.BooleanField(default=False)
-
+    comments = models.ManyToManyField("common_base.Comment")
+    tasks = models.ManyToManyField("common_base.Task")
+    
     @property
     def is_open(self):
         if self.on_hold:
@@ -86,10 +80,3 @@ class Checklist(models.Model):
     @property
     def get_type(self):
         return "checklist"
-
-class Task(models.Model):
-    checklist = models.ForeignKey("CheckList")
-    task_number = models.IntegerField()
-    description = models.CharField(max_length = 1024)
-    
-    

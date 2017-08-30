@@ -8,9 +8,55 @@ import time
 import datetime
 
 
-# Create your models here.
+class WorkOrder(models.Model):
+    type = models.ForeignKey("inv.Category")
+    machine = models.ForeignKey("inv.Machine", null=True)
+    section = models.ForeignKey("inv.Section", null=True)
+    subunit = models.ForeignKey("inv.SubUnit", null=True)
+    subassembly = models.ForeignKey("inv.SubAssembly", null=True)
+    component = models.ForeignKey("inv.Component", null=True)
+    description = models.TextField()
+    execution_date = models.DateField(auto_now=True)
+    estimated_labour_time = models.DurationField()
+    assigned_to = models.ManyToManyField("common_base.Account")
+    priority = models.CharField(max_length=4,
+                                choices=[("high", "High"), ("low", "Low")])
+    costing = models.ForeignKey("Costing", null=True)
+    status = models.CharField(max_length=16, choices=[
+                            ("requested", "Requested"),
+                        ("accepted", "Accepted"),
+                        ("completed", "Completed"),
+                        ("approved", "Approved")
+    ], default="requested")
+    resolver_action= models.TextField()
+    actual_labour_time = models.DurationField()
+    downtime = models.DurationField()
+    completion_date = models.DateField()
+    spares_issued = models.ManyToManyField("inv.Spares")
+    spares_returned = models.ManyToManyField("inv.Spares")
 
-#people = [(a.username,a.username) for a in Account.objects.all()]
+
+class PreventativeTask(models.Model):
+    tasks = models.ManyToManyField("common_base.Task")
+    frequency = models.CharField(max_length = 16, 
+                        choices = [("once", "Once off"),
+                                    ("daily", "Daily"),
+                                    ("weekly", "Weekly"),
+                                    ("fortnightly", "Every 2 weeks"),
+                                    ("monthly", "Monthly"),
+                                    ("quarterly", "Every 3 Months"),
+                                    ("bi-annually", "Every 6 Months"), 
+                                    ("yearly", "Yearly")])
+
+    estimated_labour_time = models.DurationField()
+    estimated_downtime = models.DurationField()
+    required_spares = models.ManyToManyField("inv.Spares")
+    assignments = models.ManyToManyField("common_base.Account")
+
+class Costing(models.Model):
+    id= models.CharField(max_length=32, primary_key=32)
+
+
 class AbstractJob(models.Model):
     def __str__(self):
         return self.description

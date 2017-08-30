@@ -6,8 +6,9 @@ import checklists
 import jobcards
 from .models import *
 from .forms import *
+from common_base.forms import CategoryForm
 
-from common_base.models import Account
+from common_base.models import Account, Category
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 

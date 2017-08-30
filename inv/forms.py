@@ -2,10 +2,6 @@ from django import forms
 from .models import *
 from common_base.forms import BootstrapMixin
 
-class CategoryForm(forms.ModelForm, BootstrapMixin): 
-    class Meta:
-        model = Category
-        fields = ["name", "description"]
 
 
 class InventoryItemForm(forms.ModelForm, BootstrapMixin):
