@@ -63,7 +63,8 @@ class NewPlannedJobView(CreateView):
             return HttpResponseRedirect("jobcards:new_planned_job")
 
         for id, task in enumerate(self.request.session.get("tasks")):
-            Task(task_number=id,
+            Task(created_for = "preventative_task",
+                task_number=id,
             description=task).save()
 
         self.request.session["tasks"] = []

@@ -11,12 +11,12 @@ class Asset(models.Model):
     Machine Base class
     Has a spares list relationship via a foreign key
     """
-    asset_id = models.CharField(max_length=32, primary_key=True)
-    category = models.ForeignKey("Category")
+    asset_unique_id = models.CharField(max_length=32, unique=True)
+    category = models.ForeignKey("common_base.Category")
     spares_list = models.ManyToManyField("Spares")
 
     def __str__(self):
-        return self.name
+        return self.asset_unique_id
 
 class Spares(models.Model):
     stock_id = models.CharField(max_length=32)
@@ -36,9 +36,9 @@ class Plant(models.Model):
     def __str__(self):
         return self.plant_name
 
-class Machine(Asset):
+class Machine(models.Model):
     """
-    Will inherit from asset and use its attributes.
+    Will be related to an asset and use its attributes.
     Level one equipment.
     Parent : Plant
     Child  : Section
@@ -54,8 +54,7 @@ class Machine(Asset):
     machine_name = models.CharField(max_length=128)
     unique_id = models.CharField(max_length=24, primary_key=True)
     manufacturer = models.CharField(max_length=128)
-    estimated_value = models.CharField(max_length=128)
-    #documentation = models.FileField()
+    asset_data = models.ForeignKey("Asset", null=True)
     commissioning_date = models.DateField()
 
     def __str__(self):

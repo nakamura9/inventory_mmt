@@ -18,5 +18,7 @@
 </div>
 {% endblock %}
 {% block body_script %}
-$("#id_commissioning_date").datepicker();
+$("#id_commissioning_date").datepicker({changeMonth:true,
+                                        changeYear: true,
+                                        showButtonPanel:true});
 {% endblock %}

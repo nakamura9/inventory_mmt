@@ -13,7 +13,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from .forms import CheckListCreateForm
 from django.forms import widgets
-from  common_base.models import  Account
+from  common_base.models import  Account, Task
 from django.contrib.auth import authenticate
 import json
 
@@ -64,8 +64,8 @@ class ChecklistCompleteView(DetailView):
                 auth =self.get_object().resolver
                 chk = self.get_object()
                 Comment(author=auth,
-                checklist = chk,
-                        content=self.request.POST["comment"]).save()
+                created_for="checklist",
+                content=self.request.POST["comment"]).save()
             return HttpResponseRedirect(reverse("inventory:inventory-home"))
 
         else:
@@ -96,7 +96,7 @@ class ChecklistCreateView(CreateView):
         
         
         for id, task in enumerate(self.request.session["tasks"]):
-            Task(checklist =Checklist.objects.get(title= self.request.POST["title"]) ,
+            Task(created_for="checklist",
                 task_number = id,
                 description=task).save()
             self.request.session["tasks"] = []
@@ -123,7 +123,7 @@ class ChecklistUpdateView(UpdateView):
                                         kwargs={"pk": self.kwargs["pk"]}))
         
         for id, task in enumerate(self.request.session["tasks"]):
-            Task(checklist =Checklist.objects.get(title= self.request.POST["title"]) ,
+            Task(created_for="checklist" ,
                 task_number = id,
                 description=task).save()
         
@@ -158,7 +158,7 @@ def hold_checklist(request, pk):
     chk.on_hold = True
     chk.save()
     Comment(author=auth,
-            checklist = chk,
+            created_for="checklist",
             content="HOLD:" + request.POST["reason"]).save()
     return HttpResponse(json.dumps({"authenticated":True}), 
                             content_type="application/json")

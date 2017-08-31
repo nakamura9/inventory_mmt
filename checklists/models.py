@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
 import datetime
+from common_base.utilities import time_choices
 
 
 def now():
@@ -26,13 +27,11 @@ class Checklist(models.Model):
                             unique=True, primary_key=True)
     creation_date = models.DateField()
     last_completed_date = models.DateField(blank = True, null=True)
-    estimated_time= models.CharField(max_length=4, choices = [
-                ("00%d" % i, "00%d" % i)for i in range(10, 60, 5)] \
-                + [("0%d00" % i, "0%d00" % i) for i in range(1, 8)], 
-                default = now)
-    start_time = models.CharField(max_length = 5, choices = [
-                ("0%d00" % i, "%d:00" % i) for i in range(6, 9)] \
-                 + [("%d00" % i, "%d:00" % i) for i in range(10, 17)] )
+    estimated_time= models.DurationField(choices = [] \
+                         + time_choices("00:05:00", "00:35:00", "00:05:00") \
+                         + time_choices("01:00:00", "08:01:00", "01:00:00"))
+    start_time = models.TimeField(choices=time_choices(
+                                            "06:30:00", "17:30:00", "00:30:00"))
     machine = models.ForeignKey("inv.Machine")
     section = models.ForeignKey("inv.Section", 
                 null=True, on_delete=models.SET_NULL)

@@ -24,4 +24,4 @@ class userForm(forms.ModelForm, BootstrapMixin):
 class CategoryForm(forms.ModelForm, BootstrapMixin): 
     class Meta:
         model = Category
-        fields = ["name", "description"]
+        fields = ["created_for", "name", "description"]

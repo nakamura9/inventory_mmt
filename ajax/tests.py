@@ -59,6 +59,18 @@ class selectAjaxCalls(TestCase, TestDataMixin):
         
         self.assertContains(response, "components")
 
+    
+    def test_add_task(self):
+        session = self.client.session
+        session["tasks"] = []
+        session.save()
+        response = self.client.post(reverse("ajax:add_task"), 
+                                    {"task":"Some Test Task"},
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.content, "0")# '0' indicates success
+
+
     def test_ajaxAuthenticate(self):
         response = self.client.post(reverse("ajax:ajax-authenticate"),
                                     {"username": "Test User",

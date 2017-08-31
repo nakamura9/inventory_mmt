@@ -161,7 +161,6 @@ class ViewTests(TestCase, TestDataMixin):
                                     data={"unique_id":"P_T_M",
                                             "machine_name": "Posted Test Machine",
                                             "manufacturer": "Test Manufacturer",
-                                            "estimated_value": "2000000",
                                             "commissioning_date":datetime.date.today()})
         
         self.assertIsInstance(Machine.objects.get(pk="P_T_M"), Machine)
@@ -244,17 +243,6 @@ class ViewTests(TestCase, TestDataMixin):
         
         self.assertIsInstance(InventoryItem.objects.get(pk="101"), InventoryItem)
 
-
-
-    def test_post_check_and_delete_category(self):
-        #delete view for category not yet implemented
-        response = self.client.post(reverse("inventory:new-category"),
-                                    data={"name":"Posted Test Category",
-                                        "description": "Posted Test Description"
-                                        })
-        
-        self.assertIsInstance(Category.objects.get(name="Posted Test Category"), Category)
-        
 
 class ModelTests(TestCase):
     def test_create_plant(self):

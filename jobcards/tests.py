@@ -56,7 +56,9 @@ class ViewTests(TestCase, TestDataMixin):
         data["section"] = Section.objects.first().pk
         data["subunit"] = SubUnit.objects.first().pk
         data["scheduled_for"] = datetime.date.today()
-
+        session = self.client.session
+        session["tasks"] = ["some test task"]
+        session.save()
         response = self.client.post(reverse("jobcards:new_planned_job"),
                                     data = data)
         

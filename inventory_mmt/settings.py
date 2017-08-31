@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'inv',
-    'inventory_mmt',
     'jobcards',
     'checklists',
     'rca',
@@ -47,6 +46,7 @@ INSTALLED_APPS = [
     'ajax',
     'maintenance',
     'planning',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

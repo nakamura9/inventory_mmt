@@ -14,34 +14,13 @@ class ModelTests(TestCase, TestDataMixin):
         cls.create_dummy_accounts()
         cls.create_test_checklist()
       
-    def test_create_comment(self):
-        comment = models.Comment.objects.create(
-            checklist=models.Checklist.objects.get(title="Test Checklist"),
-            author=Account.objects.first(),
-            content="Test Comment"
-        )
-        self.assertIsInstance(comment, models.Comment)
+    
 
 
     def test_create_checklist(self):
         self._checklist_data["title"] = "Unit Test Checklist"
         check = models.Checklist.objects.create(**self._checklist_data)
         self.assertIsInstance(check, models.Checklist)
-
-    def test_create_task(self):
-        task = models.Task.objects.create(
-                checklist=models.Checklist.objects.get(title="Test Checklist"),
-                    task_number=1, description="A Test Checklist Task")
-        self.assertIsInstance(task, models.Task)
-
-
-
-    """def test_tasks_associated_with_checklists(self):
-        pass
-
-    def test_comments_associated_with_checklists(self):
-        pass
-    """
 
 
     def test_checklist_properties(self):
@@ -147,16 +126,6 @@ class AjaxRequestsTests(TestCase, TestDataMixin):
         super(AjaxRequestsTests, cls).setUpClass()
         cls.client = Client()
 
-
-    def test_add_task(self):
-        session = self.client.session
-        session["tasks"] = []
-        session.save()
-        response = self.client.post(reverse("checklists:add_task"), 
-                                    {"task":"Some Test Task"},
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-
-        self.assertEqual(response.content, "0")# '0' indicates success
 
 
     def test_remove_task(self):

@@ -13,11 +13,11 @@ class PlannedMaintenanceFilterForm(forms.Form):
 
         checklists = forms.BooleanField(required=False)
         planned_jobs = forms.BooleanField(required=False)
-        resolver = forms.ChoiceField(choices = [(acc.pk, acc.username) \
+        """resolver = forms.ChoiceField(choices = [(acc.pk, acc.username) \
                                     for acc in Account.objects.all()],
                                     required=False)
         machine = forms.ChoiceField(choices = [(mach.pk, mach.machine_name) \
                                                 for mach in Machine.objects.all()],
-                                                required=False)
+                                                required=False)"""
         start_date = forms.DateField(required=False)
         end_date = forms.DateField(required=False)

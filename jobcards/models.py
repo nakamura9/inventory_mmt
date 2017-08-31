@@ -9,7 +9,7 @@ import datetime
 
 
 class WorkOrder(models.Model):
-    type = models.ForeignKey("inv.Category")
+    type = models.ForeignKey("common_base.Category")
     machine = models.ForeignKey("inv.Machine", null=True)
     section = models.ForeignKey("inv.Section", null=True)
     subunit = models.ForeignKey("inv.SubUnit", null=True)
@@ -32,8 +32,8 @@ class WorkOrder(models.Model):
     actual_labour_time = models.DurationField()
     downtime = models.DurationField()
     completion_date = models.DateField()
-    spares_issued = models.ManyToManyField("inv.Spares")
-    spares_returned = models.ManyToManyField("inv.Spares")
+    spares_issued = models.ManyToManyField("inv.Spares", related_name="%(class)s_spares_issued")
+    spares_returned = models.ManyToManyField("inv.Spares",related_name="%(class)s_spares_returned")
 
 
 class PreventativeTask(models.Model):

@@ -25,7 +25,7 @@ class MachineForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Machine
         fields = ["commissioning_date", "machine_name", 
-                "estimated_value", "manufacturer", 
+                 "manufacturer", 
                 "unique_id"]
 
 class SectionForm(forms.ModelForm, BootstrapMixin):

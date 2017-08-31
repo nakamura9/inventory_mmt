@@ -23,7 +23,7 @@ class Task(models.Model):
                             ("preventative_task", "Preventative Task")
     ])
     task_number = models.IntegerField()
-    description = models.CharField(max_length=1024)
+    description = models.CharField(max_length=1024, unique=True)
 
 class Comment(models.Model):
     created_for = models.CharField(max_length=24, choices=[
