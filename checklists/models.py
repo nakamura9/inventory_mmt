@@ -11,6 +11,9 @@ def now():
 
 class Checklist(models.Model):
 
+    def save(self, *args, **kwargs):
+        print self.estimated_time
+        super(Checklist, self).save(*args, **kwargs)
     def __str__(self):
         return self.title
     
@@ -28,8 +31,10 @@ class Checklist(models.Model):
     creation_date = models.DateField()
     last_completed_date = models.DateField(blank = True, null=True)
     estimated_time= models.DurationField(choices = [] \
-                         + time_choices("00:05:00", "00:35:00", "00:05:00") \
-                         + time_choices("01:00:00", "08:01:00", "01:00:00"))
+                        + time_choices("00:05:00", "00:35:00", 
+                                        "00:05:00", delta=True) \
+                         + time_choices("01:00:00", "08:01:00", 
+                                        "01:00:00", delta=True))
     start_time = models.TimeField(choices=time_choices(
                                             "06:30:00", "17:30:00", "00:30:00"))
     machine = models.ForeignKey("inv.Machine")

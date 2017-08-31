@@ -16,7 +16,7 @@
                     <td>Description:</td>
                     <td>Completed:</td>
                 </tr>
-            {% for task in object.task_set.all %}
+            {% for task in object.tasks %}
                 <tr>
                 <td>{{task.description}}</td> <td><input type="checkbox"></td>
                 </tr>

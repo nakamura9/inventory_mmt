@@ -94,11 +94,12 @@ class ChecklistCreateView(CreateView):
         if len(self.request.session.get("tasks")) == 0:
             return HttpResponseRedirect(reverse("checklists:create_checklist"))
         
-        
+        checklist = Checklist.objects.get(pk=self.request.POST["title"])
         for id, task in enumerate(self.request.session["tasks"]):
-            Task(created_for="checklist",
+            checklist.tasks.add(Task(created_for="checklist",
                 task_number = id,
-                description=task).save()
+                description=task).save())
+            checklist.save()
             self.request.session["tasks"] = []
             self.request.session.modified = True
         return resp

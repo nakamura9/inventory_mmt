@@ -13,8 +13,10 @@ class CheckListCreateForm(forms.ModelForm, BootstrapMixin):
         self.fields["subunit"].widget.attrs["onchange"] = \
                 "prepSubAssemblyUpdate()"
         
+
     class Meta:
         model= Checklist
         fields = ["title", "creation_date", 'estimated_time', 'start_time',
                     "machine", "section","subunit", "subassembly", "resolver", 
                     "category", "frequency"]
+

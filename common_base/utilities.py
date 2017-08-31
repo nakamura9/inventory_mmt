@@ -1,13 +1,15 @@
 import datetime
 import pytz
 
-def time_choices(start, stop, interval):
+def time_choices(start, stop, interval, delta=False):
     """
     start and stop are strings that represent time in the format H:M:00.
     interval is the time to be incremented between start and stop in the
     same format as above.
     The function returns a list of tuples in human readable format from
-    the start time up to but not including the end time
+    the start time up to but not including the end time. 
+    The function can either return strings that correspond to time or 
+    strings that correspond to timedelta objects.
     """
 
     times = []
@@ -20,7 +22,13 @@ def time_choices(start, stop, interval):
 
     current_time = _start
     while current_time < _stop:
-        times.append((current_time.strftime("%H:%M:00"),current_time.strftime("%H:%M:00")))
+        if delta:
+            times.append((datetime.timedelta(hours=current_time.hour,
+                                            minutes=current_time.minute),
+                                                current_time.strftime("%H:%M")))
+        else:
+            times.append((current_time ,current_time.strftime("%H:%M")))
+        
         current_time = (datetime.datetime.combine(datetime.date.today(), current_time) \
                         + datetime.timedelta(hours = _interval.hour,
                                             minutes=_interval.minute,
