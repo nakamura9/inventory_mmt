@@ -19,7 +19,7 @@
             <h4>Existing Tasks:</h4>
             <div id="tasklist">
                 
-            {% for task in object.task_set.all %}
+            {% for task in object.tasks.all %}
                 <p>{{task.description}} <button class="btn btn-danger"  onclick="deleteTask(this)">Delete</button></p>
             {% endfor %}
 

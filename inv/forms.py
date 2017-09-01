@@ -3,6 +3,19 @@ from .models import *
 from common_base.forms import BootstrapMixin
 
 
+class SparesForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = Spares
+        fields = ["stock_id", "quantity", "reorder_level",
+        "reorder_quantity","last_order_price","category"]
+
+
+
+class AssetForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = Asset
+        fields = ["asset_unique_id", "spares_list", "category"]
+
 
 class InventoryItemForm(forms.ModelForm, BootstrapMixin):
     class Meta:
@@ -25,7 +38,7 @@ class MachineForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Machine
         fields = ["commissioning_date", "machine_name", 
-                 "manufacturer", 
+                 "manufacturer", "asset_data",
                 "unique_id"]
 
 class SectionForm(forms.ModelForm, BootstrapMixin):

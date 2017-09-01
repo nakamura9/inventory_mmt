@@ -13,8 +13,6 @@ class ModelTests(TestCase, TestDataMixin):
         super(ModelTests, cls).setUpTestData()
         cls.create_dummy_accounts()
         cls.create_test_checklist()
-      
-    
 
 
     def test_create_checklist(self):

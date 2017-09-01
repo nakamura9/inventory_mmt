@@ -1,5 +1,18 @@
 from django.conf.urls import url
 import views
+spares_urls = [
+    url(r'^spares-details/(?P<pk>[\d]+)/?$', views.SparesDetail.as_view(), name="spares-details"),
+    url(r'^spares-create/?$', views.SparesCreate.as_view(), name="spares-create"),
+    url(r'^spares-update/(?P<pk>[\d]+)/?$', views.SparesUpdate.as_view(), name="spares-update"),
+    ]
+
+
+asset_urls = [
+    url(r'^asset-details/(?P<pk>[\d]+)/?$', views.AssetDetail.as_view(), name="asset-details"),
+    url(r'^asset-create/?$', views.AssetCreate.as_view(), name="asset-create"),
+    url(r'^asset-update/(?P<pk>[\d]+)/?$', views.AssetUpdate.as_view(), name="asset-update"),
+    ]
+
 
 component_urls =[ 
     
@@ -92,4 +105,4 @@ urlpatterns = [
     url(r'^new-category/?$', views.categoryForm.as_view(), name='new-category'),
 
 ] + component_urls + machine_urls + subassembly_urls + subunit_urls + order_urls + \
-    production_inventory_urls + section_urls
+    production_inventory_urls + section_urls + asset_urls + spares_urls

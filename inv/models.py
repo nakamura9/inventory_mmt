@@ -19,6 +19,11 @@ class Asset(models.Model):
         return self.asset_unique_id
 
 class Spares(models.Model):
+    """
+    Need to be linked somehow to components.
+    relationship, all spares are machine components but not all components are spares
+    """
+    
     stock_id = models.CharField(max_length=32)
     category = models.ForeignKey("common_base.Category")
     quantity = models.IntegerField()
@@ -173,6 +178,7 @@ class SubAssembly(models.Model):
     subunit = models.ForeignKey("SubUnit", null=True, on_delete=models.SET_NULL)
     section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
     machine = models.ForeignKey("Machine", null=True, on_delete=models.SET_NULL)
+    
 
     def __str__(self):
         return self.unit_name
@@ -199,7 +205,9 @@ class Component(models.Model):
     section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
     subunit = models.ForeignKey("SubUnit", null=True, on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("SubAssembly", null=True, on_delete=models.SET_NULL)
+    spares_data=models.ForeignKey("Spares", null=True)
 
+    
     def __str__(self):
         return self.component_name
 

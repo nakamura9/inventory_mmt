@@ -39,6 +39,37 @@ class EngineeringInventoryView(TemplateView):
 #                      Engineering Inventory Creation                         #
 ###############################################################################
 
+class AssetCreate(CreateView):
+    template_name = os.path.join("inv", "addasset.html") 
+    model = Asset
+    form_class = AssetForm
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class AssetUpdate(UpdateView):
+    template_name = os.path.join("inv", "addasset.html") 
+    model = Asset
+    form_class = AssetForm
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class AssetDetail(DetailView):
+    template_name = os.path.join("inv", "asset_detail.html") 
+    model = Asset
+
+class SparesCreate(CreateView):
+    template_name = os.path.join("inv", "addspares.html") 
+    model = Asset
+    form_class = SparesForm
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class SparesUpdate(UpdateView):
+    template_name = os.path.join("inv", "addspares.html") 
+    model = Asset
+    form_class = SparesForm
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class SparesDetail(DetailView):
+    template_name = os.path.join("inv", "spares_detail.html") 
+    model = Spares
 
 class machineView(CreateView):
     template_name = os.path.join("inv", "addmachine.html") 

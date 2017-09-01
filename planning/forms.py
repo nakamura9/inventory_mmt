@@ -5,12 +5,8 @@ from common_base.models import Account
 from common_base.forms import BootstrapMixin
 
 class CalenderFilterForm(BootstrapMixin):
-    """machine = forms.ChoiceField(choices= [(mech.pk, mech.machine_name) \
-                                            for mech in Machine.objects.all()],
-                                            required=False)
-    resolver = forms.ChoiceField(choices= [(r.pk, r.username) \
-                                            for r in Account.objects.all()],
-                                            required=False)"""
+    machine = forms.ModelChoiceField(Machine.objects.all(), required=False)
+    resolver = forms.ModelChoiceField(Account.objects.all(), required=False)
     checklists = forms.BooleanField(initial=True, required=False)
     planned_jobs = forms.BooleanField(initial=True, required=False)
     #orders = forms.BooleanField(initial=True)

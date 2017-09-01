@@ -96,12 +96,14 @@ class ChecklistCreateView(CreateView):
         
         checklist = Checklist.objects.get(pk=self.request.POST["title"])
         for id, task in enumerate(self.request.session["tasks"]):
-            checklist.tasks.add(Task(created_for="checklist",
+            _task = Task(created_for="checklist",
                 task_number = id,
-                description=task).save())
+                description=task)
+            _task.save()
+            checklist.tasks.add(_task)
             checklist.save()
-            self.request.session["tasks"] = []
-            self.request.session.modified = True
+        self.request.session["tasks"] = []
+        self.request.session.modified = True
         return resp
 
 
@@ -123,10 +125,14 @@ class ChecklistUpdateView(UpdateView):
             return HttpResponseRedirect(reverse("checklists:update_checklist", 
                                         kwargs={"pk": self.kwargs["pk"]}))
         
+        checklist = self.get_object()
         for id, task in enumerate(self.request.session["tasks"]):
-            Task(created_for="checklist" ,
+            _task = Task(created_for="checklist" ,
                 task_number = id,
-                description=task).save()
+                description=task)
+            _task.save()
+            checklist.tasks.add(_task)
+            checklist.save()
         
         self.request.session["tasks"] = []
         self.request.session.modified = True

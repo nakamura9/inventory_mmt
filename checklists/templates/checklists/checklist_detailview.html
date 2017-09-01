@@ -13,7 +13,7 @@
             <br />
             <h4>Tasks:</h4>
             <hr />
-            {% for task in object.task_set.all %}
+            {% for task in object.tasks.all %}
                 <p>{{forloop.counter}}.    {{task.description}}</p>
             {% endfor %}
            
