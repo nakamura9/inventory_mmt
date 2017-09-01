@@ -1,0 +1,45 @@
+<div class="modal fade" id="category-modal-view">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">New Category</h4>
+            </div>
+            <div class="modal-body">
+                
+                <form action="{% url 'ajax:add-category' %}" method="POST" role="form" id="category-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="created_for">Created For:</label>
+                        <select class="form-control" name="created_for" id="id_created_for">
+                            <option value="checklist">Checklist</option>
+                            <option value="work_order">Work Order</option>
+                            <option value="preventative_task">Preventative Task</option>
+                        </select>
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="id_name" name="name" placeholder="Input field">
+                        <label for="description">Description</label>
+                        <input type="text" class="form-control" id="id_description" name="description" placeholder="Input field">
+                        
+                    </div>
+                
+                    
+                
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="javascript">
+    $("#category-form").on('success', function(this){
+        console.log("working");
+        this.parent.modal('hide');
+    })
+</script>

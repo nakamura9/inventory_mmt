@@ -7,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 import json
 from django.contrib.auth import authenticate
+from common_base.models import Category
+
 
 @csrf_exempt
 def update_section(request):
@@ -88,6 +90,14 @@ def add_task(request):
             return HttpResponse("-1")
     else:
         return Http404()
+
+def add_category(request):
+    if request.method == "POST":
+        print request.POST
+        data = request.POST.copy().dict()
+        data.pop("csrfmiddlewaretoken")
+        Category(**data).save()
+        return HttpResponse("0")
 
 @csrf_exempt
 def remove_task(request):

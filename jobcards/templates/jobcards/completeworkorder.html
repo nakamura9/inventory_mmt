@@ -1,0 +1,62 @@
+{% extends "window.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4 bg-info" style="padding: 10px;">
+            <h3>Work Order Details</h3>
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <td>{{object.type}}</td>
+                </tr>
+                <tr>
+                    <th>Machine</th>
+                    <td>{{object.machine}}</td>
+                </tr>
+                <tr>
+                    <th>Section</th>
+                    <td>{{object.section}}</td>
+                </tr>
+                <tr>
+                    <th>SubUnit</th>
+                    <td>{{object.subunit}}</td>
+                </tr>
+                <tr>
+                    <th>SubAssembly</th>
+                    <td>{{object.subassembly}}</td>
+                </tr>
+                <tr>
+                    <th>Component</th>
+                    <td>{{object.component}}</td>
+                </tr>
+                <tr>
+                    <th>Estimated Time</th>
+                    <td>{{object.estimated_labour_time}}</td>
+                </tr>
+            </table>
+            <hr />
+            <b>Description:</b>
+            <p>{{object.description}}</p>
+        </div>
+        <div class="col-sm-4 well ">
+            <h3>Complete Work Order</h3>
+            <form class="form-group" method="POST" action="" >
+                {% csrf_token %}
+                <table>
+                {{form.as_table}}
+                </table>
+            <button type="submit" class="btn btn-primary">Complete Work Order</button>
+            </form>
+        </div>
+        <div class="col-sm-4">
+            <h4>Tools:</h4>
+            <p><a class="btn btn-info" href="{% url 'inventory:spares-create' %}">Add Spares</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block body_script %}
+$("#id_completion_date").datepicker();
+
+{% endblock %}

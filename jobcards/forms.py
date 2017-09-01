@@ -1,9 +1,36 @@
-from .models import Breakdown, JobCard, PlannedJob
+from .models import Breakdown, JobCard, PlannedJob, WorkOrder, PreventativeTask
 from django import forms
 from django.utils import timezone
 from common_base.forms import BootstrapMixin
 from common_base.models import Account
 from inv.models import Machine
+
+
+
+class WorkOrderCreateForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = WorkOrder
+        fields = ["type", "machine", "section", "subunit", "subassembly", "component", "description", "execution_date", "estimated_labour_time", "assigned_to", "priority"]
+
+class WorkOrderCompleteForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = WorkOrder
+        fields = ["resolver_action", "actual_labour_time",
+                "downtime", "completion_date", "spares_issued", "spares_returned"]
+
+
+class PreventativeTaskCreateForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = PreventativeTask
+        fields = [ "machine", "section", "subunit", "subassembly", "component", "description",  "frequency", "estimated_labour_time", "estimated_downtime","required_spares", "assignments"]# tasks are handled in the POST
+
+
+class PreventativeTaskCompleteForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = PreventativeTask
+        fields = ["actual_downtime", "completed_date", "feedback",
+                "spares_used"]
+
 
 class DateInput(forms.DateInput):
     input_type = "text"

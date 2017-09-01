@@ -21,6 +21,64 @@ from django.views.generic.edit import UpdateView
 from common_base.utilities import filter_by_dates
 from common_base.models import Task
 
+class NewWorkOrderView(CreateView):
+    form_class = WorkOrderCreateForm
+    template_name = os.path.join("jobcards", "newworkorder.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class EditNewWorkOrderView(UpdateView):
+    model = WorkOrder
+    form_class = WorkOrderCreateForm
+    template_name = os.path.join("jobcards", "newworkorder.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class CompleteWorkOrderView(UpdateView):
+    model = WorkOrder
+    form_class = WorkOrderCompleteForm
+    template_name = os.path.join("jobcards", "completeworkorder.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class NewPreventativeTaskView(CreateView):
+    form_class = PreventativeTaskCreateForm
+    template_name = os.path.join("jobcards", "newpreventativetask.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+
+    def get(self, *args, **kwargs):
+        """The list of tasks that will be populated by Ajax requests"""
+        self.request.session["tasks"] = []
+        return super(NewPreventativeTaskView, self).get(*args, **kwargs)
+
+    
+    def post(self, *args, **kwargs):
+        resp = super(NewPreventativeTaskView, self).post(*args, **kwargs)
+        #makes sure there is at least one task in the session
+        if len(self.request.session.get("tasks")) == 0:
+            return HttpResponseRedirect(reverse("jobcards:new-preventative-task"))
+        
+        p_task = PreventativeTask.objects.get(description=self.request.POST["description"])# need to find another unique identifier
+        for id, task in enumerate(self.request.session["tasks"]):
+            _task = Task(created_for="preventative_task",
+                task_number = id,
+                description=task)
+            _task.save()
+            p_task.tasks.add(_task)
+            p_task.save()
+        self.request.session["tasks"] = []
+        self.request.session.modified = True
+        return resp
+
+class EditNewPreventativeTaskView(UpdateView):
+    form_class = PreventativeTaskCreateForm
+    template_name = os.path.join("jobcards", "newpreventativetask.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+
+class CompletePreventativeTaskView(UpdateView):
+    form_class = PreventativeTaskCompleteForm
+    model = PreventativeTask
+    template_name = os.path.join("jobcards", "completepreventativetask.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+
+
 class NewUnplannedJobView(CreateView):
     """
     The view for creating unplanned jobs a.k.a work orders

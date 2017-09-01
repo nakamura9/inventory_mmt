@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^ajax-authenticate/?$', ajaxAuthenticate, name="ajax-authenticate"),
     url(r'^add_task/?$', add_task, name="add_task"),
     url(r'^remove_task/?$', remove_task,name="remove_task"),
+    url(r'^add-category/?$', add_category,name="add-category"),
 ]

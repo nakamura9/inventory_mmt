@@ -31,7 +31,8 @@ class Spares(models.Model):
     reorder_quantity = models.IntegerField()
     last_order_price = models.FloatField()
     
-
+    def __str__(self):
+        return self.stock_id
 class Plant(models.Model):
     """
     Might be deprecated soon. used to distinguish main plant from sheet plant

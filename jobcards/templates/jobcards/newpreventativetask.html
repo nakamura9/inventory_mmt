@@ -1,0 +1,74 @@
+{% extends "window.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        
+        <div class="col-sm-4 well ">
+            <h3>New Scheduled Preventative Task</h3>
+            <form class="form-group" method="POST" action="" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <table>
+                {{form.as_table}}
+                </table>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="col-sm-4">
+            <h4>Tasks:</h4>
+            <div id="tasklist"></div>
+            <p><textarea id="task" rows="3" cols="48"></textarea></p>
+            <button type="button" onclick="addTask()" class="btn btn-warning">+ Add Task</button>
+        </div>
+        <div class="col-sm-4">
+            <h4>Tools:</h4>
+            <p><a class="btn btn-info" data-toggle="modal" href='#category-modal-view'>Add Category</a></p>
+            <p><a class="btn btn-info" href="{% url 'inventory:spares-create' %}">Add Spares</a></p>
+        </div>
+    </div>
+</div>
+{% include "common_base/modals/category_modal.html" %}
+{% endblock %}
+{% block body_script %}
+    var num_tasks = 0;    
+    $("#id_execution_date").datepicker();
+
+
+    //script to make sure the modal does not refresh the page
+    
+    function prepSectionUpdate(){
+        var url = "{% url 'ajax:update_section' %}";
+        var machine = $('#id_machine').val();
+        var section = $('#id_section');
+        updateSections(url, machine, section);
+}
+
+
+    function prepSubUnitUpdate(){
+        var url = "{% url 'ajax:update_subunit' %}";
+        var section = $('#id_section').val();
+        var subunit = $('#id_subunit');
+        updateSubUnits(url, section, subunit);
+    }
+
+    function addTask(){
+        $.post("{% url 'ajax:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+
+    }
+
+    function editTasks(data){
+        $("#tasklist").append(
+            "<p>" + num_tasks +". "+ $("#task").val() + "</p>"
+        );
+        $("#task").val("");
+        num_tasks += 1;
+    }
+
+    function validateForm(){
+        if(num_tasks == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+{% endblock %}

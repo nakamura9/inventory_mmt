@@ -1,0 +1,92 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4 bg-info">
+            <h4>Scheduled Task Description:</h4>
+            <table>
+                <tr>
+                    <th>Machine</th>
+                    <td>{{object.machine}}</td>
+                </tr>
+                <tr>
+                    <th>Section</th>
+                    <td>{{object.section}}</td>
+                </tr>
+                <tr>
+                    <th>SubUnit</th>
+                    <td>{{object.subunit}}</td>
+                </tr>
+                <tr>
+                    <th>SubAssembly</th>
+                    <td>{{object.subassembly}}</td>
+                </tr>
+                <tr>
+                    <th>Component</th>
+                    <td>{{object.component}}</td>
+                </tr>
+                <tr>
+                    <th>Frequency</th>
+                    <td>{{object.frequency}}</td>
+                </tr>
+            </table>
+            <hr />
+            <h4>Required_spares</p>
+            {% for spares in object.required_spares.all %}
+                <p>{{spares.stock_id}}</p>
+            {% endfor %}
+            <hr />
+            <h4>Description:</h4>
+            {{object.description}}
+            <hr />
+            <h4>Tasks</h4>
+            <table class="table">
+                {% for task in object.tasks.all %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{task.description}}</td>
+                        <td><input type="checkbox" class="form-control" name="task_{{forloop.counter}}"></td>
+                    </tr>
+            
+                 {% endfor %}
+            </table>
+            
+        </div>
+        <div class="col-sm-4 well ">
+            <h3>Scheduled Maintenance Completion Form:</h3><hr />
+            <form class="form form-group" method="POST" action="" >
+                {% csrf_token %}
+                <table class="table">
+                {{form.as_table}}
+                </table>
+            <button type="submit" class="btn btn-primary">Complete</button>
+            </form>
+        </div>
+        <div class="col-sm-4">
+            <div class="col-sm-4">
+            <h4>Tools:</h4>
+            <p><a class="btn btn-info" href="{% url 'inventory:spares-create' %}">Add Spares</a></p>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block body_script %}
+
+    $("#id_completed_date").datepicker();
+    function prepSectionUpdate(){
+        var url = "{% url 'ajax:update_section' %}";
+        var machine = $('#id_machine').val();
+        var section = $('#id_section');
+        updateSections(url, machine, section);
+}
+
+
+    function prepSubUnitUpdate(){
+        var url = "{% url 'ajax:update_subunit' %}";
+        var section = $('#id_section').val();
+        var subunit = $('#id_subunit');
+        updateSubUnits(url, section, subunit);
+    }
+    
+{% endblock %}
