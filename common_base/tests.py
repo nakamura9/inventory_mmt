@@ -136,33 +136,6 @@ class TestDataMixin(object):
 
 
     @classmethod
-    def create_test_jobcards(cls):
-        if inv_models.Machine.objects.all().count() == 0:
-            cls.create_test_inventory_models()
-
-        if models.Account.objects.all().count() == 0:
-            cls.create_dummy_accounts() 
-
-        common_data = {"description": "Test Description",
-                    "creation_epoch": datetime.date.today(),
-                    "resolver": models.Account.objects.first(),
-                    "estimated_time": "0030",
-                    "completed": False,
-                    "machine": inv_models.Machine.objects.first(),
-                    "section": inv_models.Section.objects.get(pk="T_SE"),
-                    "subunit": inv_models.SubUnit.objects.first()
-                    }
-        planned_data = common_data
-    
-        p = jb_models.PlannedJob(**planned_data)
-        p.scheduled_for = timezone.now()
-        p.save()
-
-        breakdown_data = common_data
-        breakdown_data["requested_by"] = models.Account.objects.first()
-        jb_models.Breakdown(**breakdown_data).save()     
-
-    @classmethod
     def create_dummy_accounts(cls):
         models.Account(username= "Test User",
                 first_name="Test",

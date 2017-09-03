@@ -37,7 +37,7 @@
                                 <p>Machine: {{job.machine}}</p>
                                 <p>SubUnit: {{job.subunit}}</p>
                                 <p>Requested by: {{job.request_by}}</p>
-                                <a href= "{% url 'jobcards:job_detail' pk=job.pk %}"class="btn btn-primary" >View</a>
+                                <a href= "{% url 'jobcards:complete-work-order' pk=job.pk %}"class="btn btn-primary" >View</a>
                             </div>
                         </div>
                     {% endfor %}
@@ -53,7 +53,7 @@
                             <p>Resolver: {{job.resolver}}</p>
                             <p>Machine: {{job.machine}}</p>
                             <p>SubUnit: {{job.subunit}}</p>
-                            <a href= "{% url 'jobcards:planned_job_detail' pk=job.pk %}"class="btn btn-primary" >View</a>
+                            <a href= "{% url 'jobcards:complete-preventative-task' pk=job.pk %}"class="btn btn-primary" >View</a>
                         </div>
                     </div>
                     {% endfor %}

@@ -23,7 +23,7 @@ class CalendarObjectsTests(TestCase, TestDataMixin):
         day.get_agenda()
         print day.agenda
         #self.assertFalse(Checklist.objects.first() in day.agenda)
-        self.assertTrue(PlannedJob.objects.first() in day.agenda)
+        self.assertTrue(WorkOrder.objects.first() in day.agenda)
 
     def test_week(self):
         today = datetime.date.today()

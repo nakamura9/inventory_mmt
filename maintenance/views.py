@@ -8,7 +8,7 @@ from checklists.models import Checklist
 from django.forms import widgets
 from common_base.models import Account
 from django.contrib.auth import authenticate
-from jobcards.models import Breakdown, PlannedJob
+from jobcards.models import PreventativeTask, WorkOrder
 from .forms import PlannedMaintenanceFilterForm
 from common_base.utilities import filter_by_dates
 
@@ -18,6 +18,11 @@ import os
 class PlantOverView(ListView):            
     model = Machine
     template_name = os.path.join("inv", "plantview.html")
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(PlantOverView, self).get_context_data(*args, **kwargs)
+        context["work_orders"] = WorkOrder.objects.all()
+        return context
 
 
 class PlannedMaintenanceView(TemplateView):
@@ -39,7 +44,7 @@ class PlannedMaintenanceView(TemplateView):
 
         if not self.request.GET.get("resolver", None):
             context["checklists"] = Checklist.objects.all()
-            context["planned_jobs"] = PlannedJob.objects.all()
+            context["planned_jobs"] =PreventativeTask.objects.all()
             
         if checks:
             checklist_queryset = Checklist.objects.all()
@@ -56,7 +61,7 @@ class PlannedMaintenanceView(TemplateView):
             context["checklists"] = checklist_queryset
 
         if jobs:
-            jobs_queryset = PlannedJob.objects.all()
+            jobs_queryset = PreventativeTask.objects.all()
 
             if resolver:
                 jobs_queryset = jobs_queryset.filter(resolver = resolver)
@@ -100,8 +105,8 @@ class MaintenanceInbox(ListView):
 
         user = Account.objects.get(username= user)
         context["message"] = "Hello %s." % user.username
-        context["jobs"] = Breakdown.objects.filter(resolver = user)
-        context["planned"] = PlannedJob.objects.filter(resolver = user)
+        context["jobs"] = [order for order in WorkOrder.objects.all() if user in order.assigned_to.all()]
+        context["planned"] = [task  for task in PreventativeTask.objects.all() if user in task.assignments.all()]
         context["checklists"] = Checklist.objects.filter(resolver = user)
 
         return context

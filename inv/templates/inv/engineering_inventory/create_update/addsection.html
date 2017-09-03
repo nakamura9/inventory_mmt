@@ -1,0 +1,22 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4 well">
+        <form action="" method="POST" role="form">
+    <legend>New Section</legend>
+    <table>
+        {{form.as_table}}
+    </table>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+    </div>
+    <div class="col-sm-4"></div>
+</div>
+
+
+{% endblock %}
+{% block body_script %}
+$("#id_order_date").datepicker();
+{% endblock %}

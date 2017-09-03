@@ -73,25 +73,25 @@ class Machine(models.Model):
     @property
     def n_breakdowns_today(self):
         yesterday = timezone.now() - timedelta(days=1)
-        return self.abstractjob_set.filter(creation_epoch__gt = yesterday).count()
+        return self.workorder_set.filter(execution_date__gt = yesterday).count()
 
 
     @property
     def n_breakdowns_weekly(self):
         week = timezone.now() - timedelta(days=7)
-        return self.abstractjob_set.filter(creation_epoch__gt = week).count()
+        return self.workorder_set.filter(execution_date__gt = week).count()
 
 
     @property
     def n_breakdowns_monthly(self):
         month = timezone.now() - timedelta(days=30)
-        return self.abstractjob_set.filter(creation_epoch__gt = month).count()
+        return self.workorder_set.filter(execution_date__gt = month).count()
 
 
     @property
     def n_breakdowns_sixmonths(self):
         bi_ann = timezone.now() - timedelta(days=182)
-        return self.abstractjob_set.filter(creation_epoch__gt = bi_ann).count()
+        return self.workorder_set.filter(execution_date__gt = bi_ann).count()
 
 
     @property

@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-sm-12">
             <a class="btn btn-primary" href="{% url 'checklists:create_checklist' %}">New Checklist</a>
-            <a class="btn btn-primary" href="{% url 'jobcards:new_planned_job' %}">New Planned Job</a>
+            <a class="btn btn-primary" href="{% url 'jobcards:new-preventative-task' %}">New Planned Job</a>
         </div>
     </div>
     <hr />
@@ -55,9 +55,8 @@
                     <td>{{job.machine}}</td>
                     <td>{{job.description | truncatechars:40}}</td>
                     <td>
-                        <a href="{% url 'jobcards:planned_job_detail' pk=job.number %}">Details</a> |
-                        <a href="{% url 'jobcards:delete_planned_job' pk=job.number %}">Delete</a> |
-                        <a href="{% url 'jobcards:edit_planned_job' pk=job.number %}">Edit</a>
+                        <a href="{% url 'jobcards:complete-preventative-task' pk=job.pk %}">Details</a> |
+                        <a href="{% url 'jobcards:edit-preventative-task' pk=job.pk %}">Edit</a>
                     </td>
                 </tr>
             {% endfor %}

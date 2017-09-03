@@ -40,6 +40,14 @@ class WorkOrder(models.Model):
 
 
 class PreventativeTask(models.Model):
+    mapping =  {"daily": 1,
+        "weekly": 7,
+        "fortnightly": 14,
+        "monthly": 30,
+        "quarterly": 90,
+        "bi-annually": 180,
+        "yearly": 360}
+    
     machine = models.ForeignKey("inv.Machine", null=True)
     section = models.ForeignKey("inv.Section", null=True)
     subunit = models.ForeignKey("inv.SubUnit", null=True)
@@ -59,76 +67,28 @@ class PreventativeTask(models.Model):
 
     estimated_labour_time = models.DurationField(choices=time_duration)
     estimated_downtime = models.DurationField(choices=time_duration)
+    scheduled_for = models.DateField()
     required_spares = models.ManyToManyField("inv.Spares", related_name="%(class)s_required_spares")
     assignments = models.ManyToManyField("common_base.Account")
     feedback = models.TextField(null=True)
     actual_downtime = models.DurationField(null=True,choices=time_duration)
     completed_date = models.DateField(null=True)
     spares_used = models.ManyToManyField("inv.Spares", related_name="%(class)s_spares_used")
+    
+    @property
+    def is_open(self):
+        if self.completed_date is None:
+            return True
+        else:
+            if self.frequency == "once":
+                return False
+            
+            delta = datetime.date.today() - self.completed_date
+
+        if delta.days > self.mapping[self.frequency]:
+            return True
+        else:
+            return False
 
 class Costing(models.Model):
     id= models.CharField(max_length=32, primary_key=32)
-
-
-class AbstractJob(models.Model):
-    def __str__(self):
-        return self.description
-
-    
-    description = models.TextField()
-    creation_epoch = models.DateTimeField(default = timezone.now)
-    number = models.AutoField(primary_key=True)
-    resolver = models.ForeignKey("common_base.Account")
-    estimated_time = models.CharField(max_length=4)
-    completed = models.BooleanField(default = False)
-    machine = models.ForeignKey("inv.Machine", null=True)
-    section = models.ForeignKey("inv.Section", null=True)
-    subunit = models.ForeignKey("inv.SubUnit", null=True)
-    subassembly = models.ForeignKey("inv.SubAssembly", null=True)
-    component = models.ForeignKey("inv.Component", null=True)
-
-class Breakdown(AbstractJob):
-    requested_by = models.ForeignKey("common_base.Account")
-    
-
-
-    #used when completing the Jobcard
-     
-    def save(self, *args, **kwargs):
-        self.creation_epoch = timezone.now()
-        super(Breakdown, self).save(*args, **kwargs)
-
-    @property
-    def people(self):
-        ret_value = []
-        for user in Account.objects.all():
-            ret_calue.append((user.user_name, user.user_name))
-        return ret_value
-
-class PlannedJob(AbstractJob):
-    scheduled_for = models.DateField()
-
-    @property
-    def get_type(self):
-        return "job"
-
-class JobCard(models.Model):
-    completion_epoch = models.DateTimeField()
-    on_hold = models.BooleanField(default = False)
-    job_execution_time = models.CharField(max_length=4)
-    # create response time fields
-    breakdown = models.OneToOneField("Breakdown", null=True)
-    planned_job = models.OneToOneField("PlannedJob", null=True)
-    number = models.AutoField(primary_key=True)
-    components_requested = models.CharField(max_length = 128)
-    resolver_action = models.TextField()
-    root_cause = models.TextField()
-    notes = models.TextField()
-    recommended_pm = models.TextField()
-
-
-    
-
-class Job(models.Model):
-    breakdown = models.OneToOneField("Breakdown")
-    jobcard = models.OneToOneField("JobCard")

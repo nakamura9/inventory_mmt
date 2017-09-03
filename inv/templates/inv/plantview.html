@@ -37,11 +37,11 @@
                                 </tr>
                         </thead>
                         <tbody>
-                            {% for job in machine.abstractjob_set.all %}
-                                {% if not job.completed %}
+                            {% for job in work_orders %}
+                                {% if job.machine == machine %}
                                     <tr>
-                                        <td>{{job.creation_epoch}}</td>
-                                        <td>{{job.resolver}}</td>
+                                        <td>{{job.execution_date}}</td>
+                                        <td>{{job.assigned_to.first}}</td>
                                         <td>{{job.description|truncatechars:40}}</td>
                                     </tr>
                                 {% endif %}

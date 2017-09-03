@@ -5,7 +5,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
 from .models import *
-from jobcards.models import Breakdown, PlannedJob
+from jobcards.models import WorkOrder, PreventativeTask
 import inv
 import os
 import datetime

@@ -54,7 +54,7 @@
         </div>
         <div class="col-sm-4 well ">
             <h3>Scheduled Maintenance Completion Form:</h3><hr />
-            <form class="form form-group" method="POST" action="" >
+            <form class="form form-group" method="POST" action="" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <table class="table">
                 {{form.as_table}}
@@ -89,4 +89,22 @@
         updateSubUnits(url, section, subunit);
     }
     
+function validateForm(){
+        tasks = 0;
+        console.log("called");
+        $("input[type=checkbox]").each(function(){
+            if(this.checked != true){
+                tasks += 1;
+            }
+        });
+        console.log(tasks);
+        if(test == 0){
+            return true;
+        }else{
+            
+            alert(tasks + " tasks  have not been completed.")
+            tasks = 0;
+            return false;
+        }
+    }    
 {% endblock %}

@@ -1,6 +1,6 @@
 import datetime
 from inv.models import Order
-from jobcards.models import PlannedJob
+from jobcards.models import PreventativeTask
 from checklists.models import Checklist
 import calendar
 
@@ -66,14 +66,14 @@ class MaintenanceDay(Day):
 
     @property
     def job_count(self):
-        return len([item for item in self.agenda if isinstance(item, PlannedJob)])
+        return len([item for item in self.agenda if isinstance(item, PreventativeTask)])
     
     def get_agenda(self):
         """Maintenance days look out for planned jobs and checklists"""
 
         if "jobs" in self.include:
             self.agenda = [job for job in \
-                        PlannedJob.objects.filter(
+                        PreventativeTask.objects.filter(
                             scheduled_for = self.date).filter(
                                 **self.filters
                             )]

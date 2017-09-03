@@ -21,31 +21,29 @@
         </div>
         <div class="col-sm-9">
             <h3>Open Jobs:</h3>
-            <a class="btn btn-primary" href="{% url 'jobcards:new_unplanned_job' %}"> New Unplanned Job</a>
+            <a class="btn btn-primary" href="{% url 'jobcards:new-work-order' %}"> New Unplanned Job</a>
             <table  class="table table-striped">
                 <thead>
                     <tr>
-                        <td>Date</td>
-                        <td>Time</td>
+                        <td>Execution Date</td>
+                        <td>Status</td>
                         <td>Number</td>
                         <td>Resolver</td>
-                        <td>Requested</td>
                         <td>Machine</td>
                         <td>Problem Description</td>
-                        <td></td>
+                        <td>Actions(view)</td>
                     </tr>
                 </thead>
                 <tbody>
                     {% for job in object_list %}
                         <tr>
-                            <td>{{job.creation_epoch.date}}</td>
-                            <td>{{job.creation_epoch.time}}</td>
+                            <td>{{job.execution_date}}</td>
+                            <td>{{job.status}}</td>
                             <td>{{job.pk}}</td>
-                            <td>{{job.resolver}}</td>
-                            <td>{{job.requested_by}}</td>
+                            <td>{{job.assigned_to.first}}</td>
                             <td>{{job.machine}}</td>
                             <td>{{job.description |truncatechars:40}}</td>
-                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:job_detail' pk=job.pk %}">View</a></td>
+                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:complete-work-order' pk=job.pk %}">View</a></td>
                         </tr>
                     {% endfor %}        
                 </tbody>

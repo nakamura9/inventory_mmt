@@ -17,42 +17,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='AbstractJob',
-            fields=[
-                ('description', models.TextField()),
-                ('creation_epoch', models.DateTimeField(default=django.utils.timezone.now)),
-                ('number', models.AutoField(primary_key=True, serialize=False)),
-                ('estimated_time', models.CharField(max_length=4)),
-                ('completed', models.BooleanField(default=False)),
-            ],
-        ),
+        
         migrations.CreateModel(
             name='Costing',
             fields=[
                 ('id', models.CharField(max_length=32, primary_key=32, serialize=False)),
             ],
         ),
-        migrations.CreateModel(
-            name='Job',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='JobCard',
-            fields=[
-                ('completion_epoch', models.DateTimeField()),
-                ('on_hold', models.BooleanField(default=False)),
-                ('job_execution_time', models.CharField(max_length=4)),
-                ('number', models.AutoField(primary_key=True, serialize=False)),
-                ('components_requested', models.CharField(max_length=128)),
-                ('resolver_action', models.TextField()),
-                ('root_cause', models.TextField()),
-                ('notes', models.TextField()),
-                ('recommended_pm', models.TextField()),
-            ],
-        ),
+        
+        
         migrations.CreateModel(
             name='PreventativeTask',
             fields=[
@@ -89,71 +62,5 @@ class Migration(migrations.Migration):
                 ('subunit', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='inv.SubUnit')),
                 ('type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='common_base.Category')),
             ],
-        ),
-        migrations.CreateModel(
-            name='Breakdown',
-            fields=[
-                ('abstractjob_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='jobcards.AbstractJob')),
-                ('requested_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='common_base.Account')),
-            ],
-            bases=('jobcards.abstractjob',),
-        ),
-        migrations.CreateModel(
-            name='PlannedJob',
-            fields=[
-                ('abstractjob_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='jobcards.AbstractJob')),
-                ('scheduled_for', models.DateField()),
-            ],
-            bases=('jobcards.abstractjob',),
-        ),
-        migrations.AddField(
-            model_name='job',
-            name='jobcard',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='jobcards.JobCard'),
-        ),
-        migrations.AddField(
-            model_name='abstractjob',
-            name='component',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='inv.Component'),
-        ),
-        migrations.AddField(
-            model_name='abstractjob',
-            name='machine',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='inv.Machine'),
-        ),
-        migrations.AddField(
-            model_name='abstractjob',
-            name='resolver',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='common_base.Account'),
-        ),
-        migrations.AddField(
-            model_name='abstractjob',
-            name='section',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='inv.Section'),
-        ),
-        migrations.AddField(
-            model_name='abstractjob',
-            name='subassembly',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='inv.SubAssembly'),
-        ),
-        migrations.AddField(
-            model_name='abstractjob',
-            name='subunit',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='inv.SubUnit'),
-        ),
-        migrations.AddField(
-            model_name='jobcard',
-            name='breakdown',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='jobcards.Breakdown'),
-        ),
-        migrations.AddField(
-            model_name='jobcard',
-            name='planned_job',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='jobcards.PlannedJob'),
-        ),
-        migrations.AddField(
-            model_name='job',
-            name='breakdown',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='jobcards.Breakdown'),
         ),
     ]
