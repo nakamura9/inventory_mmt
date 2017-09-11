@@ -176,7 +176,7 @@ class MachineView(DetailView):
         context = super(MachineView, self).get_context_data(*args, **kwargs)
         Planned = namedtuple("Planned", "date resolver est_time type")
         planned_for_machine =PreventativeTask.objects.filter(machine=self.object, 
-                                                    completed=False)
+                                                    completed_date=None)
         context["planned_jobs"] = [Planned(job.creation_epoch, job.resolver,
                                         job.estimated_time, "Planned Job") for job in planned_for_machine]
         checklist_on_machine = Checklist.objects.filter(machine = self.object)
@@ -194,7 +194,7 @@ class MachineView(DetailView):
         unplanned_job_on_machine = WorkOrder.objects.filter(machine = self.object)
         
         
-        context["unplanned_jobs"] = [UnPlanned(b.creation_epoch, b.resolver, b.description, b.completed) \
+        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to.first, b.description, b.status) \
                                     for b in unplanned_job_on_machine]
 
         
@@ -209,31 +209,6 @@ class SubUnitView(DetailView):
     template_name = os.path.join("inv", "engineering_inventory", "details", "subunit_details.html")
     model = SubUnit
 
-    def get_context_data(self, *args, **kwargs):
-        context = super(SubUnitView, self).get_context_data(*args, **kwargs)
-        Planned = namedtuple("Planned", "date resolver est_time type")
-        planned_for_machine =PreventativeTask.objects.filter(subunit=self.object, 
-                                                    completed=False)
-        context["planned_jobs"] = [Planned(job.creation_epoch, job.resolver,
-                                        job.estimated_time, "Planned Job") for job in planned_for_machine]
-        checklist_on_machine = Checklist.objects.filter(subunit = self.object)
-        
-        for check in checklist_on_machine:
-            if check.is_open:
-                context["planned_jobs"].append(Planned(check.creation_date, 
-                                                        check.resolver, 
-                                                        check.estimated_time,
-                                                        "Checklist"))
-
-        UnPlanned = namedtuple("UnPlanned", "date resolver description status")
-
-        unplanned_job_on_machine = WorkOrder.objects.filter(subunit = self.object)
-                
-        context["unplanned_jobs"] = [UnPlanned(b.creation_epoch, b.resolver, b.description, b.completed) \
-                                    for b in unplanned_job_on_machine]
-
-        return context
-
 
 class sectionDetailView(DetailView):
     model = Section
@@ -242,9 +217,8 @@ class sectionDetailView(DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super(sectionDetailView, self).get_context_data(*args, **kwargs)
         Planned = namedtuple("Planned", "date resolver est_time type")
-        planned_for_machine =PreventativeTask.objects.filter(section=self.object, 
-                                                    completed=False)
-        context["planned_jobs"] = [Planned(job.creation_epoch, job.resolver,
+        planned_for_machine =PreventativeTask.objects.filter(section=self.object, completed_date = None)
+        context["planned_jobs"] = [Planned(job.execution_date, job.resolver,
                                         job.estimated_time, "Planned Job") \
                                         for job in planned_for_machine]
 
@@ -261,7 +235,7 @@ class sectionDetailView(DetailView):
 
         unplanned_job_on_machine = WorkOrder.objects.filter(section = self.object)
                 
-        context["unplanned_jobs"] = [UnPlanned(b.creation_epoch, b.resolver, b.description, b.completed) \
+        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to.first, b.description, b.status) \
                                     for b in unplanned_job_on_machine]
 
         return context

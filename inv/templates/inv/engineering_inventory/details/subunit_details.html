@@ -18,6 +18,7 @@
                         }
         </style>
     <div class="container-fluid">
+
         <div class="row">
             <div class="col-sm-4">
                 <h3>Children:</h3>
@@ -41,70 +42,6 @@
                  
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <h3>Maintenance Record:</h3>
-                <h4>Upcoming planned Jobs:</h4>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td>Date</td>
-                            <td>Resolver</td>
-                            <td>Estimated Time</td>
-                            <td>Type</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for job in planned_jobs %}
-                            <tr>
-                                <td>{{job.date}}</td>
-                                <td>{{job.resolver}}</td>
-                                <td>{{job.est_time}}</td>
-                                <td>{{job.type}}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <h4>Recent Unplanned Jobs</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <td>Date/Time</td>
-                                <td>Resolver</td>
-                                <td>Description</td>
-                                <td>Status</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for job in unplanned_jobs %}
-                            <tr>
-                                <td>{{job.date}}</td>
-                                <td>{{job.resolver}}</td>
-                                <td>{{job.description}}</td>
-                                <td>{{job.status}}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-            </div>
-
-        </div>
-         <div class="row">
-            
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <h3>Reliability</h3>
-                <label for="period">Period</label>
-                <select name="period" id="id_period" class="form-control">   
-                    <option value="1">The Last Week</option>
-                    <option value="2">The Last Month</option>
-                    <option value="3">The Last Six Months</option>
-                </select>
-                <button class="btn btn-primary">Show</button>
-                <div id="id_reliability_window"></div>
-            </div>
-            
         </div>
     </div>
 {% endblock %}

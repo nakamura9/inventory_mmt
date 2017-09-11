@@ -23,22 +23,28 @@
                 <h3>Children:</h3>
                 <hr />
                 <ul>
-                        {% for unit in object.subunit_set.all %}
-                            <li><span class = "btn btn-primary subunit" onclick = "reveal('#{{unit.unique_id|slugify}}')">{{unit.unit_name}} | <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a></span>
-                                <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
-                                    {% for sub in unit.subassembly_set.all %}
-                                        <li><span class="btn btn-info" onclick = "reveal('#{{sub.unique_id|slugify}}')">{{sub.unit_name}} | <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a></span>
-                                            <ul id="{{sub.unique_id|slugify}}" style="display:none;">
-                                            {% for component in sub.component_set.all %}
-                                                <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
-                                            {% endfor %}
-                                            </ul>
-                                        </li>
-                                    {% endfor%}    
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% for section in object.section_set.all %}
+                        <li><span class = "btn btn-primary" onclick = "reveal('#{{section.unique_id|slugify}}')">{{section.section_name}} | <a href="{% url 'inventory:section_details' pk=section.unique_id %}">Details</a></span>
+                        <ul id="{{section.unique_id|slugify}}" style="display: none;" >
+                            {% for unit in object.subunit_set.all %}
+                                <li><span class = "btn btn-primary subunit" onclick = "reveal('#{{unit.unique_id|slugify}}')">{{unit.unit_name}} | <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a></span>
+                                    <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
+                                        {% for sub in unit.subassembly_set.all %}
+                                            <li><span class="btn btn-info" onclick = "reveal('#{{sub.unique_id|slugify}}')">{{sub.unit_name}} | <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a></span>
+                                                <ul id="{{sub.unique_id|slugify}}" style="display:none;">
+                                                {% for component in sub.component_set.all %}
+                                                    <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
+                                                {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% endfor%}    
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
             <div class="col-sm-8">
                 <div class="well">
