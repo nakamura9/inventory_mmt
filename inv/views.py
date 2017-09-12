@@ -265,18 +265,18 @@ class SubAssyView(DetailView):
 class CategoryList(ListView):
     model = Category
     context_object_name = 'categories'
-    template_name=os.path.join("inv", "production_invetory", "create_update","raw_materials.html")
+    template_name=os.path.join("inv", "production_inventory","raw_materials.html")
 
 
 class categoryForm(CreateView):
-    template_name = os.path.join("inv", "production_invetory", "create_update","category_form.html")
+    template_name = os.path.join("inv","category_form.html")
     form_class = CategoryForm
     success_url = reverse_lazy("inventory:raw-materials")
 
 
 class inventoryItemUpdateView(UpdateView):
     model = InventoryItem
-    template_name = os.path.join("inv", "production_invetory", "create_update","inventory_item.html")
+    template_name = os.path.join("inv", "production_inventory", "create_update","inventory_item.html")
     success_url = reverse_lazy("inventory:raw-materials")
     form_class = InventoryItemForm
 
@@ -284,17 +284,17 @@ class inventoryItemUpdateView(UpdateView):
 class inventoryItemFormView(CreateView):
     model = InventoryItem
     form_class = InventoryItemForm
-    template_name = os.path.join("inv", "production_invetory", "create_update","inventory_item.html")
+    template_name = os.path.join("inv", "production_inventory", "create_update","inventory_item.html")
     success_url = reverse_lazy("inventory:raw-materials")
 
 
 class inventoryItemDetailView(DetailView):
     model = InventoryItem
-    template_name= os.path.join("inv","production_invetory", "details", "inventory_item_details.html")
+    template_name= os.path.join("inv","production_inventory", "details", "inventory_item_details.html")
     
 
 class inventoryListView(TemplateView):
-    template_name = os.path.join("inv","production_invetory", "list","inventory_list.html")
+    template_name = os.path.join("inv","production_inventory", "list","inventory_list.html")
 
     def get_context_data(self, *args, **kwargs):
         context = super(inventoryListView, self).get_context_data(*args, **kwargs)
@@ -307,23 +307,23 @@ class inventoryListView(TemplateView):
 class OrderCreateView(CreateView):
     form_class = OrderForm
     success_url = reverse_lazy("inventory:raw-materials")
-    template_name = os.path.join("inv","production_invetory", "create_update", "order_form.html")
+    template_name = os.path.join("inv","production_inventory", "create_update", "order_form.html")
 
 
 class OrderUpdateView(UpdateView):
     form_class = OrderForm
     success_url = reverse_lazy("inventory:raw-materials")
-    template_name = os.path.join("inv", "production_invetory", "create_update","order_form.html")
+    template_name = os.path.join("inv", "production_inventory", "create_update","order_form.html")
     model = Order
 
 class OrderList(ListView):
     model = Order
-    template_name= os.path.join("inv","production_invetory", "list", "orders_list.html")
+    template_name= os.path.join("inv","production_inventory", "list", "order_list.html")
 
 
 class OrderDetailView(DetailView):
     model = Order
-    template_name = os.path.join("inv","production_invetory", "details", "orders_detailview.html")
+    template_name = os.path.join("inv","production_inventory", "details", "orders_detailview.html")
 
 
 ###############################################################################

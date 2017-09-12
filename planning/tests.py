@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from calendar_objects import *
 from common_base.tests import TestDataMixin
-from inv.models import Order
+from inv.models import Order, WorkOrder
 
 
 class CalendarObjectsTests(TestCase, TestDataMixin):

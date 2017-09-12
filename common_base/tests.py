@@ -136,6 +136,9 @@ class TestDataMixin(object):
 
 
     @classmethod
+    def create_test_workorders(cls):
+        
+    @classmethod
     def create_dummy_accounts(cls):
         models.Account(username= "Test User",
                 first_name="Test",
