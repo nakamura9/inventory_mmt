@@ -1,5 +1,7 @@
 from django.conf.urls import url
+
 from .views import *
+
 urlpatterns = [
     url(r"^update_section/?$", update_section, name="update_section"),
     url(r"^update_subunit/?$", update_subunit, name="update_subunit"),

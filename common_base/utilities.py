@@ -41,10 +41,14 @@ def filter_by_dates(queryset, start, stop):
     if start:
         start = datetime.datetime.strptime(start, date_format)
         start = pytz.timezone("Africa/Harare").localize(start)
-        try:
+        if hasattr(queryset, 'execution_date'):
+            queryset = queryset.filter(execution_date__gte = start)
+        elif hasattr(queryset, 'creation_date'):
             queryset = queryset.filter(creation_date__gte = start)
-        except:
+        elif hasattr(queryset, 'creation_epoch'):
             queryset = queryset.filter(creation_epoch__gte = start)
+        else:
+            pass
     if stop:
         stop = datetime.datetime.strptime(stop, date_format)
         stop = pytz.timezone("Africa/Harare").localize(stop)
@@ -53,3 +57,42 @@ def filter_by_dates(queryset, start, stop):
         except:
             queryset = queryset.filter(creation_epoch__lte = stop)
     return queryset
+
+
+def ajax_required(ret_unexcepted):
+
+    """
+
+    Decorator for determing whether the request is Ajax, in Django-views.
+
+
+
+    e.g.) in views.py
+
+    from django.http import HttpResponseBadRequest
+
+    from utils.decorators import ajax_required
+
+    
+
+    @ajax_requirxed(HttpResponseBadRequest())
+
+    def index(request):
+
+        pass
+
+    """
+
+    def _ajax_required(func):
+
+        def wrapper(request, *args, **kwargs):
+
+            if not request.is_ajax():
+
+                return ret_unexcepted
+
+            return func(request, *args, **kwargs)
+
+        return wrapper
+
+    return _ajax_required

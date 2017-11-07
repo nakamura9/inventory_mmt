@@ -22,7 +22,7 @@ class WorkOrderCompleteForm(forms.ModelForm, BootstrapMixin):
 class PreventativeTaskCreateForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = PreventativeTask
-        fields = [ "machine", "section", "subunit", "subassembly", "component", "description",  "frequency", "estimated_labour_time", "estimated_downtime","required_spares", "assignments"]# tasks are handled in the POST
+        fields = [ "machine", "section", "subunit", "subassembly", "component", "scheduled_for","description",  "frequency", "estimated_labour_time", "estimated_downtime","required_spares", "assignments"]# tasks are handled in the POST
 
 
 class PreventativeTaskCompleteForm(forms.ModelForm, BootstrapMixin):

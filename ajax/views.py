@@ -1,19 +1,29 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import json
 
 from django.shortcuts import render
-from inv import models as inv_models
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-import json
+from django.http import Http404, HttpResponse, HttpResponseRedirect,
+                        HttpResponseBadRequest
 from django.contrib.auth import authenticate
+
 from common_base.models import Category
+from common_base.utilities import ajax_required
+from inv import models as inv_models
 
+"""The views that correspond to the URLS """
 
+@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
 def update_section(request):
-    if not request.is_ajax() and \
-        request.POST.get("machine", None) == None:
+    """Takes json from request and returns the list of sections under the provided machine.
+    
+    Input: JSON -> "machine": string
+    Output: HttpResponse JSON -> "sections": 2 dimensional array
+    """
+
+    if request.POST.get("machine", None) == None:
         return Http404()
     
     machine =inv_models.Machine.objects.get(pk= \
@@ -23,11 +33,16 @@ def update_section(request):
             {"sections": sections}),
                 content_type="application/json")
 
-
+@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
 def update_subunit(request):
-    if not request.is_ajax() and \
-        request.POST.get("section", None) == None:
+    """Takes json from request and returns the list of subunits under the provided section.
+    
+    Input: JSON -> "section": string
+    Output: HttpResponse JSON -> "units": 2 dimensional array
+    """
+
+    if request.POST.get("section", None) == None:
         return Http404()
     
     section =inv_models.Section.objects.get(pk= \
@@ -38,10 +53,16 @@ def update_subunit(request):
                 content_type="application/json")
 
 
+@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
 def update_subassembly(request):
-    if not request.is_ajax() and \
-        request.POST.get("unit", None) ==None:
+    """Takes json from request and returns the list of subunits under the provided section.
+    
+    Input: JSON -> "section": string
+    Output: HttpResponse JSON -> "units": 2 dimensional array
+    """
+
+    if request.POST.get("unit", None) ==None:
         return Http404()
     
     subunit =inv_models.SubUnit.objects.get(
@@ -53,10 +74,16 @@ def update_subassembly(request):
                 content_type="application/json")
 
 
+@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
 def update_components(request):
-    if not request.is_ajax() and \
-        request.POST.get("subassy", None) == None:
+    """Takes json from request and returns the list of components under the provided subassembly.
+    
+    Input: JSON -> "subassy": string
+    Output: HttpResponse JSON -> "components": 2 dimensional array
+    """
+
+    if request.POST.get("subassy", None) == None:
         return Http404()
     
     subassy =inv_models.SubAssembly.objects.get(
@@ -67,9 +94,14 @@ def update_components(request):
             {"components": components}),
                 content_type="application/json")
 
-
+@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
 def ajaxAuthenticate(request):
+    """Authenticates users quickly in username/password combo
+
+    Input: JSON -> "username": string, "password": string
+    Output: HTTPResponse JSON-> "authenticated": Boolean
+    """
     if authenticate(username=request.POST["username"], 
             password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":True}),
@@ -78,31 +110,34 @@ def ajaxAuthenticate(request):
         return HttpResponse(json.dumps({"authenticated":False}),
                             content_type="application/json")
 
-
+@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
 def add_task(request):
-    if request.is_ajax():
-        if request.POST != "":
-            request.session["tasks"].append(request.POST["task"])
-            request.session.modified = True
-            return HttpResponse("0")
-        else:
-            return HttpResponse("-1")
-    else:
-        return Http404()
+    """Adds tasks to the current session
+    
+    Input: JSON -> "task": string
+    Output: HttpResponse -> '0' or '-1'
 
-def add_category(request):
-    if request.method == "POST":
-        print request.POST
-        data = request.POST.copy().dict()
-        data.pop("csrfmiddlewaretoken")
-        Category(**data).save()
+    Adds each task to a list called 'tasks' in the current session
+    Afterwards force updates the session
+    """
+    if request.POST != "":
+        request.session["tasks"].append(request.POST["task"])
+        request.session.modified = True
         return HttpResponse("0")
+    else:
+        return HttpResponse("-1")
 
+
+@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
 def remove_task(request):
-    if not request.is_ajax:
-        return Http404()
+    """Removes a task from the session and the database if stored
+    
+    Input: JSON -> "task":string
+    Output: HttpResponse '0' or '-1' 
+    """
+    
     if request.POST == "" or \
         "tasks" not in request.session:
         return HttpResponse("-1")
@@ -112,7 +147,19 @@ def remove_task(request):
         request.session.modified = True
     try:
         Task.objects.get(description=request.POST["task"]).delete()
-    except:
-        return Http404()
+    except:#specify the exception 
+        pass
 
     return HttpResponse("0")
+
+
+def add_category(request):
+    """Quick addition of categories to the database."""
+
+    if request.method == "POST":
+        data = request.POST.copy().dict()
+        data.pop("csrfmiddlewaretoken")
+        Category(**data).save()
+        return HttpResponse("0")
+
+

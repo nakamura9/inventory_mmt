@@ -15,10 +15,11 @@ class Day(object):
         
         assert(isinstance(date, datetime.date))
         self.date = date
-        self.filters = filters
-        for filter in self.filters:
-            if not self.filters[filter]:
-                del self.filters[filter]#makes sure no filter passes None to a query
+        self.filters = {}
+        for filter in filters:
+            if filters[filter]:
+                self.filters[filter] = filters[filter]#makes sure no filter passes None to a query
+        
         self.include = [i.lower() for i in include]
         self.weekday = (date.weekday(), day_names[date.weekday()])
         self.agenda = []

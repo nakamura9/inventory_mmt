@@ -90,11 +90,6 @@ class WorkOrderList(ListView):
         def get_context_data(self, *args, **kwargs):
             context = super(WorkOrderList, self).get_context_data(*args, **kwargs)
             context["form"] = WorkOrderListFilterForm()
-            """
-            context["machine"] = widgets.Select(attrs= {"class": "form-control"},
-                                    choices= ((m.unique_id, m.machine_name) for m in Machine.objects.all())).render("machine", "None")
-            context["resolver"] = widgets.Select(attrs= {"class": "form-control"},
-                                        choices= ((r.id, r.username) for r in Account.objects.all())).render("resolver", "None")"""
             return context
 
         
@@ -111,7 +106,7 @@ class WorkOrderList(ListView):
                 queryset = queryset.filter(machine= machine)
 
             if resolver:
-                queryset = queryset.filter(resolver = resolver)
+                queryset = queryset.filter(assigned_to = resolver)
 
             return queryset
         
