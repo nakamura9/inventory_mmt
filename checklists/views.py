@@ -1,50 +1,55 @@
-from django.shortcuts import render
-from django.contrib.auth import authenticate
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.views.generic import ListView, DetailView, TemplateView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.utils import timezone
-from .models import *
-from jobcards.models import WorkOrder, PreventativeTask
-import inv
 import os
 import datetime
-from django.urls import reverse, reverse_lazy
-from django.views.decorators.csrf import csrf_exempt
-from .forms import CheckListCreateForm
-from django.forms import widgets
-from  common_base.models import  Account, Task
-from django.contrib.auth import authenticate
 import json
 
+from django.contrib.auth import authenticate
+from django.forms import widgets
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render
+from django.utils import timezone
+from django.urls import reverse, reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
-
+from jobcards.models import WorkOrder, PreventativeTask
+from common_base.models import  Account, Task
+from common_base.utilities import ajax_required
+from .forms import CheckListCreateForm
+from .models import *
+import inv
 
 class ChecklistDetailView(DetailView):
-    """
-    Page for viewing the details of a checklist without being able to complete it
-    """
-
+    """Page for viewing the details of a checklist without completing it"""
 
     template_name = os.path.join("checklists","checklist_detailview.html")
     model = Checklist
 
 class ChecklistCompleteView(DetailView):
-    """"
-    If a checklist is open the page is available to the appropriate artisan for 
-    completion. The model uses a custom form as very few fields are needed and 
-    the page updates an existing checklist, hence the length of the post method.
+    """"Page for interacting with an existing checklist
+    
+    Page consists of a list of details concerning the checklist, a list of 
+    all the tasks combined with checkboxes and a form of username, password
+    and comments. It also provides the option of placing the checklist on hold
+    where a reason field must be supplied
     """
     
     template_name = os.path.join("checklists","checklist_actionview.html")
     model = Checklist
 
     def get_context_data(self, *args, **kwargs):
+        """The resolver select box depends on a list of registered accounts
+        inserted here"""
+
         context = super(ChecklistCompleteView, self).get_context_data(*args, **kwargs)
-        context["users"] = Account.objects.all()# might filter by artisan later
+        context["users"] = Account.objects.all()
         return context
 
     def post(self, *args, **kwargs):
+        """completes the checklist
+        
+        Checks the resolver, authenticates him if valid and updates checklist details as appropriate. Creates a comment if necessary, returns the inventory home page if successful."""
+
         checklist = self.get_object()
 
         if checklist.resolver.username != self.request.POST["user"]:
@@ -83,18 +88,22 @@ class ChecklistCreateView(CreateView):
     success_url = reverse_lazy("maintenance:inbox")
 
     def get(self, *args, **kwargs):
-        """The list of tasks that will be populated by Ajax requests"""
+        """Prepares the session for the addition of tasks"""
         self.request.session["tasks"] = []
         return super(ChecklistCreateView, self).get(*args, **kwargs)
 
-    
+   
     def post(self, *args, **kwargs):
-        resp = super(ChecklistCreateView, self).post(*args, **kwargs)
-        #makes sure there is at least one task in the session
-        if len(self.request.session.get("tasks")) == 0:
-            return HttpResponseRedirect(reverse("checklists:create_checklist"))
+        """Creates a new checklist and its related tasks
         
+        Performs the necessary checks on the session and creates a list of tasks based on it. Associates each task with the checklist. Clears the session and saves the checklist."""
+        resp = super(ChecklistCreateView, self).post(*args, **kwargs)
         checklist = Checklist.objects.get(pk=self.request.POST["title"])
+        if len(self.request.session.get("tasks")) == 0:
+            #keep form data 
+            return HttpResponseRedirect(reverse("checklists:create_checklist"), context=self.request.POST)
+        
+        
         for id, task in enumerate(self.request.session["tasks"]):
             _task = Task(created_for="checklist",
                 task_number = id,
@@ -114,22 +123,30 @@ class ChecklistUpdateView(UpdateView):
     success_url = reverse_lazy("maintenance:inbox")
 
     def get(self, *args, **kwargs):
+        """Prepares the session for the addition of tasks"""
+
         self.request.session["tasks"] = []
         return super(ChecklistUpdateView, self).get(*args, **kwargs)
 
 
     def post(self, *args, **kwargs):
+        """Updates checklist data
+        
+        Makes sure there is at least one task and that the tasks are associated with the checklist.
+        """
+        
         resp = super(ChecklistUpdateView, self).post(*args, **kwargs)
+        checklist = self.get_object()
         if len(self.request.session.get("tasks")) == 0 \
-         and self.get_object().task_set.count() == 0:
+         and checklist.task_set.count() == 0:
+            checklist.delete()
             return HttpResponseRedirect(reverse("checklists:update_checklist", 
                                         kwargs={"pk": self.kwargs["pk"]}))
         
-        checklist = self.get_object()
+        
         for id, task in enumerate(self.request.session["tasks"]):
-            _task = Task(created_for="checklist" ,
-                task_number = id,
-                description=task)
+            _task = Task(created_for="checklist", task_number = id,
+                            description=task)
             _task.save()
             checklist.tasks.add(_task)
             checklist.save()
@@ -139,7 +156,10 @@ class ChecklistUpdateView(UpdateView):
         
         return resp
 
+
 def delete_checklist(request, pk):
+    """Deletes the checklist at the push of a button using a pk"""
+
     try:
         Checklist.objects.get(pk=pk).delete()
     except:
@@ -147,14 +167,15 @@ def delete_checklist(request, pk):
     else:
         return HttpResponseRedirect(reverse("maintenance:planned-maintenance"))
 
-
-
-    
-
 @csrf_exempt
+@ajax_required(Http404)
 def hold_checklist(request, pk):
-    if not request.is_ajax():
-        return Http404()
+    """Places the checklist on indefinite hold
+    Input -> primary key and JSON
+    Output -> JSON "authenticated": Boolean
+
+    authenticates the user using json and uses the primray key to set the on_hold field of the checklist to true"""
+
     if not authenticate(username=request.POST["username"],
                 password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":False}), 
@@ -169,5 +190,3 @@ def hold_checklist(request, pk):
             content="HOLD:" + request.POST["reason"]).save()
     return HttpResponse(json.dumps({"authenticated":True}), 
                             content_type="application/json")
-
-

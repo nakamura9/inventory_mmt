@@ -68,6 +68,9 @@
 
     function validateForm(){
         if(num_tasks == 0){
+            alert("At least one task must be created");
+            $("#task").css("border-color", "red");
+            $("#task").focus();
             return false;
         }else{
             return true;

@@ -1,15 +1,23 @@
 from django import forms
+
 from common_base.forms import BootstrapMixin
 from .models import Checklist
+from common_base.models import Account
 
 
 class CheckListCreateForm(forms.ModelForm, BootstrapMixin):
+    """Form for creating checklists.
+    
+    fields: title, creation_date, estimated_time, start_time,
+            machine, section,subunit, subassembly, resolver, 
+            category, "frequency"""
+
     def __init__(self, *args , **kwargs):
         super(CheckListCreateForm, self).__init__(*args, **kwargs)
         self.fields["machine"].widget.attrs["onchange"] = \
-                "prepSectionUpdate()"
+            "prepSectionUpdate()"
         self.fields["section"].widget.attrs["onchange"] = \
-                "prepSubUnitUpdate()"
+            "prepSubUnitUpdate()"
         self.fields["subunit"].widget.attrs["onchange"] = \
                 "prepSubAssemblyUpdate()"
         
@@ -19,4 +27,5 @@ class CheckListCreateForm(forms.ModelForm, BootstrapMixin):
         fields = ["title", "creation_date", 'estimated_time', 'start_time',
                     "machine", "section","subunit", "subassembly", "resolver", 
                     "category", "frequency"]
+
 

@@ -137,6 +137,7 @@ class TestDataMixin(object):
 
     @classmethod
     def create_test_workorders(cls):
+        pass
         
     @classmethod
     def create_dummy_accounts(cls):

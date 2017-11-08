@@ -4,8 +4,7 @@ import json
 
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404, HttpResponse, HttpResponseRedirect,
-                        HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
 from django.contrib.auth import authenticate
 
 from common_base.models import Category
@@ -14,8 +13,8 @@ from inv import models as inv_models
 
 """The views that correspond to the URLS """
 
-@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
+@ajax_required(HttpResponseBadRequest)
 def update_section(request):
     """Takes json from request and returns the list of sections under the provided machine.
     
@@ -33,8 +32,8 @@ def update_section(request):
             {"sections": sections}),
                 content_type="application/json")
 
-@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
+@ajax_required(HttpResponseBadRequest)
 def update_subunit(request):
     """Takes json from request and returns the list of subunits under the provided section.
     
@@ -53,8 +52,8 @@ def update_subunit(request):
                 content_type="application/json")
 
 
-@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
+@ajax_required(HttpResponseBadRequest)
 def update_subassembly(request):
     """Takes json from request and returns the list of subunits under the provided section.
     
@@ -74,8 +73,8 @@ def update_subassembly(request):
                 content_type="application/json")
 
 
-@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
+@ajax_required(HttpResponseBadRequest)
 def update_components(request):
     """Takes json from request and returns the list of components under the provided subassembly.
     
@@ -94,8 +93,8 @@ def update_components(request):
             {"components": components}),
                 content_type="application/json")
 
-@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
+@ajax_required(HttpResponseBadRequest)
 def ajaxAuthenticate(request):
     """Authenticates users quickly in username/password combo
 
@@ -110,8 +109,8 @@ def ajaxAuthenticate(request):
         return HttpResponse(json.dumps({"authenticated":False}),
                             content_type="application/json")
 
-@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
+@ajax_required(HttpResponseBadRequest)
 def add_task(request):
     """Adds tasks to the current session
     
@@ -128,16 +127,15 @@ def add_task(request):
     else:
         return HttpResponse("-1")
 
-
-@ajax_required(HttpResponseBadRequest)
 @csrf_exempt
+@ajax_required(HttpResponseBadRequest)
 def remove_task(request):
     """Removes a task from the session and the database if stored
     
     Input: JSON -> "task":string
     Output: HttpResponse '0' or '-1' 
     """
-    
+
     if request.POST == "" or \
         "tasks" not in request.session:
         return HttpResponse("-1")
@@ -161,5 +159,3 @@ def add_category(request):
         data.pop("csrfmiddlewaretoken")
         Category(**data).save()
         return HttpResponse("0")
-
-

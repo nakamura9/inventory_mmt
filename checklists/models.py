@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
+import datetime
 
 from django.db import models
 from django.utils import timezone
-import datetime
+
 from common_base.utilities import time_choices
 
 
@@ -10,10 +11,41 @@ def now():
     return datetime.datetime.now().strftime("%H%M")
 
 class Checklist(models.Model):
-
+    """Data representation of a checklist
+    
+    Fields
+    ==========
+    title -> string
+    creation_date -> date
+    last_completed_date ->date
+    estimated_time -> Duration
+    start_time -> Time
+    machine -> Machine Instance
+    section -> Section Instance
+    subunit -> Subunit Instance
+    subassembly -> SubAssembly Instance
+    resolver -> Account Instance
+    category -> string (ENUM)
+    frequency -> string (ENUM)
+    on_hold -> Boolean
+    comments -> Comment Instance
+    tasks -> Task Instance
+    
+    
+    Properties
+    ==========
+    is_opem -> Boolean
+    get_type -> string
+    next -> timedelta
+    
+    Methods
+    ==========
+    None
+    """
+    
     def save(self, *args, **kwargs):
-        print self.estimated_time
         super(Checklist, self).save(*args, **kwargs)
+    
     def __str__(self):
         return self.title
     

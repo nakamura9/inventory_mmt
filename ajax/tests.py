@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 import json
 
@@ -74,7 +74,7 @@ class selectAjaxCalls(TestCase, TestDataMixin):
         self.assertContains(response, "components")
 
 
-class OtherAjaxTests(Testcase):
+class OtherAjaxTests(TestCase, TestDataMixin):
     """
     Tests ajax functions not associated with select widgets
 
