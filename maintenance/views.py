@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import os
 
 from django.shortcuts import render
 from django.views.generic import ListView, TemplateView
-from inv.models import Machine
-from checklists.models import Checklist
 from django.forms import widgets
-from common_base.models import Account
 from django.contrib.auth import authenticate
-from jobcards.models import PreventativeTask, WorkOrder
-from .forms import PlannedMaintenanceFilterForm
+
+from checklists.models import Checklist
+from common_base.models import Account
 from common_base.utilities import filter_by_dates
+from jobcards.models import PreventativeTask, WorkOrder
+from inv.models import Machine
+from .forms import PlannedMaintenanceFilterForm
 
 
-import os
+class MachineOverView(ListView):            
+    """Page that provides a summary of all the machines."""
 
-class PlantOverView(ListView):            
     model = Machine
     template_name = os.path.join("inv", "plantview.html")
 
@@ -26,6 +28,11 @@ class PlantOverView(ListView):
 
 
 class PlannedMaintenanceView(TemplateView):
+    """Page responsible for displaying all the checklists and preventative tasks.
+
+    Cannot use a ListView because 2 models are involved.
+    Filter present.
+    """
     template_name = os.path.join("maintenance", "planned_maintenance_view.html")
 
     def get_context_data(self, *args, **kwargs):
@@ -42,7 +49,7 @@ class PlannedMaintenanceView(TemplateView):
             "planned_jobs": "True",
         })
 
-        if not self.request.GET.get("resolver", None):
+        if not resolver:
             context["checklists"] = Checklist.objects.all()
             context["planned_jobs"] =PreventativeTask.objects.all()
             
@@ -54,22 +61,17 @@ class PlannedMaintenanceView(TemplateView):
             if machine:
                 checklist_queryset = checklist_queryset.filter(
                                                         machine=machine)
-                
             checklist_queryset = filter_by_dates(checklist_queryset, start, 
                                                 stop)
-
             context["checklists"] = checklist_queryset
 
         if jobs:
             jobs_queryset = PreventativeTask.objects.all()
-
             if resolver:
                 jobs_queryset = jobs_queryset.filter(resolver = resolver)
             if machine:
                 jobs_queryset = jobs_queryset.filter(machine = machine)
-
             jobs_queryset = filter_by_dates(jobs_queryset, start, stop)
-
             context["planned_jobs"] = jobs_queryset
         
         return context
@@ -80,6 +82,10 @@ class MaintenanceInbox(ListView):
     The List view acts as an inbox for artisans which divides maintenance tasks
     into checklists, planned and unplanned jobs.
     The page has a login form for resolvers as well as a welcome and login status message 
+    The inbox is divided into:
+        Work Orders
+        Preventative Tasks
+        Checklists
     """
 
     model = Checklist

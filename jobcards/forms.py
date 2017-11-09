@@ -1,18 +1,29 @@
-from .models import WorkOrder, PreventativeTask
 from django import forms
 from django.utils import timezone
+
 from common_base.forms import BootstrapMixin
 from common_base.models import Account
 from inv.models import Machine
-
+from .models import WorkOrder, PreventativeTask
 
 
 class WorkOrderCreateForm(forms.ModelForm, BootstrapMixin):
+    """Class for creating work orders.
+    
+    Fields: type, machine, section, subunit, subassembly, component, description, execution_date, estimated_labour_time, assigned_to, priority
+    """
+    
     class Meta:
         model = WorkOrder
         fields = ["type", "machine", "section", "subunit", "subassembly", "component", "description", "execution_date", "estimated_labour_time", "assigned_to", "priority"]
 
 class WorkOrderCompleteForm(forms.ModelForm, BootstrapMixin):
+    """Class for completing workorders.
+
+    Fields: resolver_action, actual_labour_time,
+            downtime, completion_date, spares_issued, spares_returned
+    """
+
     class Meta:
         model = WorkOrder
         fields = ["resolver_action", "actual_labour_time",
@@ -20,34 +31,31 @@ class WorkOrderCompleteForm(forms.ModelForm, BootstrapMixin):
 
 
 class PreventativeTaskCreateForm(forms.ModelForm, BootstrapMixin):
+    """Class for creating preventative tasks.
+
+    Fields:"""
+
     class Meta:
         model = PreventativeTask
         fields = [ "machine", "section", "subunit", "subassembly", "component", "scheduled_for","description",  "frequency", "estimated_labour_time", "estimated_downtime","required_spares", "assignments"]# tasks are handled in the POST
 
 
 class PreventativeTaskCompleteForm(forms.ModelForm, BootstrapMixin):
+    """Class for completing preventative tasks.
+
+    Fields:"""
+
     class Meta:
         model = PreventativeTask
         fields = ["actual_downtime", "completed_date", "feedback",
                 "spares_used"]
 
 
-class DateInput(forms.DateInput):
-    input_type = "text"
-
-class TimeInput(forms.TimeInput):
-    input_type = "time"
-
-class DurationInput(forms.Select):
-    def __init__(self, *args, **kwargs):
-        super(DurationInput, self).__init__(*args, **kwargs)
-        self.attrs["class"] = "form-control"
-        self.choices = [("00%d" % i, "00%d" % i) for i in range(10, 60, 5)] \
-                        + [("0%d00" % i, "0%d00" % i) for i in range(1, 9)] \
-                        + [("%d00" % i, "%d00" % i) for i in range(10, 24)]
-
-
 class WorkOrderListFilterForm(forms.Form):
+    """Form for filtering Work orders in the list view.
+
+    Fields: start_date, end_date, resolver, machine,"""
+
     def __init__(self, *args, **kwargs):
         super(WorkOrderListFilterForm, self).__init__(*args, **kwargs)
         for field in self.fields:

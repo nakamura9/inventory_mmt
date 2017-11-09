@@ -1,17 +1,28 @@
 from __future__ import unicode_literals
-
-from django.db import models
-from inv.models import *
-from common_base.models import Account
-from django.utils import timezone
 import time 
 import datetime
+
+from django.utils import timezone
+from django.db import models
+
+from inv.models import *
+from common_base.models import Account
 from common_base.utilities import time_choices
-time_duration = [] + time_choices("00:05:00", "00:30:00", "00:05:00", delta=True) \
-+ time_choices("00:30:00", "02:00:00", "00:15:00", delta=True) \
-+ time_choices("02:00:00", "08:00:00", "00:30:00", delta=True)  
+
+time_duration = [] + time_choices("00:05:00", "00:30:00", "00:05:00",
+            delta=True) + time_choices("00:30:00", "02:00:00", "00:15:00",
+            delta=True) + time_choices("02:00:00", "08:00:00", "00:30:00",
+            delta=True)  
 
 class WorkOrder(models.Model):
+    """Model that represents a job assigned ad-hoc i.e. a breakdown.
+
+    Fields: type, machine, section, subunit, subassembly, component,
+            description, execution_date,estimated_labour_time,assigned_to, 
+            priority, costing, status, resolver_action, actual_labour_time,
+            downtime,completion_date, spares_issued, spares_returned"""
+
+
     type = models.ForeignKey("common_base.Category")
     machine = models.ForeignKey("inv.Machine", null=True)
     section = models.ForeignKey("inv.Section", null=True)
@@ -40,6 +51,14 @@ class WorkOrder(models.Model):
 
 
 class PreventativeTask(models.Model):
+    """Model representing preventatitve maintenance jobs.
+
+    May be once off or recurring 
+    Fields: machine, section, subunit, subassembly, component,
+            description, tasks, frequency, scheduled_for, estimated_labour_time,assignments, feedback, actual_downtime,completed_date, spares_issued, spares_returned
+
+    Properties: is_open-> Boolean"""
+    
     mapping =  {"daily": 1,
         "weekly": 7,
         "fortnightly": 14,
@@ -91,4 +110,5 @@ class PreventativeTask(models.Model):
             return False
 
 class Costing(models.Model):
+    """Model used when planning the budget of a preventative task."""
     id= models.CharField(max_length=32, primary_key=32)

@@ -1,16 +1,18 @@
 import datetime
+import calendar
+
 from inv.models import Order
 from jobcards.models import PreventativeTask
 from checklists.models import Checklist
-import calendar
 
 
 class Day(object):
     def __init__(self, date, filters = {}, include = []):
-        """Day object that stores a reference of its date as week as 
+        """Day object that stores a reference of its date as well as 
         other features
-        The filters are used to narrow database queries and the include argument limits 
-        the classes used to construct the queries"""
+        The filters are used to narrow database queries and the included argument limits. 
+        The classes used to construct the queries."""
+
         day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         
         assert(isinstance(date, datetime.date))
@@ -44,6 +46,8 @@ class Day(object):
         
 
 class ProductionDay(Day):
+    """Lists events associated with orders"""
+
     def get_agenda(self):
         """Production days look out for manufacture days and 
         delivery dates. 
@@ -61,6 +65,8 @@ class ProductionDay(Day):
 
 
 class MaintenanceDay(Day):
+    """Lists events based on preventativeTasks and Checklists"""
+    
     @property
     def checklist_count(self):
         return len([item for item in self.agenda if isinstance(item, Checklist)])

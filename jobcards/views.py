@@ -1,44 +1,57 @@
 # coding: utf-8
+import os
+import json
+import datetime
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from .models import PreventativeTask, WorkOrder
+from django.forms import widgets
+from django import forms
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views import View
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
 from django.views.decorators.csrf import csrf_exempt
-from inv.models import *
-import os
-from django.urls import reverse, reverse_lazy
-import json
-from .forms import *
-from common_base.models import Account
-from django import forms
-import datetime
-from django.forms import widgets
-from django.utils import timezone
-import pytz
 from django.views.generic.edit import UpdateView
+import pytz
+
 from common_base.utilities import filter_by_dates
 from common_base.models import Task
+from common_base.models import Account
+from inv.models import *
+from .forms import *
+from .models import PreventativeTask, WorkOrder
+
 
 class NewWorkOrderView(CreateView):
+    """Work order create view"""
+
     form_class = WorkOrderCreateForm
     template_name = os.path.join("jobcards", "newworkorder.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
 class EditNewWorkOrderView(UpdateView):
+    """Edit work order view"""
+    
     model = WorkOrder
     form_class = WorkOrderCreateForm
     template_name = os.path.join("jobcards", "newworkorder.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
 class CompleteWorkOrderView(UpdateView):
+    """Complete work order view"""
+
     model = WorkOrder
     form_class = WorkOrderCompleteForm
     template_name = os.path.join("jobcards", "completeworkorder.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
 class NewPreventativeTaskView(CreateView):
+    """New preventative task view.
+    
+    Uses sessions to store the list of tasks."""
+
     form_class = PreventativeTaskCreateForm
     template_name = os.path.join("jobcards", "newpreventativetask.html")
     success_url = reverse_lazy("inventory:inventory-home")
@@ -51,11 +64,11 @@ class NewPreventativeTaskView(CreateView):
     
     def post(self, *args, **kwargs):
         resp = super(NewPreventativeTaskView, self).post(*args, **kwargs)
-        #makes sure there is at least one task in the session
         if len(self.request.session.get("tasks")) == 0:
             return HttpResponseRedirect(reverse("jobcards:new-preventative-task"))
         
-        p_task = PreventativeTask.objects.get(description=self.request.POST["description"])# need to find another unique identifier
+        p_task = PreventativeTask.objects.get(
+                            description=self.request.POST["description"])
         for id, task in enumerate(self.request.session["tasks"]):
             _task = Task(created_for="preventative_task",
                 task_number = id,
@@ -68,12 +81,16 @@ class NewPreventativeTaskView(CreateView):
         return resp
 
 class EditNewPreventativeTaskView(UpdateView):
+    """Edits a new preventative task """
+
     form_class = PreventativeTaskCreateForm
     model = PreventativeTask
     template_name = os.path.join("jobcards", "newpreventativetask.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
 class CompletePreventativeTaskView(UpdateView):
+    """Complete view for preventative tasks."""
+
     form_class = PreventativeTaskCompleteForm
     model = PreventativeTask
     template_name = os.path.join("jobcards", "completepreventativetask.html")
@@ -82,7 +99,7 @@ class CompletePreventativeTaskView(UpdateView):
 
 class WorkOrderList(ListView):
         """
-        List of all unplanned Jobs in the works summary
+        List of all unplanned Jobs in the works summary.
         """
         model = WorkOrder
         template_name = os.path.join("jobcards", "work_order_list.html")
@@ -94,6 +111,7 @@ class WorkOrderList(ListView):
 
         
         def get_queryset(self, *args, **kwargs):
+            """This method is overridden for the sake of the filter functionality incorporated into the page"""
             queryset = self.model.objects.all()
             start_date = self.request.GET.get("start_date", None)
             end_date = self.request.GET.get("end_date", None)
@@ -113,6 +131,8 @@ class WorkOrderList(ListView):
 
 @csrf_exempt
 def get_resolvers(request):
+    """Returns a json representation of all the accounts in the application for instances where the resovler might change"""
+
     resolvers = [[acc.username, acc.id] for acc in Account.objects.all()]
     return HttpResponse(json.dumps(
         {"resolvers": resolvers}
