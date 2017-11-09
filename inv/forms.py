@@ -4,6 +4,8 @@ from common_base.forms import BootstrapMixin
 
 
 class SparesForm(forms.ModelForm, BootstrapMixin):
+    """Form used to create Spares items."""
+
     class Meta:
         model = Spares
         fields = ["stock_id", "quantity", "reorder_level",
@@ -12,12 +14,16 @@ class SparesForm(forms.ModelForm, BootstrapMixin):
 
 
 class AssetForm(forms.ModelForm, BootstrapMixin):
+    """Form used to create asset objects"""
+
     class Meta:
         model = Asset
         fields = ["asset_unique_id", "spares_list", "category"]
 
 
 class InventoryItemForm(forms.ModelForm, BootstrapMixin):
+    """Form used to create inventory items""" 
+
     class Meta:
         model = InventoryItem
         fields = ["serial_number", "name", "order_number", 
@@ -27,6 +33,8 @@ class InventoryItemForm(forms.ModelForm, BootstrapMixin):
 
 
 class OrderForm(forms.ModelForm, BootstrapMixin):
+    """Form used to create order items"""
+
     class Meta:
         model = Order
         fields = ["order_number", "description",     "quantity", "unit_price", 
@@ -35,6 +43,8 @@ class OrderForm(forms.ModelForm, BootstrapMixin):
 
 
 class MachineForm(forms.ModelForm, BootstrapMixin):
+    """Form used to create machine objects"""
+
     class Meta:
         model = Machine
         fields = ["commissioning_date", "machine_name", 
@@ -42,12 +52,18 @@ class MachineForm(forms.ModelForm, BootstrapMixin):
                 "unique_id"]
 
 class SectionForm(forms.ModelForm, BootstrapMixin):
+    """Form used to create Sections"""
+
     class Meta:
         model = Section
         fields = [ "section_name", "machine", "unique_id"]
 
 
 class SubUnitForm(forms.ModelForm, BootstrapMixin):
+    """Form used to create SubUnits.
+    
+    The machine widget has the additional attribute, 'onchange' added during init."""
+
     class Meta:
         model = SubUnit
         fields = [ "unit_name", "machine", "section", "unique_id"]
@@ -58,6 +74,10 @@ class SubUnitForm(forms.ModelForm, BootstrapMixin):
                 "prepSectionUpdate()"
 
 class SubAssyForm(forms.ModelForm, BootstrapMixin):
+    """Form for creating SubAssemblies.
+    
+    The machine and section widgets have an 'onchange' attribute added to them during init."""
+
     class Meta:
         model = SubAssembly
         fields = ["unit_name", "machine", "section", "subunit", "unique_id"]
@@ -72,6 +92,10 @@ class SubAssyForm(forms.ModelForm, BootstrapMixin):
 
 
 class ComponentForm(forms.ModelForm, BootstrapMixin):
+    """Form for creating Components.
+    
+    The machine, section and subunit widgets have an 'onchange' attribute during init."""
+    
     class Meta:
         model = Component
         fields = ["component_name", 

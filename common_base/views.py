@@ -1,19 +1,30 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-from django.shortcuts import render,reverse
-from django.http import HttpResponse, HttpResponseRedirect
-from .models import Account
+import os
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render,reverse
+
 from .forms import userForm
-import os
+from .models import Account
+
 
 def login(request):
+    """Login view for the application.
+    
+    GET: 'login.html'
+    
+    POST: 
+        Input: username and password
+        Output: Successful 'maintenance:machine-overview'
+                Failed redirect back to the login page"""
+    
     if request.method == "GET":
        return render(request, os.path.join("common_base", "login.html"))
+    
     else:
         name = request.POST["name"]
         pwd = request.POST["pwd"]
@@ -26,6 +37,13 @@ def login(request):
 
 
 def sign_up(request):
+    """Sign up page for new users.
+    
+    GET: 'signup.html'
+    POST:
+        success: 'login' page.
+        failure: signup page with error."""
+    
     if request.method == "GET":
         form = userForm()
         return render(request, os.path.join("common_base", "signup.html"), context={"form": form})
@@ -48,10 +66,13 @@ def sign_up(request):
             return render(request, os.path.join("common_base", "signup.html"), context={"form": form})
 
 def logout(request):
+    """Function used to logout users without an associated page
+    
+    #add js dialog box next time.
+
+    always returns the login page."""
+    
     if request.user.is_authenticated:
         auth_logout(request)
 
     return HttpResponseRedirect(reverse("login"))
-
-
-# Create your views here.

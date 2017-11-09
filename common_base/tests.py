@@ -1,25 +1,34 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import datetime
+import random
+
 from django.shortcuts import reverse
 from django.test import TestCase, Client
-from inv import models as inv_models
+from django.utils import timezone
+
 from checklists import models as ch_models
+from inv import models as inv_models
 from jobcards import models as jb_models
 from . import models
-import datetime
-from django.utils import timezone
-import random
 from .utilities import time_choices
 
 
 class TestUtilities(TestCase):
+    """Tests the utilities functions.
+    
+    ajaxRequired decorator untested because the function is copied from the github community and has been tested by the author."""
+
     def test_time_choices(self):
         data = time_choices("13:00:00", "20:00:00", "00:15:00")
         print data
         self.assertIsInstance(data, list)
 
+    
 
 class TestViews(TestCase):
+    """Used to test content created by the category form."""
+
     @classmethod
     def setUpClass(cls):
         super(TestViews, cls).setUpClass()
@@ -40,6 +49,14 @@ class TestViews(TestCase):
 
 
 class TestDataMixin(object):
+    """This class is used to provide test data for other applications, especially those whose tests have multiple dependancies.
+    models:
+    Machine, Section, SubUnit, SubAssembly, Component, Category, Inventory_item, Order.
+    
+    classmethods:
+        create_dummy_accounts
+        create_test_checklist"""
+
     @classmethod
     def create_test_inventory_models(cls):
         inv_models.Machine(machine_name="Test Machine",
@@ -137,7 +154,7 @@ class TestDataMixin(object):
 
     @classmethod
     def create_test_workorders(cls):
-        pass
+        raise NotImplementedError
         
     @classmethod
     def create_dummy_accounts(cls):
@@ -155,6 +172,9 @@ class TestDataMixin(object):
 
 
 class TestModels(TestCase, TestDataMixin):
+    """Tests the common models.
+    
+    models: Comment, Task, Account"""
     def test_create_account(self):
         models.Account(username= "Test User",
                 first_name="Test",
@@ -180,3 +200,5 @@ class TestModels(TestCase, TestDataMixin):
                 created_for="checklist",
                 task_number=1, description="A Test Checklist Task")
         self.assertIsInstance(task, models.Task)
+
+    #test create category

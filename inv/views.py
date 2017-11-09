@@ -1,20 +1,21 @@
-from django.shortcuts import render, reverse
+import os
+from collections import namedtuple
+
+
+from django.shortcuts import render, reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
-import os
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
 import checklists
 import jobcards
 from .models import *
 from .forms import *
 from common_base.forms import CategoryForm
-
 from common_base.models import Account, Category
-from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-
 from checklists.models import Checklist
 from jobcards.models import PreventativeTask, WorkOrder
-from collections import namedtuple
 
 
 class invHome(TemplateView):
@@ -40,45 +41,62 @@ class EngineeringInventoryView(TemplateView):
 ###############################################################################
 
 class AssetCreate(CreateView):
-    template_name = os.path.join("inv", "engineering_inventory", "create_update","addasset.html") 
+    """Asset creation view"""
+    
+    template_name = os.path.join("inv", "engineering_inventory", 
+                                "create_update","addasset.html") 
     model = Asset
     form_class = AssetForm
     success_url = reverse_lazy("inventory:inventory-home")
 
 class AssetUpdate(UpdateView):
+    """Asset Update view"""
+
     template_name = os.path.join("inv","engineering_inventory", "create_update", "addasset.html") 
     model = Asset
     form_class = AssetForm
     success_url = reverse_lazy("inventory:inventory-home")
 
 class AssetDetail(DetailView):
+    """Asset Details view"""
+
     template_name = os.path.join("inv","engineering_inventory", "details", "asset_detail.html") 
     model = Asset
 
 class SparesCreate(CreateView):
-    template_name = os.path.join("inv","engineering_inventory", "create_update", "addspares.html") 
-    model = Asset
+    """Spares creation view"""
+
+    template_name = os.path.join("inv","engineering_inventory", "create_update",                                 "addspares.html") 
+    model = Spares
     form_class = SparesForm
     success_url = reverse_lazy("inventory:inventory-home")
 
 class SparesUpdate(UpdateView):
+    """Spares Updating view"""
+
     template_name = os.path.join("inv","engineering_inventory", "create_update", "addspares.html") 
-    model = Asset
+    model = Spares
     form_class = SparesForm
     success_url = reverse_lazy("inventory:inventory-home")
 
 class SparesDetail(DetailView):
+    """Spares details view"""
+
     template_name = os.path.join("inv", "engineering_inventory", "details","spares_detail.html") 
     model = Spares
 
-class machineView(CreateView):
+class MachineCreateView(CreateView):
+    """Machine Create View"""
+
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addmachine.html") 
     model = Machine
     form_class = MachineForm
     success_url = reverse_lazy("inventory:inventory-home")
     
 
-class subunitView(CreateView):
+class SubUnitCreateView(CreateView):
+    """SubUnit create view"""
+
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubunit.html")
     model = SubUnit
     form_class = SubUnitForm
@@ -86,8 +104,11 @@ class subunitView(CreateView):
     success_url = reverse_lazy("inventory:inventory-home")
 
 
-class sectionView(CreateView):
-    template_name = os.path.join("inv", "engineering_inventory", "create_update", "addsection.html")
+class SectionCreateView(CreateView):
+    """Section create view"""
+
+    template_name = os.path.join("inv", "engineering_inventory", 
+    "create_update", "addsection.html")
     model = Section
     form_class = SectionForm
     
@@ -99,7 +120,9 @@ class sectionView(CreateView):
         return context
 
 
-class sectionUpdateView(UpdateView):
+class SectionUpdateView(UpdateView):
+    """Section update view"""
+
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsection.html")
     model = Section
     form_class = SectionForm
@@ -114,20 +137,26 @@ class sectionUpdateView(UpdateView):
 
         
 
-class subassyView(CreateView):
+class SubAssyCreateView(CreateView):
+    """SubAssembly create view"""
+
     template_name = os.path.join("inv","engineering_inventory", "create_update", "addsubassy.html")
     model = SubAssembly
     form_class = SubAssyForm
     
     success_url = reverse_lazy("inventory:inventory-home")
 
-class plantView(CreateView):
+class PlantCreateView(CreateView):
+    """Plant create view"""
+
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addplant.html")
     model = Plant
     fields = ["plant_name"]
     success_url = reverse_lazy("inventory:inventory-home")
 
-class componentView(CreateView):
+class ComponentCreateView(CreateView):
+    """Component create view"""
+
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addcomponent.html")
     model = Component
     form_class = ComponentForm
@@ -135,26 +164,34 @@ class componentView(CreateView):
     success_url = reverse_lazy("inventory:inventory-home")
 
 
-class componentEditView(UpdateView):
+class ComponentEditView(UpdateView):
+    """Component update view"""
+
     model = Component
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addcomponent.html")
     form_class = ComponentForm
 
 
-class machineEditView(UpdateView):
+class MachineEditView(UpdateView):
+    """Machine update view"""
+
     model = Machine
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addmachine.html")
     form_class = MachineForm
     success_url = reverse_lazy("inventory:inventory-home")
 
 
-class subassyEditView(UpdateView):
+class SubAssyEditView(UpdateView):
+    """SubAssembly update view"""
+
     model = SubAssembly
     form_class = SubAssyForm
-    template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubassy.html")
+    template_name = os.path.join("inv", "engineering_inventory", "create_update","adFdsubassy.html")
     
 
-class subunitEditView(UpdateView):
+class SubunitEditView(UpdateView):
+    """SubUnit update view"""
+
     model = SubUnit
     form_class = SubUnitForm
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubunit.html")
@@ -166,8 +203,9 @@ class subunitEditView(UpdateView):
 
 
 class MachineView(DetailView):
-    """
-    Provides in depth information regarding the requested machine
+    """Machine detail view.
+    
+    Context populated with breakdown history, checklist data and planned jobs.
     """
     template_name = os.path.join("inv","engineering_inventory", "details", "machine_details.html")
     model = Machine 
@@ -210,7 +248,12 @@ class SubUnitView(DetailView):
     model = SubUnit
 
 
-class sectionDetailView(DetailView):
+class SectionDetailView(DetailView):
+    """Section detail view.
+    
+    Context populated with breakdown history, checklist data and planned jobs.
+    """
+    
     model = Section
     template_name = os.path.join("inv","engineering_inventory", "details", "section_details.html")
 
@@ -263,37 +306,49 @@ class SubAssyView(DetailView):
 
 
 class CategoryList(ListView):
+    """Category list view"""
+
     model = Category
     context_object_name = 'categories'
     template_name=os.path.join("inv", "production_inventory","raw_materials.html")
 
 
-class categoryForm(CreateView):
+class CategoryCreateView(CreateView):
+    """Category create view"""
+
     template_name = os.path.join("inv","category_form.html")
     form_class = CategoryForm
     success_url = reverse_lazy("inventory:raw-materials")
 
 
-class inventoryItemUpdateView(UpdateView):
+class InventoryItemUpdateView(UpdateView):
+    """Inventory Item Update view"""
+
     model = InventoryItem
     template_name = os.path.join("inv", "production_inventory", "create_update","inventory_item.html")
     success_url = reverse_lazy("inventory:raw-materials")
     form_class = InventoryItemForm
 
 
-class inventoryItemFormView(CreateView):
+class InventoryItemFormView(CreateView):
+    """Inventory Item Create View"""
+
     model = InventoryItem
     form_class = InventoryItemForm
     template_name = os.path.join("inv", "production_inventory", "create_update","inventory_item.html")
     success_url = reverse_lazy("inventory:raw-materials")
 
 
-class inventoryItemDetailView(DetailView):
+class InventoryItemDetailView(DetailView):
+    """Inventory Item Detail view"""
+
     model = InventoryItem
     template_name= os.path.join("inv","production_inventory", "details", "inventory_item_details.html")
     
 
-class inventoryListView(TemplateView):
+class InventoryListView(TemplateView):
+    """Inventory List view"""
+    
     template_name = os.path.join("inv","production_inventory", "list","inventory_list.html")
 
     def get_context_data(self, *args, **kwargs):
@@ -305,23 +360,31 @@ class inventoryListView(TemplateView):
 
 
 class OrderCreateView(CreateView):
+    """Order Create View"""
+
     form_class = OrderForm
     success_url = reverse_lazy("inventory:raw-materials")
     template_name = os.path.join("inv","production_inventory", "create_update", "order_form.html")
 
 
 class OrderUpdateView(UpdateView):
+    """Order Update view """
+
     form_class = OrderForm
     success_url = reverse_lazy("inventory:raw-materials")
     template_name = os.path.join("inv", "production_inventory", "create_update","order_form.html")
     model = Order
 
 class OrderList(ListView):
+    """Order List View"""
+
     model = Order
     template_name= os.path.join("inv","production_inventory", "list", "order_list.html")
 
 
 class OrderDetailView(DetailView):
+    """Order Detail View"""
+
     model = Order
     template_name = os.path.join("inv","production_inventory", "details", "orders_detailview.html")
 
@@ -332,26 +395,38 @@ class OrderDetailView(DetailView):
 
 
 def delete_component(request, pk):
-    Component.objects.get(pk=pk).delete()
+    """Deletes a Component specified by pk, raises 404 if not found"""
+
+    get_object_or_404(Component, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
 def delete_subassembly(request, pk):    
-    SubAssembly.objects.get(pk=pk).delete()
+    """Deletes a SubAssembly specified by pk, raises 404 if not found"""
+
+    get_object_or_404(SubAssembly, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
 def delete_section(request, pk):    
-    Section.objects.get(pk=pk).delete()
+    """Deletes a Section specified by pk, raises 404 if not found"""
+
+    get_object_or_404(Section, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
-def delete_subunit(request, pk):    
-    SubUnit.objects.get(pk=pk).delete()
+def delete_subunit(request, pk):
+    """Deletes a SubUnit specified by pk, raises 404 if not found"""
+
+    get_object_or_404(SubUnit, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
 
 def delete_machine(request, pk):
-    Machine.objects.get(pk=pk).delete()
+    """Deletes a Machine specified by pk, raises 404 if not found"""
+
+    get_object_or_404(Machine, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
 def delete_order(request, pk):
-    Order.objects.get(pk=pk).delete()
+    """Deletes an Order specified by pk, raises 404 if not found"""
+
+    get_object_or_404(Order, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))

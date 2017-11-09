@@ -1,12 +1,18 @@
-from django.test import TestCase
-from django.test import Client
+import datetime
+
 from django.shortcuts import reverse
+from django.test import TestCase, Client
 
 from common_base.tests import TestDataMixin
 from .models import *
-import datetime
+
 
 class ViewTests(TestCase, TestDataMixin):
+    """Tests for views for creation, viewing, updating and deleting inventory models
+
+    GET tests take a url, use the client to retrieve and test if the status_code is 200.
+    POST tests create a database entry via a url, test if the entry is present in the test database, use another url to delete the entry and test if the request resulted in a redirect(302) which indicates success."""
+    
     @classmethod
     def setUpTestData(cls):
         super(ViewTests, cls).setUpTestData()
@@ -245,6 +251,8 @@ class ViewTests(TestCase, TestDataMixin):
 
 
 class ModelTests(TestCase):
+    """Tests for model creation and their properties."""
+
     def test_create_plant(self):
         pass
 

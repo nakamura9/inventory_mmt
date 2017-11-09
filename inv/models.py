@@ -8,8 +8,11 @@ from django.utils import timezone
 
 class Asset(models.Model):
     """
-    Machine Base class
+    Model that represents a company asset.
+
+    #Should act as the Machine model base class
     Has a spares list relationship via a foreign key
+
     """
     asset_unique_id = models.CharField(max_length=32, unique=True)
     category = models.ForeignKey("common_base.Category")
@@ -20,8 +23,12 @@ class Asset(models.Model):
 
 class Spares(models.Model):
     """
-    Need to be linked somehow to components.
-    relationship, all spares are machine components but not all components are spares
+    Represents an item that can replace some piece of equipment and can be retrieved from stores.
+
+    #Need to be linked somehow to components.
+    #relationship, all spares are machine components but not all components are spares.
+
+    Fields: stock_id, category, quantity, reorder_level, reorder_quanity, last_order_price
     """
     
     stock_id = models.CharField(max_length=32)
@@ -33,9 +40,11 @@ class Spares(models.Model):
     
     def __str__(self):
         return self.stock_id
+
 class Plant(models.Model):
-    """
-    Might be deprecated soon. used to distinguish main plant from sheet plant
+    """Used to distinguish main plant from sheet plant
+    
+    Might be deprecated soon. 
     """
     plant_name= models.CharField(max_length = 128)
     
@@ -56,6 +65,12 @@ class Machine(models.Model):
             +--Vacuum system
                 +--Vacuum pump assembly
                     +--10 kW Motor
+
+    Properties:
+    ===========
+    n_units -returns the number of units
+    n_breakdowns(today/weekly/monthly/sixmonths) - returns number of breakdowns over the period
+    checklist_coverage - how many units and sections are covered by a checklist versus the total number of units and sections
     """
     machine_name = models.CharField(max_length=128)
     unique_id = models.CharField(max_length=24, primary_key=True)
@@ -215,9 +230,11 @@ class Component(models.Model):
 
 class InventoryItem(models.Model):
     """
-    Inventory used for production like paper and inks
-    used to track stock levels and reorder thresholds as well as other information
+    Represents items retained in stock.
+
+    Fields: serial_number, name, order_number, quantity, unit, order_date, category, supplier, unit_price, min_stock_level, reorder_quantity
     """
+
     serial_number = models.CharField(max_length= 32, primary_key=True)
     name = models.CharField(max_length= 32)
     order_number = models.CharField(max_length=32)
@@ -235,7 +252,9 @@ class InventoryItem(models.Model):
 
 class Order(models.Model):
     """
-    Used to manage orders and forms the basis for production planning
+    Model representing customer order on which production calender is based.
+
+    Fields: order_number, description, quantity, unit_price, manufacture_date, flute_profile(enum), liner(enum), layers(enum), delivery_date, customer, production_status(enum),delivery_status(enum)`
     
     """
     def __init__(self, *args, **kwargs):
