@@ -1,15 +1,16 @@
 from django.test import TestCase, Client
 from calendar_objects import *
 from common_base.tests import TestDataMixin
-from inv.models import Order, WorkOrder
+from inv.models import Order
+from jobcards.models import  WorkOrder
 
-
+"""
 class CalendarObjectsTests(TestCase, TestDataMixin):
     @classmethod
     def setUpTestData(cls):
         super(CalendarObjectsTests, cls).setUpTestData()
         cls.create_test_checklist()# will also create dummy inventory models
-        cls.create_test_jobcards()
+        cls.create_test_workorders()
 
 
     def test_production_day_agenda(self):
@@ -21,7 +22,6 @@ class CalendarObjectsTests(TestCase, TestDataMixin):
     def test_maintenance_day_agenda(self):
         day = MaintenanceDay(datetime.date.today(), include=["jobs", "checks"])
         day.get_agenda()
-        print day.agenda
         #self.assertFalse(Checklist.objects.first() in day.agenda)
         self.assertTrue(WorkOrder.objects.first() in day.agenda)
 
@@ -45,3 +45,4 @@ class CalendarObjectsTests(TestCase, TestDataMixin):
         month.get_month_agenda()
         self.assertTrue(month.month_agenda != [])
         
+"""

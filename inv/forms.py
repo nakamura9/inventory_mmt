@@ -44,12 +44,16 @@ class OrderForm(forms.ModelForm, BootstrapMixin):
 
 class MachineForm(forms.ModelForm, BootstrapMixin):
     """Form used to create machine objects"""
-
+    def __init__(self, *args, **kwargs):
+        super(MachineForm, self).__init__(*args, **kwargs)
+        self.fields["asset_data"].required = False
+        
     class Meta:
         model = Machine
         fields = ["commissioning_date", "machine_name", 
                  "manufacturer", "asset_data",
                 "unique_id"]
+        
 
 class SectionForm(forms.ModelForm, BootstrapMixin):
     """Form used to create Sections"""

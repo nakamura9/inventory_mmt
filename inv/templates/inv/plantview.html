@@ -85,39 +85,51 @@
                     </style>
                     
                     <ul>
-                        {% for unit in machine.subunit_set.all %}
-                            <li><div class = "subunit" onclick = "reveal('#{{unit.unique_id|slugify}}')">
-                                    {{unit.unit_name}}  
-                                    <span style="float: right;">
-                                        <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a>
-                                    </span>
-                                </div>
-                                <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
-                                    {% for sub in unit.subassembly_set.all %}
-                                        <li><div class="subassy" onclick = "reveal('#{{sub.unique_id|slugify}}')">
-                                                {{sub.unit_name}} 
-                                                <span style="float: right;">
-                                                    <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a>
-                                                </span>
-                                            </div>
-                                            
-                                            <ul id="{{sub.unique_id|slugify}}" style="display:none;">
-                                            {% for component in sub.component_set.all %}
-                                                <li><div class="components">
-                                                        {{component.component_name}} 
+                        {% for section in machine.section_set.all %}
+                        <li><div class="subunit" onclick = "reveal('#{{section.unique_id|slugify}}')">
+                                {{section.section_name}}
+                                <span style="float: right;">
+                                        <a href="{% url 'inventory:section_details' pk=section.unique_id %}">Details</a>
+                                </span>
+                            </div>
+                        </li>
+                        <ul id="{{section.unique_id|slugify}}" style="display: none;">
+                                {% for unit in section.subunit_set.all %}
+                                    <li><div class = "subunit" onclick = "reveal('#{{unit.unique_id|slugify}}')">
+                                            {{unit.unit_name}}  
+                                            <span style="float: right;">
+                                                <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a>
+                                            </span>
+                                        </div>
+                                        <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
+                                            {% for sub in unit.subassembly_set.all %}
+                                                <li><div class="subassy" onclick = "reveal('#{{sub.unique_id|slugify}}')">
+                                                        {{sub.unit_name}} 
                                                         <span style="float: right;">
-                                                            <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a>
+                                                            <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a>
                                                         </span>
-                                                        </div>
+                                                    </div>
+                                                    
+                                                    <ul id="{{sub.unique_id|slugify}}" style="display:none;">
+                                                    {% for component in sub.component_set.all %}
+                                                        <li><div class="components">
+                                                                {{component.component_name}} 
+                                                                <span style="float: right;">
+                                                                    <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a>
+                                                                </span>
+                                                                </div>
+                                                        </li>
+                                                    {% endfor %}
+                                                    </ul>
                                                 </li>
-                                            {% endfor %}
-                                            </ul>
-                                        </li>
-                                    {% endfor%}    
-                                </ul>
-                            </li>
+                                            {% endfor%}    
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>    
                         {% endfor %}
                     </ul>
+                    
                 </div>
             </div>
         </div>

@@ -21,7 +21,6 @@ class TestUtilities(TestCase):
 
     def test_time_choices(self):
         data = time_choices("13:00:00", "20:00:00", "00:15:00")
-        print data
         self.assertIsInstance(data, list)
 
     
@@ -154,8 +153,23 @@ class TestDataMixin(object):
 
     @classmethod
     def create_test_workorders(cls):
-        raise NotImplementedError
-        
+        jb_models.WorkOrder(type=models.Category.objects.first(),
+                            machine= inv_models.Machine.objects.get(pk="T_M"),
+                            section= inv_models.Section.objects.get(pk="T_SE"),
+                            subunit=inv_models.SubUnit.objects.get(pk="T_S"),
+                            subassembly=inv_models.SubAssembly.objects.first(),
+                            component=inv_models.Component.objects.first(),
+                            description="Some description...",
+                            execution_date=datetime.date.today(),
+                            estimated_labour_time="00:30",
+                            assigned_to=models.Account.objects.first(),
+                            priority="low",
+                            status="requested",
+                            resolver_action= "Some action...",
+                            actual_labour_time="00:30").save()
+        jb_models.WorkOrder.first().spares_issued_set.add(Spares.objects.first()).save()
+        jb_models.WorkOrder.first().spares_returned_set.add(Spares.objects.first()).save()
+
     @classmethod
     def create_dummy_accounts(cls):
         models.Account(username= "Test User",
@@ -187,7 +201,6 @@ class TestModels(TestCase, TestDataMixin):
 
     def test_create_comment(self):
         self.create_dummy_accounts()
-        print models.Account.objects.first()
         comment = models.Comment.objects.create(
             created_for= "checklist",
             author=models.Account.objects.first(),
@@ -200,5 +213,3 @@ class TestModels(TestCase, TestDataMixin):
                 created_for="checklist",
                 task_number=1, description="A Test Checklist Task")
         self.assertIsInstance(task, models.Task)
-
-    #test create category

@@ -22,7 +22,7 @@ class MachineOverView(ListView):
     template_name = os.path.join("inv", "plantview.html")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(PlantOverView, self).get_context_data(*args, **kwargs)
+        context = super(MachineOverView, self).get_context_data(*args, **kwargs)
         context["work_orders"] = WorkOrder.objects.all()
         return context
 

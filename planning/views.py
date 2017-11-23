@@ -97,7 +97,6 @@ class maintenanceDayView(TemplateView):
         _filters = {}
         if self.request.GET.get("date", None):
             _day = datetime.datetime.strptime(self.request.GET["date"], "%m/%d/%Y").date()
-            print _day
             _filters = {"resolver":self.request.GET["resolver"],
                                                     "machine": self.request.GET["machine"]}
         else:

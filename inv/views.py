@@ -115,7 +115,7 @@ class SectionCreateView(CreateView):
     success_url = reverse_lazy("inventory:inventory-home")
 
     def get_context_data(self):
-        context = super(sectionView, self).get_context_data()
+        context = super(SectionCreateView, self).get_context_data()
         context["title"] = "Section"
         return context
 
@@ -215,8 +215,8 @@ class MachineView(DetailView):
         Planned = namedtuple("Planned", "date resolver est_time type")
         planned_for_machine =PreventativeTask.objects.filter(machine=self.object, 
                                                     completed_date=None)
-        context["planned_jobs"] = [Planned(job.creation_epoch, job.resolver,
-                                        job.estimated_time, "Planned Job") for job in planned_for_machine]
+        context["planned_jobs"] = [Planned(job.scheduled_for, job.assignments.first(),
+                                        job.estimated_labour_time, "Planned Job") for job in planned_for_machine]
         checklist_on_machine = Checklist.objects.filter(machine = self.object)
         
         
@@ -258,7 +258,7 @@ class SectionDetailView(DetailView):
     template_name = os.path.join("inv","engineering_inventory", "details", "section_details.html")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(sectionDetailView, self).get_context_data(*args, **kwargs)
+        context = super(SectionDetailView, self).get_context_data(*args, **kwargs)
         Planned = namedtuple("Planned", "date resolver est_time type")
         planned_for_machine =PreventativeTask.objects.filter(section=self.object, completed_date = None)
         context["planned_jobs"] = [Planned(job.execution_date, job.resolver,
@@ -352,7 +352,7 @@ class InventoryListView(TemplateView):
     template_name = os.path.join("inv","production_inventory", "list","inventory_list.html")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(inventoryListView, self).get_context_data(*args, **kwargs)
+        context = super(InventoryListView, self).get_context_data(*args, **kwargs)
         category = Category.objects.get(name=self.kwargs["filter"])
         context["items"] = InventoryItem.objects.filter(category = category)
         context["category"] = category 
