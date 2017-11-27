@@ -67,11 +67,11 @@ class PreventativeTask(models.Model):
         "bi-annually": 180,
         "yearly": 360}
     
-    machine = models.ForeignKey("inv.Machine", null=True)
-    section = models.ForeignKey("inv.Section", null=True)
-    subunit = models.ForeignKey("inv.SubUnit", null=True)
-    subassembly = models.ForeignKey("inv.SubAssembly", null=True)
-    component = models.ForeignKey("inv.Component", null=True)
+    machine = models.ForeignKey("inv.Machine", null=True, blank=True)
+    section = models.ForeignKey("inv.Section", null=True, blank=True)
+    subunit = models.ForeignKey("inv.SubUnit", null=True, blank=True)
+    subassembly = models.ForeignKey("inv.SubAssembly", null=True, blank=True)
+    component = models.ForeignKey("inv.Component", null=True, blank=True)
     description = models.TextField()
     tasks = models.ManyToManyField("common_base.Task")
     frequency = models.CharField(max_length = 16, 

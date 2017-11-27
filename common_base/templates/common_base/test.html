@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block _content%}
+<div class="form-group">
+    <input class="form-control" type="search" id="search" name="search" list="options">
+    <datalist id="options">
+        <option value="Val">
+    </datalist>
+</div>
+
+
+
+{% endblock %}
+{% block _body_script %}
+$("#search").keyup(function(){
+    if($("#search").val().length > 2){
+        $.ajax({
+            url: "{% url 'ajax:get-combos' %}",
+            data: {"str": $("#search").val(),
+                    "model": "spares"},
+            method:"POST",
+            success: function(result){
+                console.log(result.matches);
+                var html = "";
+                for(i in result.matches){
+                    html += "\n<option value='*' >".replace("*", result.matches[i]);
+                } 
+                $("#options").html(html);
+            }
+    
+        })
+    }
+    })
+{% endblock %}

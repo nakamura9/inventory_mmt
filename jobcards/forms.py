@@ -12,7 +12,19 @@ class WorkOrderCreateForm(forms.ModelForm, BootstrapMixin):
     
     Fields: type, machine, section, subunit, subassembly, component, description, execution_date, estimated_labour_time, assigned_to, priority
     """
+    def __init__(self, *args, **kwargs):
+        super(WorkOrderCreateForm, self).__init__(*args, **kwargs)
+        self.fields["component"].widget.choices= [('', '--------')]
+        self.fields["section"].widget.choices= [('', '--------')]
+        self.fields["subunit"].widget.choices= [('', '--------')]
+        self.fields["subassembly"].widget.choices= [('', '--------')]
     
+        self.fields["section"].widget.attrs["onchange"] = "prepSubUnitUpdate()"
+        self.fields["subunit"].widget.attrs["onchange"] = "prepSubAssemblyUpdate()"
+        self.fields["subassembly"].widget.attrs["onchange"] = "prepComponentUpdate()"
+        self.fields["machine"].widget.attrs["onchange"] = "prepSectionUpdate()"
+
+
     class Meta:
         model = WorkOrder
         fields = ["type", "machine", "section", "subunit", "subassembly", "component", "description", "execution_date", "estimated_labour_time", "assigned_to", "priority"]
@@ -34,6 +46,20 @@ class PreventativeTaskCreateForm(forms.ModelForm, BootstrapMixin):
     """Class for creating preventative tasks.
 
     Fields:"""
+
+    def __init__(self, *args, **kwargs):
+        super(PreventativeTaskCreateForm, self).__init__(*args, **kwargs)
+        
+        self.fields["component"].widget.choices= [('', '--------')]
+        self.fields["section"].widget.choices= [('', '--------')]
+        self.fields["subunit"].widget.choices= [('', '--------')]
+        self.fields["subassembly"].widget.choices= [('', '--------')]
+        
+        self.fields["section"].widget.attrs["onchange"] = "prepSubUnitUpdate()"
+        self.fields["subunit"].widget.attrs["onchange"] = "prepSubAssemblyUpdate()"
+        self.fields["subassembly"].widget.attrs["onchange"] = "prepComponentUpdate()"
+        self.fields["machine"].widget.attrs["onchange"] = "prepSectionUpdate()"
+
 
     class Meta:
         model = PreventativeTask

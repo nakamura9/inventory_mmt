@@ -11,6 +11,9 @@ from django.shortcuts import render,reverse
 from .forms import userForm
 from .models import Account
 
+def test_features(request):
+    return render(request, os.path.join("common_base", "test.html"), context={})
+
 
 def login(request):
     """Login view for the application.

@@ -8,10 +8,11 @@ class SparesForm(forms.ModelForm, BootstrapMixin):
 
     class Meta:
         model = Spares
-        fields = ["stock_id", "quantity", "reorder_level",
-        "reorder_quantity","last_order_price","category"]
+        fields = ["name", "description", "stock_id", "quantity", "reorder_level","reorder_quantity","last_order_price","category"]
 
-
+        widgets = {
+            "description": forms.widgets.Textarea
+        }
 
 class AssetForm(forms.ModelForm, BootstrapMixin):
     """Form used to create asset objects"""
@@ -103,7 +104,7 @@ class ComponentForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Component
         fields = ["component_name", 
-                "machine", "section", "subunit", "subassembly", "unique_id"]
+                "machine", "section", "subunit", "subassembly", "unique_id", "spares_data"]
     
     def __init__(self, *args , **kwargs):
         super(ComponentForm, self).__init__(*args, **kwargs)

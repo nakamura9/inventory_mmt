@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
 from django.contrib.auth import authenticate
 
-from common_base.models import Category
+from common_base.models import Category, Account
 from common_base.utilities import ajax_required
 from inv import models as inv_models
 
@@ -40,7 +40,7 @@ def update_subunit(request):
     Input: JSON -> "section": string
     Output: HttpResponse JSON -> "units": 2 dimensional array
     """
-
+    
     if request.POST.get("section", None) == None:
         return Http404()
     
@@ -149,6 +149,52 @@ def remove_task(request):
         pass
 
     return HttpResponse("0")
+
+@csrf_exempt
+@ajax_required(HttpResponseBadRequest)
+def get_combos(request):
+    s = request.POST.get("str", None)
+    _model = request.POST.get("model", None)
+
+    
+    if s and _model:
+        items = []
+        if _model == "account":
+            get_account(s)
+            
+        elif _model == "component":
+            items += get_component(s)
+        
+        elif _model == "spares":
+            items += get_spares(s)
+        
+        return HttpResponse(json.dumps({"matches":items}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({"matches": []}))
+
+
+def get_component(name):
+    items = []
+    items += [c.component_name for c in inv_models.Component.objects.filter(component_name__startswith=name)]
+    items += [c.component_name for c in inv_models.Component.objects.filter(unique_id__startswith=name)] 
+    return items
+
+def get_spares(name):
+    items = []
+    items += [sp.name for sp in inv_models.Spares.objects.filter(stock_id__startswith=name)]
+    items += [sp.name for sp in inv_models.Spares.objects.filter(name__startswith=name)] 
+    return items
+
+def get_account(name):
+    items = []
+    items += [a.username  for a in Account.objects.filter(
+                username__startswith=name)]
+    items += [a.username  for a in Account.objects.filter(
+                first_name__startswith=name)]
+    items += [a.username  for a in Account.objects.filter(
+                last_name__startswith=name)]
+    
+    return items
 
 
 def add_category(request):

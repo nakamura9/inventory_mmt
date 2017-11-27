@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from inv import views as inv_views
-from common_base.views import sign_up, logout, login
+from common_base.views import sign_up, logout, login, test_features
 from inv import urls as inv_urls
 from inv.views import *
 
@@ -24,6 +24,7 @@ from inv.views import *
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^feature-tests/$', test_features),
     url(r'^inventory/', include(inv_urls, namespace="inventory")),
     url(r'^logout/$', logout, name="logout"),
     url(r'^login/$', login, name="login"),

@@ -130,7 +130,7 @@ class SectionUpdateView(UpdateView):
     success_url = reverse_lazy("inventory:inventory-home")
 
     def get_context_data(self):
-        context = super(sectionUpdateView, self).get_context_data()
+        context = super(SectionUpdateView, self).get_context_data()
         context["title"] = "Section"
         return context
 

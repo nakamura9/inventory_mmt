@@ -1,0 +1,33 @@
+<div class="modal fade" id="spares-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Add spares</h4>
+            </div>
+            <div class="modal-body">
+                
+                    <table>
+                        {% csrf_token %}
+                        {{spares_form.as_table}}
+                    </table>
+                
+            </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="addSpares();">Submit</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Dismiss</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function addSpares(){
+        $.ajax({
+            url: "{% url 'inventory:spares-create' %}",
+            method: "POST",
+            data: {
+
+            } 
+        })
+    }
+</script>

@@ -67,6 +67,7 @@ class ProductionDay(Day):
 class MaintenanceDay(Day):
     """Lists events based on preventativeTasks and Checklists"""
     
+
     @property
     def checklist_count(self):
         return len([item for item in self.agenda if isinstance(item, Checklist)])
@@ -77,19 +78,9 @@ class MaintenanceDay(Day):
     
     def get_agenda(self):
         """Maintenance days look out for planned jobs and checklists"""
-
-        if "jobs" in self.include:
-            self.agenda = [job for job in \
-                        PreventativeTask.objects.filter(
-                            scheduled_for = self.date).filter(
-                                **self.filters
-                            )]
-        else:
-            self.agenda =[]
+        self.agenda = []
         if "checks" in self.include:
-            for check in Checklist.objects.all().filter(
-                **self.filters
-            ):
+            for check in Checklist.objects.all().filter(**self.filters):
                 if check.is_open and (self.date > check.creation_date):
                     if check.frequency == "daily" and not self.is_weekend:
                         self.agenda.append(check)
@@ -97,6 +88,18 @@ class MaintenanceDay(Day):
                     if check.frequency != "daily" and check.creation_date.weekday() == \
                         self.weekday[0]:
                         self.agenda.append(check)
+        
+        
+        if "jobs" in self.include:
+            if self.filters.get("resolver", None):
+                self.filters["assignments"] = self.filters["resolver"]
+                del self.filters["resolver"]
+        
+            self.agenda += [job for job in \
+                        PreventativeTask.objects.filter(
+                            scheduled_for = self.date).filter(
+                                **self.filters
+                            )]
                     
 
 class Week(object):

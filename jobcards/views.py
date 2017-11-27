@@ -22,6 +22,7 @@ from common_base.models import Account
 from inv.models import *
 from .forms import *
 from .models import PreventativeTask, WorkOrder
+from inv.forms import SparesForm
 
 
 class NewWorkOrderView(CreateView):
@@ -46,6 +47,8 @@ class CompleteWorkOrderView(UpdateView):
     form_class = WorkOrderCompleteForm
     template_name = os.path.join("jobcards", "completeworkorder.html")
     success_url = reverse_lazy("inventory:inventory-home")
+
+    
 
 class NewPreventativeTaskView(CreateView):
     """New preventative task view.
@@ -96,6 +99,10 @@ class CompletePreventativeTaskView(UpdateView):
     template_name = os.path.join("jobcards", "completepreventativetask.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(CompletePreventativeTaskView, self).get_context_data(*args, **kwargs)
+        context["spares_form"] = SparesForm()
+        return context
 
 class WorkOrderList(ListView):
         """

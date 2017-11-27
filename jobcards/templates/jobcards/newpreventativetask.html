@@ -51,6 +51,20 @@
         updateSubUnits(url, section, subunit);
     }
 
+    function prepSubAssemblyUpdate(){
+        var url = "{% url 'ajax:update_subassembly' %}";
+        var subunit = $('#id_subunit').val();
+        var subassembly = $('#id_subassembly');
+        updateSubAssemblies(url, subunit, subassembly);
+    }
+
+    function prepComponentUpdate(){
+        var url = "{% url 'ajax:update_component' %}";
+        var subassembly = $('#id_subassembly').val();
+        var component = $('#id_component');
+        updateComponents(url, subassembly, component);
+    }
+
     function addTask(){
         $.post("{% url 'ajax:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
 

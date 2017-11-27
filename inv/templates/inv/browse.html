@@ -5,6 +5,13 @@
         <div class="col-sm-3"></div>
         <div class="col-sm-6 well">
             <h3>Inventory classes</h3>
+            
+            <div class="bg-info" id="message" style="padding: 20px;">
+                    <h5>Import csv file</h5>
+                    <input type="file" name ="csv_file" id="id_csv_file" >
+                    <button class="btn btn-success" onclick>Process file</button>
+                <p>Not implemented yet</p> 
+            </div>
             <p>Select a class below for item creation:</p>
             <style>
                row li{
@@ -39,6 +46,7 @@
                             <a class="btn btn-primary roomy" href="{% url 'inventory:add_subunit' %}">Add SubUnit</a>
                             <a class="btn btn-primary roomy" href="{% url 'inventory:add_subassembly' %}">Add Sub Assembly</a>
                             <a class="btn btn-primary roomy" href="{% url 'inventory:add_component' %}">Add Component</a>
+                            <a class="btn btn-primary roomy" href="{% url 'inventory:spares-create' %}">Add Spares</a>
                     </div>
                 </center>
                 
@@ -46,7 +54,7 @@
                 
                 <ul>
                 {%for machine in machines %}
-                    <li><div class="_item" onclick = "reveal('#{{machine.unique_id|slugify}}')" >
+                    <li><div class="_item" onclick = "reveal('#{{machine.unique_id|slugify}}', null)" >
                             {{machine}} 
                             <span style="float: right;">
                                 <a href="{% url 'inventory:machine_details' machine.pk %}">Details</a> |
@@ -57,7 +65,7 @@
                     <ul id="{{machine.unique_id|slugify}}" style="display: none;" >
                             {% for section in machine.section_set.all %}
                             <li>
-                                <div class="_item" onclick="reveal('#{{section.unique_id|slugify}}')">
+                                <div class="_item" onclick="reveal('#{{section.unique_id|slugify}}', 'subunit', '{{section.unique_id|slugify}}')">
                                     {{section}}
                                     <span style="float:right;">
                                             <a href="{% url 'inventory:section_details' section.pk %}">Details</a> |
@@ -66,52 +74,13 @@
                                     </span>
                                 </div>
                                 <ul id="{{section.unique_id|slugify}}" style="display:none;">
-                                        {% for unit in section.subunit_set.all %}
-                                        <li><div class = "_item" onclick = "reveal('#{{unit.unique_id|slugify}}')">
-                                                {{unit.unit_name}}  
-                                                <span style="float: right;">
-                                                    <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a> |
-                                                    <a href="{% url 'inventory:edit_subunit' pk=unit.unique_id %}">Edit</a> |
-                                                    <a href="{% url 'inventory:delete_subunit' unit.unique_id %}">Delete</a>
-                                                </span>
-                                            </div>
-                                            <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
-                                                {% for sub in unit.subassembly_set.all %}
-                                                    <li><div class="_item" onclick = "reveal('#{{sub.unique_id|slugify}}')">
-                                                            {{sub.unit_name}} 
-                                                            <span style="float: right;">
-                                                                <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a> |
-                                                                <a href="{% url 'inventory:edit_subassembly' pk=sub.unique_id %}">Edit</a> |
-                                                                <a href="{% url 'inventory:delete_subassembly' sub.unique_id %}">Delete</a>
-                                                            </span>
-                                                        </div>
-                                                        
-                                                        <ul id="{{sub.unique_id|slugify}}" style="display:none;">
-                                                        {% for component in sub.component_set.all %}
-                                                            <li><div class="_item">
-                                                                    {{component.component_name}} 
-                                                                    <span style="float: right;">
-                                                                        <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a> |
-                                                                        <a href="{% url 'inventory:edit_component' pk=component.unique_id %}">Edit</a> |
-                                                                        <a href="{% url 'inventory:delete_component' component.unique_id %}">Delete</a>
-                                                                    </span>
-                                                                </div>
-                                                            </li>
-                                                        {% endfor %}
-                                                        </ul>
-                                                    </li>
-                                                {% endfor%}    
-                                            </ul>
-                                        </li>
-                                    {% endfor %}
                                 </ul>
                             </li>
-                        {% endfor %}
-                        
+                            {% endfor %}
                     </ul>
-                    </li>
-                {% endfor %}
-</ul>
+                </li>
+            {% endfor %}
+        </ul>
 </div>
 <div class="col-sm-3"></div>
 </div>
@@ -119,8 +88,54 @@
 {% endblock %}
 
 {% block body_script %}
-    function reveal(cls){
-        
+    function reveal(cls, level){
+        var id = cls.replace("#", "");
+        if(level == "subunit"){
+            $.ajax({
+                method: "POST",
+                url: "{% url 'ajax:update_subunit' %}",
+                data: {"section": id},
+                success: function(result){
+                    var html = "";
+                    for(i in result.units){
+
+                        html += `<li><div class='_item' onclick="reveal('#*', 'subassy')" >`.replace("*", result.units[i][0]) + result.units[i][1] + `<span style='float:right'><a href="/inventory/subunit_details/*" >Details</a> | <a href="/inventory/edit_subunit/*" >Edit</a> | <a href="/inventory/delete_subunit/*">Delete</a></span></div><ul id="*" style="display: none;"></ul></li>`.split("*").join(result.units[i][0]);
+                    }
+                    $(cls).html(html);
+                }
+            })
+        }else if(level == "subassy"){
+            $.ajax({
+                method: "POST",
+                url: "{% url 'ajax:update_subassembly' %}",
+                data: {"unit": id},
+                success: function(result){
+                    var html = "";
+                    for(i in result.subassemblies){
+
+                        html += `<li><div class='_item' onclick="reveal('#*', 'comp')" >`.replace("*", result.subassemblies[i][0]) + result.subassemblies[i][1] + `<span style='float:right'><a href="/inventory/subassembly_details/*">Details</a> | <a href=/"inventory/edit_subassembly/*">Edit</a> | <a href="/inventory/delete_subassembly/*">Delete</a></span></div><ul id="*" style="display: none;"></ul></li>`.split("*").join(result.subassemblies[i][0]);
+                    }
+                    $(cls).html(html);
+                }
+            })
+        }else if(level == "comp"){
+            $.ajax({
+                method: "POST",
+                url: "{% url 'ajax:update_component' %}",
+                data: {"subassy": id},
+                success: function(result){
+                    var html = "";
+                    for(i in result.components){
+
+                        html += `<li><div class='_item' >` + result.components[i][1] + `<span style='float:right'><a href="/inventory/component_details/*">Details</a> | <a href="/inventory/edit_component/*">Edit</a> | <a href="/inventory/delete_component/*">Delete</a></span></div></li>`.split("*").join(result.components[i][0])
+                    }
+                    console.log("called");
+                    $(cls).html(html);
+                }
+            })
+        }
+
+
         if($(cls).css("display") == "block"){
             $(cls).css("display", "none");
 

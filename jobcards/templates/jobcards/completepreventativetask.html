@@ -65,11 +65,14 @@
         <div class="col-sm-4">
             <div class="col-sm-4">
             <h4>Tools:</h4>
-            <p><a class="btn btn-info" href="{% url 'inventory:spares-create' %}">Add Spares</a></p>
+            <a class="btn btn-primary" data-toggle="modal" href='#spares-modal'>Add Spares</a>
         </div>
         </div>
     </div>
 </div>
+
+{% include "inv/engineering_inventory/create_update/spares_modal.html" %}
+
 {% endblock %}
 {% block body_script %}
 

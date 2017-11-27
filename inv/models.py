@@ -25,18 +25,20 @@ class Spares(models.Model):
     """
     Represents an item that can replace some piece of equipment and can be retrieved from stores.
 
-    #Need to be linked somehow to components.
+    Linked to spares using stock_id
     #relationship, all spares are machine components but not all components are spares.
 
-    Fields: stock_id, category, quantity, reorder_level, reorder_quanity, last_order_price
+    Fields: name, description, stock_id, category, quantity, reorder_level, reorder_quanity, last_order_price
     """
     
+    name = models.CharField(max_length = 32)
+    description = models.CharField(max_length= 128, null=True, blank=True)
     stock_id = models.CharField(max_length=32)
     category = models.ForeignKey("common_base.Category")
-    quantity = models.IntegerField()
-    reorder_level = models.IntegerField()
-    reorder_quantity = models.IntegerField()
-    last_order_price = models.FloatField()
+    quantity = models.IntegerField( default = 0)
+    reorder_level = models.IntegerField(default = 0)
+    reorder_quantity = models.IntegerField( default = 0)
+    last_order_price = models.FloatField(default = 0.0)
     
     def __str__(self):
         return self.stock_id
@@ -75,8 +77,8 @@ class Machine(models.Model):
     machine_name = models.CharField(max_length=128)
     unique_id = models.CharField(max_length=24, primary_key=True)
     manufacturer = models.CharField(max_length=128)
-    asset_data = models.ForeignKey("Asset", null=True)
-    commissioning_date = models.DateField()
+    asset_data = models.ForeignKey("Asset", null=True, blank=True, verbose_name="Linked Asset Data")
+    commissioning_date = models.DateField(blank = True, null=True)
 
     def __str__(self):
         return self.machine_name
@@ -221,7 +223,7 @@ class Component(models.Model):
     section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
     subunit = models.ForeignKey("SubUnit", null=True, on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("SubAssembly", null=True, on_delete=models.SET_NULL)
-    spares_data=models.ForeignKey("Spares", null=True)
+    spares_data=models.ForeignKey("Spares", null=True, blank=True, verbose_name="linked spares")
 
     
     def __str__(self):

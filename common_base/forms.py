@@ -11,12 +11,10 @@ class BootstrapMixin(forms.Form):
         for field in self.fields:
             field = self.fields.get(field)
             field.widget.attrs['class'] ="form-control"
-            if isinstance(field.widget, forms.TextInput):
+            """if isinstance(field.widget, forms.TextInput):
                 field.widget.attrs['placeholder'] =field.label
-                field.label = ""
-            else:
-                field.widget.attrs["class"] = "form-control"  
-
+                field.label = """
+            
 
 class userForm(forms.ModelForm, BootstrapMixin):
     """Form used for creating new users on a site
@@ -36,3 +34,6 @@ class CategoryForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Category
         fields = ["created_for", "name", "description"]
+
+class SearchComboWidget(forms.Widget):
+    pass

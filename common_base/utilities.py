@@ -61,21 +61,37 @@ def filter_by_dates(queryset, start, stop):
     The filter process involves first first conveting the datetime to a format the django orm understands, pytz.timezone and then filtering accordingly."""
 
     date_format = "%m/%d/%Y"
+    sample = queryset.first()
+
     if start:
         start = datetime.datetime.strptime(start, date_format)
         start = pytz.timezone("Africa/Harare").localize(start)
-        try:
+        if 'creation_date' in dir(sample):
             queryset = queryset.filter(creation_date__gte= start)
-        except:
+        elif 'creation_epoch' in dir(sample):
             queryset = queryset.filter(creation_epoch__gte = start)
+        elif 'execution_date' in dir(sample):
+            queryset = queryset.filter(execution_date__gte = start)
+        elif 'scheduled_for' in dir(sample):
+            queryset = queryset.filter(scheduled_for__gte = start)
+        else:
+            print "not found"        
+            
 
     if stop:
         stop = datetime.datetime.strptime(stop, date_format)
         stop = pytz.timezone("Africa/Harare").localize(stop)
-        try:
-            queryset = queryset.filter(creation_date__lte = stop)
-        except:
+        if 'creation_date' in dir(sample):
+            queryset = queryset.filter(creation_date__lte= stop)
+        elif 'creation_epoch' in dir(sample):
             queryset = queryset.filter(creation_epoch__lte = stop)
+        elif 'execution_date' in dir(sample):
+            queryset = queryset.filter(execution_date__lte = stop)
+        elif 'scheduled_for' in dir(sample):
+            queryset = queryset.filter(scheduled_for__lte = stop)
+        else:
+            print "not found"
+    
     return queryset
 
 

@@ -69,7 +69,7 @@ function updateComponents(django_url, subassembly, component){
     $.ajax({
             method: "POST",
             url: django_url,
-            subassembly: subassembly,
+            component: component,
             data: {
                 "subassy": subassembly,
             },

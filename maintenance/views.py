@@ -49,10 +49,10 @@ class PlannedMaintenanceView(TemplateView):
             "planned_jobs": "True",
         })
 
-        if not resolver:
+        """if not resolver:
             context["checklists"] = Checklist.objects.all()
             context["planned_jobs"] =PreventativeTask.objects.all()
-            
+        """    
         if checks:
             checklist_queryset = Checklist.objects.all()
             if resolver:
