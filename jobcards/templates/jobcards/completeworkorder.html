@@ -97,10 +97,12 @@
                     <div id="id_spares_returned_list"></div>   
             </div>
             <h4>Tools:</h4>
-            <p><a class="btn btn-info" href="{% url 'inventory:spares-create' %}">Add Spares</a></p>
+            <p><a class="btn btn-primary" data-toggle="modal" href='#spares-modal'>Add Spares</a></p>
         </div>
     </div>
 </div>
+
+{% include "inv/engineering_inventory/create_update/spares_modal.html" %}
 {% endblock %}
 {% block body_script %}
 $("#id_completion_date").datepicker();
@@ -190,6 +192,29 @@ function removeIssued(id){
 function removeReturned(id){
     $("#row_*".replace("*", id.replace(" ", ""))).remove();
     $("#*".replace("*", id.replace(" ", ""))).remove();
+}
+
+function addSpares(){
+    $.ajax({
+        method: "POST",
+        url: "{% url 'inventory:spares-create' %}",
+        data: { "name": $("#id_name").val(),
+                "description": $("#id_description").val(),
+                "stock_id": $("#id_stock_id").val(),
+                "quantity": $("#id_quantity").val(),
+                "reorder_level": $("#id_reorder_level").val(),
+                "reorder_quantity": $("#id_reorder_quantity").val(),
+                "last_order_price": $("#id_last_order_price").val(),
+                "category": $("#id_category").val(),
+                "csrfmiddlewaretoken": "{{csrf_token}}"
+        },
+        success: function(result){
+            $("#spares-modal").modal("hide");
+        },
+        error: function(resp){
+            console.log(resp);
+        }
+    })
 }
 
 {% endblock %}

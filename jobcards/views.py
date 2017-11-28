@@ -48,6 +48,11 @@ class CompleteWorkOrderView(UpdateView):
     template_name = os.path.join("jobcards", "completeworkorder.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(CompleteWorkOrderView, self).get_context_data(*args, **kwargs)
+        context["spares_form"] = SparesForm()
+        return context
+
     def post(self, *args, **kwargs):
         resp = super(CompleteWorkOrderView, self).post(*args, **kwargs)
 
@@ -70,12 +75,13 @@ class NewPreventativeTaskView(CreateView):
     template_name = os.path.join("jobcards", "newpreventativetask.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
-    
-    def post(self, *args, **kwargs):
+    def get_context_data(self, *args, **kwargs):
+        context = super(NewPreventativeTaskView, self).get_context_data(*args, **kwargs)
+        context["spares_form"] = SparesForm()
+        return context
 
+    def post(self, *args, **kwargs):
         resp = super(NewPreventativeTaskView, self).post(*args, **kwargs)
-        
-        
         p_task = PreventativeTask.objects.latest("pk")
 
         n = 0

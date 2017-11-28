@@ -8,7 +8,6 @@
             <div class="modal-body">
                 
                     <table>
-                        {% csrf_token %}
                         {{spares_form.as_table}}
                     </table>
                 
@@ -20,14 +19,3 @@
         </div>
     </div>
 </div>
-<script>
-    function addSpares(){
-        $.ajax({
-            url: "{% url 'inventory:spares-create' %}",
-            method: "POST",
-            data: {
-
-            } 
-        })
-    }
-</script>

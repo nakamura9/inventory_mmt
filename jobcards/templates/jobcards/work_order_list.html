@@ -31,7 +31,7 @@
                         <td>Resolver</td>
                         <td>Machine</td>
                         <td>Problem Description</td>
-                        <td>Actions(view)</td>
+                        <td></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,10 +40,10 @@
                             <td>{{job.execution_date}}</td>
                             <td>{{job.status}}</td>
                             <td>{{job.pk}}</td>
-                            <td>{{job.assigned_to.first}}</td>
+                            <td>{{job.assigned_to}}</td>
                             <td>{{job.machine}}</td>
                             <td>{{job.description |truncatechars:40}}</td>
-                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:complete-work-order' pk=job.pk %}">View</a></td>
+                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:complete-work-order' pk=job.pk %}">Complete</a>| <a href="#">View</a></td>
                         </tr>
                     {% endfor %}        
                 </tbody>

@@ -71,6 +71,12 @@ class SparesCreate(CreateView):
     form_class = SparesForm
     success_url = reverse_lazy("inventory:inventory-home")
 
+    def form_invalid(self, form):
+        print self.get_form().errors
+        print self.request.POST
+        print self.get_form_kwargs()
+        return super(SparesCreate, self).form_invalid(form)
+
 class SparesUpdate(UpdateView):
     """Spares Updating view"""
 

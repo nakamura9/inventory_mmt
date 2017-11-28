@@ -7,8 +7,7 @@
             </div>
             <div class="modal-body">
                 
-                <form action="{% url 'ajax:add-category' %}" method="POST" role="form" id="category-form">
-                    {% csrf_token %}
+                
                     <div class="form-group">
                         <label for="created_for">Created For:</label>
                         <select class="form-control" name="created_for" id="id_created_for">
@@ -17,7 +16,7 @@
                             <option value="preventative_task">Preventative Task</option>
                         </select>
                         <label for="name">Name</label>
-                        <input type="text" class="form-control" id="id_name" name="name" placeholder="Input field">
+                        <input type="text" class="form-control" id="id_category_name" name="name" placeholder="Input field">
                         <label for="description">Description</label>
                         <input type="text" class="form-control" id="id_description" name="description" placeholder="Input field">
                         
@@ -25,8 +24,7 @@
                 
                     
                 
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                    <button type="button" class="btn btn-primary" onclick="addCategory()">Submit</button>
                 
             </div>
             <div class="modal-footer">

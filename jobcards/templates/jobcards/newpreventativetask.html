@@ -66,12 +66,13 @@
         <div class="col-sm-4">
             <h4>Tools:</h4>
             <p><a class="btn btn-info" data-toggle="modal" href='#category-modal-view'>Add Category</a></p>
-            <p><a class="btn btn-info" href="{% url 'inventory:spares-create' %}">Add Spares</a></p>
+            <p><a class="btn btn-info" href="#spares-modal" data-toggle="modal">Add Spares</a></p>
             
         </div>
     </div>
 </div>
 {% include "common_base/modals/category_modal.html" %}
+{% include "inv/engineering_inventory/create_update/spares_modal.html" %}
 {% endblock %}
 {% block body_script %}
     $("#id_scheduled_for").datepicker();
@@ -230,5 +231,46 @@
         }else{
             return true;
         }
+    }
+
+    //modal forms
+
+    function addCategory(){
+        $.ajax({
+            method: "POST",
+            url: "{% url 'ajax:add-category' %}",
+            data: {
+                "created_for": $("#id_created_for").val(),
+                "name" :$("#id_name").val(),
+                "description": $("#id_description").val(),
+                "csrfmiddlewaretoken": "{{csrf_token}}"
+            },
+            success: function(result){
+                $("#category-modal-view").modal("hide");
+            }
+        });
+    }
+
+    function addSpares(){
+        $.ajax({
+            method: "POST",
+            url: "{% url 'inventory:spares-create' %}",
+            data: { "name": $("#id_name").val(),
+                    "description": $("#id_description").val(),
+                    "stock_id": $("#id_stock_id").val(),
+                    "quantity": $("#id_quantity").val(),
+                    "reorder_level": $("#id_reorder_level").val(),
+                    "reorder_quantity": $("#id_reorder_quantity").val(),
+                    "last_order_price": $("#id_last_order_price").val(),
+                    "category": $("#id_category").val(),
+                    "csrfmiddlewaretoken": "{{csrf_token}}"
+            },
+            success: function(result){
+                $("#spares-modal").modal("hide");
+            },
+            error: function(resp){
+                console.log(resp);
+            }
+        })
     }
 {% endblock %}
