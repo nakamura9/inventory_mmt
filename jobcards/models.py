@@ -66,7 +66,13 @@ class PreventativeTask(models.Model):
         "quarterly": 90,
         "bi-annually": 180,
         "yearly": 360}
-    
+    @property
+    def get_type(self):
+        return "job"
+
+    def __str__(self):
+        return self.description
+
     machine = models.ForeignKey("inv.Machine", null=True, blank=True)
     section = models.ForeignKey("inv.Section", null=True, blank=True)
     subunit = models.ForeignKey("inv.SubUnit", null=True, blank=True)

@@ -11,10 +11,18 @@
         color: white;
 
     }
-    .items{
+    .item{
         border: 1px solid #337ab7;
-        margin: 2px;
         padding: 5px;
+    }
+    .title{
+        padding: 2px;
+
+    }
+
+    .white-link{
+        color: white;
+        text-decoration: none;
     }
     .heading {
         margin:2px;
@@ -70,12 +78,35 @@
                 <tbody>
                     <tr>
                         {% for day in week.week_agenda %}
-                            <td>
+                            <td style="vertical-align: top;">
                                 {% for task in day.agenda %}
                                     {% if task.get_type == 'checklist' %}
-                                    <a href="{% url 'checklists:checklist_details' pk=task.pk %}"><p class="items">{{task|truncatechars:100}}</p></a>
-                                    {% elif task.get_type == 'job' %}
-                                    <a href="{% url 'jobcards:planned_job_detail' pk=task.pk %}"><p class="items">{{task|truncatechars:100}}</p></a>
+                                    <div class="item">
+                                        <div class="bg-primary title">
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> | {{task|truncatechars:50}}
+                                        <span style="float:right">| <a class="white-link" href="{% url 'checklists:checklist_details' pk=task.pk %}">Details</a></span>
+                                        </div>
+                                        <div class="body">
+                                            <p>Resolver: {{task.resolver}}</p>
+                                            <p>Machine: {{task.machine}}</p>
+                                            <p>Category: {{task.category}}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if task.get_type == 'job' %}
+                                    
+                                    <div class="item">
+                                            <div class="bg-primary title">
+                                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> | {{task|truncatechars:50}}
+                                            <span style="float:right">| <a class="white-link" href="{% url 'jobcards:complete-preventative-task' pk=task.pk %}">Details</a></span>
+                                            </div>
+                                            <div class="body">
+                                                <p>Resolver(s): {{task.assignments.first}}</p>
+                                                <p>Machine: {{task.machine}}</p>
+                                                <p>Frequency: {{task.frequency}}</p>
+                                            </div>
+                                        </div>
+                                    
                                     {% endif %}
                                 {% endfor %}
                             </td>    

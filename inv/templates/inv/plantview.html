@@ -1,12 +1,42 @@
 {% extends "window.html" %}
-{% block content %}
-    <style>
-        span  a{
-            color: white;
-        }
-        
-    </style>
+{% block head_style %}
+row li{
+    list-style-type: none; 
+    padding: 2px;
+    min-width: 200px;
+    
+}
+ul {
+    list-style-type: none; 
 
+}
+.subunit {
+    display: block;
+    padding: 5px;
+    margin: 2px;
+    min-height: 30px;
+    min-width: 200px;
+    background-color: #ccc;
+    
+}
+.struct {
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.children{
+    padding: 5px;
+    margin: 2px;
+    min-height: 30px;
+    min-width: 200px;
+    background-color: #ccc;
+}
+
+span  a{
+    color: white;
+}
+{% endblock %}
+{% block content %}
     {% for machine in object_list %}
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -50,39 +80,9 @@
                     </table>
 
                 </div>
-                <div class="col-sm-3 bg-info">
+                <div class="col-sm-3 bg-info struct">
                     <h4>Structure:</h4>
-                    <style>
-                       row li{
-                            list-style-type: none; 
-                            padding: 2px;
-                            min-width: 200px;
-                            
-                        }
-                        ul {
-                            list-style-type: none; 
-
-                        }
-                        .subunit {
-                            display: block;
-                            padding: 5px;
-                            margin: 2px;
-                            min-height: 30px;
-                            min-width: 200px;
-                            background-color: #ccc;
-                            
-                        }
-
-                        .children{
-                            padding: 5px;
-                            margin: 2px;
-                            min-height: 30px;
-                            min-width: 200px;
-                            background-color: #ccc;
-                        }
-
-                        
-                    </style>
+                    
                     
                     <ul>
                         {% for section in machine.section_set.all %}
