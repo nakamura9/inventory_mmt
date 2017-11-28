@@ -5,6 +5,15 @@
         <div class="col-sm-3"></div>
         <div class="col-sm-6 well">
             <h3>Inventory classes</h3>
+            <div class="input-group">
+                <input class="form-control" placeholder="Search inventory..." type="search" list="inv-data" id="id_inv">
+                <span class="input-group-btn">
+                        <button class="btn btn-primary" onclick="itemDetail()">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </button>
+                </span>     
+            </div>
+            <div class="bg-info" id="results"></div>
             
             <div class="bg-info" id="message" style="padding: 20px;">
                     <h5>Import csv file</h5>
@@ -36,6 +45,25 @@
                         span a{
                             color: white;
                         }
+
+                        #results {
+                            max-height: 300px;
+                            overflow-y: scroll;
+                        }
+
+                        .result-cell {
+                            min-height: 30px;
+                            padding: 3px;
+                            border-bottom: 1px solid white;
+                        }
+
+                        .result-links {
+                            
+                            color: white; 
+                            text-decoration: none;
+                            float: right;
+                        }
+
 
                     </style>
                 <center>
@@ -144,5 +172,63 @@
         }
         
     }
+
+    $("#id_inv").keyup(function(){
+        if($("#id_inv").val().length > 2){
+            $.ajax({
+                url: "{% url 'ajax:get-combos' %}",
+                data: {"str": $("#id_inv").val(),
+                        "model": "inv"},
+                method:"POST",
+                success: function(result){
+                    var container
+                    var container_content;
+                    var _href;
+                    var links;
+                    var span;
+
+                    for(i in result.matches){
+                        console.log(result.matches[i]);
+                        container =$("<div></div>").attr({
+                            class: "bg-primary result-cell",
+                            id: result.matches[i][0],
+                        });
+                        
+                        
+                        
+                        if(result.matches[i][3] == 0){
+                            //component
+                            _href= "/inventory/component_details/*".replace("*", result.matches[i][0]);
+                            container_content = "Component: "  + result.matches[i][1] + " > " + result.matches[i][2];
+                        }else if(result.matches[i][3] == 1){
+                            //spares
+                            _href= "/inventory/spares-details/*".replace("*", result.matches[i][0]);
+                            container_content = "Spares: "  + result.matches[i][2] + " > " + result.matches[i][1];
+                        }else if(result.matches[i][3] == 2){
+                            //subassembly
+                            _href = "/inventory/subassembly_details/*".replace("*", result.matches[i][0]);
+                            container_content = "SubAssembly: "  + result.matches[i][1] + " > " + result.matches[i][2];
+                        }
+                        container.text(container_content);
+                        
+                        links = $("<a></a>").attr({
+                            href: _href,
+                            class: "result-links",
+                        }).text("Details");
+
+
+                        span = $("<span></span>").attr({
+                            style: "float: right;"
+                        }).html(links);
+                        container.append(links);
+                        container.appendTo("#results");
+
+                    } 
+                }
+        
+            })
+        }
+        return false;    
+    })
 
 {% endblock %}

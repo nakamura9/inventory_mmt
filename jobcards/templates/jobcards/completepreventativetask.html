@@ -1,4 +1,13 @@
 {% extends "window.html" %}
+{% block head_style %}
+._item {
+    background-color: #ccc;
+    padding: 3px;
+    min-height: 40px;
+    max-width: 200px;
+    margin: 3px;
+}
+{% endblock %}
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -39,6 +48,11 @@
             <h4>Description:</h4>
             {{object.description}}
             <hr />
+            <h4>Assigned to:</h4>
+            {%for i in object.assignments.all %}
+                <p>{{i.username}}</p>
+            {% endfor %}
+            <hr />
             <h4>Tasks</h4>
             <table class="table">
                 {% for task in object.tasks.all %}
@@ -58,15 +72,30 @@
                 {% csrf_token %}
                 <table class="table">
                 {{form.as_table}}
+                <tr>
+                        <th>Spares Issued:</th>
+                        <td>
+                        <div class="input-group">
+                            <input type="search" class="form-control" id="id_spares_issued" placeholder="Search" list="spares_issued_datalist">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" onclick="addIssued()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                            </span>
+                        </div>
+                        </td>
+                    </tr>
                 </table>
             <button type="submit" class="btn btn-primary">Complete</button>
             </form>
+            <datalist id="spares_issued_datalist"></datalist>
         </div>
         <div class="col-sm-4">
-            <div class="col-sm-4">
+                <div class="bg-info" style="padding: 10px;">
+                    <h4>Spares Issued:</h4>
+                    <div id="id_spares_issued_list"></div>
+                    <hr />
+                </div>
             <h4>Tools:</h4>
             <a class="btn btn-primary" data-toggle="modal" href='#spares-modal'>Add Spares</a>
-        </div>
         </div>
     </div>
 </div>
@@ -77,6 +106,50 @@
 {% block body_script %}
 
     $("#id_completed_date").datepicker();
+    
+    $("#id_spares_issued").keyup(function(){
+        if($("#id_spares_issued").val().length > 2){
+            $.ajax({
+                url: "{% url 'ajax:get-combos' %}",
+                data: {"str": $("#id_spares_issued").val(),
+                        "model": "spares"},
+                method:"POST",
+                success: function(result){
+                    console.log(result.matches);
+                    var html = "";
+                    for(i in result.matches){
+                        html += "\n<option value='*' >".replace("*", result.matches[i]);
+                    } 
+                    $("#spares_issued_datalist").html(html);
+                }
+        
+            })
+        }
+        return false;    
+    })
+
+    function addIssued(){
+        var data = $("#id_spares_issued").val();
+        
+                $("<input>").attr({
+                    type: "hidden",
+                    id: data.replace(" ", ""),
+                    name: "spares[]",
+                    value: data
+                }).appendTo("form");
+        
+                var item = `<div class="_item" id="row_*">*<span style='float: right; font-size:20px;'><button onclick='removeIssued("*")'>
+                <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
+                </button></span></div>`.split("*").join(data);
+        
+                $("#id_spares_issued_list").append(item);
+    }
+
+    function removeIssued(id){
+        $("#row_*".replace("*", id.replace(" ", ""))).remove();
+        $("#*".replace("*", id.replace(" ", ""))).remove();
+    }
+
     function prepSectionUpdate(){
         var url = "{% url 'ajax:update_section' %}";
         var machine = $('#id_machine').val();

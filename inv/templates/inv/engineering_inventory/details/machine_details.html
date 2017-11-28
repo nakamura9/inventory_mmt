@@ -1,50 +1,46 @@
 {% extends "window.html" %}
+{% block head_style %}
+ul, li, span{
+    list-style-type: none; 
+}
+.subunit {
+    background-color: grey;
+    border-color: grey;
+}
+
+.subassy .subsub .components{
+    display: none;
+}
+
+.btn a {
+    color: white;
+}
+
+.structure {
+    max-height: 500px;
+    overflow-y: scroll;
+}
+{% endblock %}
 {% block content %}
-        <style>
-                    ul, li, span{
-                            list-style-type: none; 
-                    }
-                        .subunit {
-                            background-color: grey;
-                            border-color: grey;
-                        }
-
-                        .subassy .subsub .components{
-                            display: none;
-                        }
-
-                        .btn a {
-                            color: white;
-                        }
-        </style>
     <div class="container-fluid">
+        <div class="row">
+            <h2>Machine Detail View</h2>
+            <hr />
+        </div>
         <div class="row">
             <div class="col-sm-4">
                 <h3>Children:</h3>
                 <hr />
-                <ul>
-                    {% for section in object.section_set.all %}
-                        <li><span class = "btn btn-primary" onclick = "reveal('#{{section.unique_id|slugify}}')">{{section.section_name}} | <a href="{% url 'inventory:section_details' pk=section.unique_id %}">Details</a></span>
-                        <ul id="{{section.unique_id|slugify}}" style="display: none;" >
-                            {% for unit in object.subunit_set.all %}
-                                <li><span class = "btn btn-primary subunit" onclick = "reveal('#{{unit.unique_id|slugify}}')">{{unit.unit_name}} | <a href="{% url 'inventory:subunit_details' pk=unit.unique_id %}">Details</a></span>
-                                    <ul id="{{unit.unique_id|slugify}}" style="display: none;" >
-                                        {% for sub in unit.subassembly_set.all %}
-                                            <li><span class="btn btn-info" onclick = "reveal('#{{sub.unique_id|slugify}}')">{{sub.unit_name}} | <a href="{% url 'inventory:subassembly_details' sub.unique_id %}">Details</a></span>
-                                                <ul id="{{sub.unique_id|slugify}}" style="display:none;">
-                                                {% for component in sub.component_set.all %}
-                                                    <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
-                                                {% endfor %}
-                                                </ul>
-                                            </li>
-                                        {% endfor%}    
-                                    </ul>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
+                <div class="structure">
+                        <ul>
+                                {% for section in object.section_set.all %}
+                                    <li><span class = "btn btn-primary " onclick="reveal('#{{section.unique_id|slugify}}', 'subunit', '{{section.unique_id|slugify}}')">{{section}} | <a href="{% url 'inventory:section_details' pk=section.unique_id %}">Details</a></span>
+                                    <ul id="{{section.unique_id|slugify}}" style="display: none;" ></ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                </div>
+                                            
             </div>
             <div class="col-sm-8">
                 <div class="well">
@@ -52,84 +48,125 @@
                 <p>Manufacturer: {{object.manufacturer}}</p>
                 <p>Date Commissioned : {{object.commissioning_date}}</p> 
                 </div>
+                <div >
+                        <h3>Maintenance Record:</h3>
+                        <h4>Upcoming planned Jobs:</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>Date</td>
+                                    <td>Resolver</td>
+                                    <td>Estimated Time</td>
+                                    <td>Type</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in planned_jobs %}
+                                    <tr>
+                                        <td>{{job.date}}</td>
+                                        <td>{{job.resolver}}</td>
+                                        <td>{{job.est_time}}</td>
+                                        <td>{{job.type}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+        
+                        <h4>Recent Unplanned Jobs</h4>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td>Date/Time</td>
+                                        <td>Resolver</td>
+                                        <td>Description</td>
+                                        <td>Status</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in unplanned_jobs %}
+                                    <tr>
+                                        <td>{{job.date}}</td>
+                                        <td>{{job.resolver}}</td>
+                                        <td>{{job.description}}</td>
+                                        <td>{{job.status}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                    </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h3>Reliability</h3>
+                        <label for="period">Period</label>
+                        <select name="period" id="id_period" class="form-control">   
+                            <option value="1">The Last Week</option>
+                            <option value="2">The Last Month</option>
+                            <option value="3">The Last Six Months</option>
+                        </select>
+                        <button class="btn btn-primary">Show</button>
+                        <div id="id_reliability_window"></div>
+                    </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <h3>Maintenance Record:</h3>
-                <h4>Upcoming planned Jobs:</h4>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td>Date</td>
-                            <td>Resolver</td>
-                            <td>Estimated Time</td>
-                            <td>Type</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for job in planned_jobs %}
-                            <tr>
-                                <td>{{job.date}}</td>
-                                <td>{{job.resolver}}</td>
-                                <td>{{job.est_time}}</td>
-                                <td>{{job.type}}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <h4>Recent Unplanned Jobs</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <td>Date/Time</td>
-                                <td>Resolver</td>
-                                <td>Description</td>
-                                <td>Status</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for job in unplanned_jobs %}
-                            <tr>
-                                <td>{{job.date}}</td>
-                                <td>{{job.resolver}}</td>
-                                <td>{{job.description}}</td>
-                                <td>{{job.status}}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-            </div>
-
-        </div>
-        <div class="row">
             
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <h3>Reliability</h3>
-                <label for="period">Period</label>
-                <select name="period" id="id_period" class="form-control">   
-                    <option value="1">The Last Week</option>
-                    <option value="2">The Last Month</option>
-                    <option value="3">The Last Six Months</option>
-                </select>
-                <button class="btn btn-primary">Show</button>
-                <div id="id_reliability_window"></div>
-            </div>
-            
-        </div>
     </div>
 {% endblock %}
 {% block body_script %}
-    function reveal(cls){
-        
-        if($(cls).css("display") == "block"){
-            $(cls).css("display", "none");
-        }else{
-            $(cls).css("display", "block");
-        }
-        
+function reveal(cls, level){
+    var id = cls.replace("#", "");
+    if(level == "subunit"){
+        $.ajax({
+            method: "POST",
+            url: "{% url 'ajax:update_subunit' %}",
+            data: {"section": id},
+            success: function(result){
+                var html = "";
+                for(i in result.units){
+
+                    html += `<li><span class='btn btn-info' onclick="reveal('#*', 'subassy')" >`.replace("*", result.units[i][0]) + result.units[i][1] + ` | <a href="/inventory/subunit_details/*" >Details</a> </span><ul id="*" style="display: none;"></ul></li>`.split("*").join(result.units[i][0]);
+                }
+                $(cls).html(html);
+            }
+        })
+    }else if(level == "subassy"){
+        $.ajax({
+            method: "POST",
+            url: "{% url 'ajax:update_subassembly' %}",
+            data: {"unit": id},
+            success: function(result){
+                var html = "";
+                for(i in result.subassemblies){
+
+                    html += `<li><span class='btn btn-primary' onclick="reveal('#*', 'comp')" >`.replace("*", result.subassemblies[i][0]) + result.subassemblies[i][1] + ` | <a href="/inventory/subassembly_details/*">Details</a> </span><ul id="*" style="display: none;"></ul></li>`.split("*").join(result.subassemblies[i][0]);
+                }
+                $(cls).html(html);
+            }
+        })
+    }else if(level == "comp"){
+        $.ajax({
+            method: "POST",
+            url: "{% url 'ajax:update_component' %}",
+            data: {"subassy": id},
+            success: function(result){
+                var html = "";
+                for(i in result.components){
+
+                    html += `<li><span class='btn btn-info' >` + result.components[i][1] + ` | <a href="/inventory/component_details/*">Details</a> </span></div></li>`.split("*").join(result.components[i][0])
+                }
+                console.log("called");
+                $(cls).html(html);
+            }
+        })
     }
+
+
+    if($(cls).css("display") == "block"){
+        $(cls).css("display", "none");
+
+    }else{
+        $(cls).css("display", "block");
+    }
+    
+}
 
 
 

@@ -18,8 +18,13 @@
                         }
         </style>
     <div class="container-fluid">
+            <div class="row">
+                    <h2>SubAssembly Detail View</h2>
+                    <hr />
+                </div>
         <div class="row">
             <div class="col-sm-4">
+                <h3>Children:</h3>
                 <ul>
                     {% for component in object.component_set.all %}
                         <li><span class="btn btn-primary">{{component.component_name}} | <a href="{% url 'inventory:component_details' component.unique_id %}" style="color: white;">Details</a></span></li>
@@ -29,7 +34,10 @@
             <div class="col-sm-8">
                 <div class="well">
                 <h3>{{object.unit_name}}</h3>
+                <p>Machine: {{object.machine.machine_name}}</p>
+                <p>Section: {{object.section}}</p>
                 <p>Sub Unit: {{object.subunit}}</p>
+                
                 
                 </div>
             </div>

@@ -232,7 +232,7 @@ class MachineView(DetailView):
         unplanned_job_on_machine = WorkOrder.objects.filter(machine = self.object)
         
         
-        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to.first, b.description, b.status) \
+        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to, b.description, b.status) \
                                     for b in unplanned_job_on_machine]
 
         
@@ -278,7 +278,7 @@ class SectionDetailView(DetailView):
 
         unplanned_job_on_machine = WorkOrder.objects.filter(section = self.object)
                 
-        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to.first, b.description, b.status) \
+        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to, b.description, b.status) \
                                     for b in unplanned_job_on_machine]
 
         return context

@@ -33,7 +33,7 @@ class MonthViewFilterForm(CalenderFilterForm):
 class WeekViewFilterForm(MonthViewFilterForm):
     """Inherits from month view and filters by year, month, week"""
 
-    week = forms.ChoiceField(choices = [(i, i) for i in range(1,6)],
+    week = forms.ChoiceField(choices = [(i-1, i) for i in range(1,6)],
                             initial=datetime.date.today().month,
                             required=False)
 

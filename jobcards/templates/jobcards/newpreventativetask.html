@@ -1,4 +1,13 @@
 {% extends "window.html" %}
+{% block head_style %}
+    ._item {
+        background-color: #ccc;
+        padding: 3px;
+        min-height: 40px;
+        max-width: 200px;
+        margin: 3px;
+    }
+{% endblock %}
 {% block content %}
 
 <div class="container-fluid">
@@ -6,33 +15,158 @@
         
         <div class="col-sm-4 well ">
             <h3>New Scheduled Preventative Task</h3>
-            <form class="form-group" method="POST" action="" onsubmit="return validateForm()">
+            <form class="form-group" method="POST" action="" onsubmit="return validateForm()" id="id_preventatitve_task_form">
                 {% csrf_token %}
                 <table>
                 {{form.as_table}}
+                
                 </table>
             <button type="submit" class="btn btn-primary">Submit</button>
             </form>
+            <datalist id="assignments_datalist">
+            </datalist>
+            <datalist id="spares_datalist"></datalist>
+
         </div>
         <div class="col-sm-4">
             <h4>Tasks:</h4>
-            <div id="tasklist"></div>
+            <div id="task_list"></div>
             <p><textarea id="task" rows="3" cols="48"></textarea></p>
             <button type="button" onclick="addTask()" class="btn btn-warning">+ Add Task</button>
+            <hr />
+            </tr>
+            <div class="bg-info" style="padding: 20px;">
+                <h5>Assignments</h5>
+                
+                <div class="input-group">
+                    <input placeholder="Search..." class="form-control" type="search" id="id_assignments" list="assignments_datalist">
+                    <span class="input-group-btn">
+                        <button  type="button" class="btn btn-primary" onclick="addAssigned()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>        
+                    </span>
+                </div>
+                
+                
+                <div id="assigned_list"></div>
+            </div>
+            <div class="bg-info" style="padding: 20px;">
+                <h5>Required Spares</h5>
+                <div class="input-group">
+                        <input placeholder="Search..." class="form-control" type="search" id="id_spares" list="spares_datalist">    
+                        <span class="input-group-btn">
+                            <button  type="button" class="btn btn-primary" onclick="addSpares()">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>    
+                <div id="spares_list"></div>
+            </div>
+
         </div>
         <div class="col-sm-4">
             <h4>Tools:</h4>
             <p><a class="btn btn-info" data-toggle="modal" href='#category-modal-view'>Add Category</a></p>
             <p><a class="btn btn-info" href="{% url 'inventory:spares-create' %}">Add Spares</a></p>
+            
         </div>
     </div>
 </div>
 {% include "common_base/modals/category_modal.html" %}
 {% endblock %}
 {% block body_script %}
-    var num_tasks = 0;    
     $("#id_scheduled_for").datepicker();
 
+    //datalist functionality
+    $("#id_assignments").keyup(function(){
+        if($("#id_assignments").val().length > 2){
+            $.ajax({
+                url: "{% url 'ajax:get-combos' %}",
+                data: {"str": $("#id_assignments").val(),
+                        "model": "account"},
+                method:"POST",
+                success: function(result){
+                    console.log(result.matches);
+                    var html = "";
+                    for(i in result.matches){
+                        html += "\n<option value='*' >".replace("*", result.matches[i]);
+                    } 
+                    $("#assignments_datalist").html(html);
+                }
+        
+            })
+        }
+        return false;    
+    })
+
+
+    $("#id_spares").keyup(function(){
+        if($("#id_spares").val().length > 2){
+            $.ajax({
+                url: "{% url 'ajax:get-combos' %}",
+                data: {"str": $("#id_spares").val(),
+                        "model": "spares"},
+                method:"POST",
+                success: function(result){
+                    console.log(result.matches);
+                    var html = "";
+                    for(i in result.matches){
+                        html += "\n<option value='*' >".replace("*", result.matches[i]);
+                    } 
+                    $("#spares_datalist").html(html);
+                }
+        
+            })
+        }
+        return false;    
+    })
+
+    function addAssigned(){
+        var data = $("#id_assignments").val();
+
+        $("<input>").attr({
+            type: "hidden",
+            id: data.replace(" ", ""),
+            name: "assignments[]",
+            value: data
+        }).appendTo("form");
+
+        var item = `<div class="_item" id="row_*">*<span style='float: right; font-size:20px;'><button onclick='removeAssigned("*")'>
+        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
+        </button></span></div>`.split("*").join(data);
+
+        $("#assigned_list").append(item);
+    }
+
+
+    function addSpares(){
+        var data = $("#id_spares").val();
+
+        $("<input>").attr({
+            type: "hidden",
+            id: data.replace(" ", ""),
+            name: "spares[]",
+            value: data
+        }).appendTo("form");
+
+        var item = `<div class="_item" id="spares_row_*">%<span style='float: right; font-size:20px;'><button onclick='removeSpares("*")'>
+        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
+        </button></span></div>`.split("*").join(data.replace(" ", "")).replace("%", data);
+
+        $("#spares_list").append(item);
+    }
+
+
+    function removeAssigned(data){
+        console.log(data);
+        $("#row_*".replace("*", data.replace(" ", ""))).remove();
+        $("#*".replace("*", data.replace(" ", ""))).remove();
+    }
+
+    function removeSpares(data){
+        console.log(data);
+        $("#spares_row_*".replace("*", data)).remove();
+        $("#*".replace("*", data)).remove();
+    }
 
     //script to make sure the modal does not refresh the page
     
@@ -64,22 +198,34 @@
         var component = $('#id_component');
         updateComponents(url, subassembly, component);
     }
+    var task_count = 0;
 
     function addTask(){
-        $.post("{% url 'ajax:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
-
+        task_count += 1;
+        var data = $("#task").val();
+        var _id = "task_" + task_count;
+        $("<input>").attr({
+                    type: "hidden",
+                    id: _id,
+                    name: "tasks[]",
+                    value: data
+                }).appendTo("form");
+        
+        var item = `<div class="_item" style="max-width:300px;" id="task_row_*">%<span style='float: right; font-size:20px;'><button onclick='removeTask("*")'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></button></span></div>`.split("*").join(_id).replace("%", data);
+        
+        $("#task_list").append(item);
+        
     }
 
-    function editTasks(data){
-        $("#tasklist").append(
-            "<p>" + num_tasks +". "+ $("#task").val() + "</p>"
-        );
-        $("#task").val("");
-        num_tasks += 1;
+    function removeTask(id){
+        console.log(id);
+        $("#task_row_*".replace("*", id)).remove();
+        $("#*".replace("*", id)).remove();
     }
+
 
     function validateForm(){
-        if(num_tasks == 0){
+        if(task_count == 0){
             return false;
         }else{
             return true;

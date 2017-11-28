@@ -87,10 +87,6 @@ class ChecklistCreateView(CreateView):
     form_class = CheckListCreateForm
     success_url = reverse_lazy("maintenance:inbox")
 
-    def get(self, *args, **kwargs):
-        """Prepares the session for the addition of tasks"""
-        self.request.session["tasks"] = []
-        return super(ChecklistCreateView, self).get(*args, **kwargs)
 
    
     def post(self, *args, **kwargs):
@@ -98,21 +94,16 @@ class ChecklistCreateView(CreateView):
         
         Performs the necessary checks on the session and creates a list of tasks based on it. Associates each task with the checklist. Clears the session and saves the checklist."""
         resp = super(ChecklistCreateView, self).post(*args, **kwargs)
-        checklist = Checklist.objects.get(pk=self.request.POST["title"])
-        if len(self.request.session.get("tasks")) == 0:
-            #keep form data 
-            return HttpResponseRedirect(reverse("checklists:create_checklist"), context=self.request.POST)
+        checklist = Checklist.objects.latest("pk")
+
+        n = 0
+        for t in self.request.POST.getlist("tasks[]"):
+            n += 1
+            checklist.tasks.create(created_for="checklist",
+                                task_number=n,
+                                description=t)
         
-        
-        for id, task in enumerate(self.request.session["tasks"]):
-            _task = Task(created_for="checklist",
-                task_number = id,
-                description=task)
-            _task.save()
-            checklist.tasks.add(_task)
-            checklist.save()
-        self.request.session["tasks"] = []
-        self.request.session.modified = True
+        checklist.save()
         return resp
 
 

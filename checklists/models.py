@@ -58,8 +58,7 @@ class Checklist(models.Model):
         "yearly": 360}
 
 
-    title = models.CharField(max_length= 64, 
-                            unique=True, primary_key=True)
+    title = models.CharField(max_length= 64)
     creation_date = models.DateField()
     last_completed_date = models.DateField(blank = True, null=True)
     estimated_time= models.DurationField(choices = [] \

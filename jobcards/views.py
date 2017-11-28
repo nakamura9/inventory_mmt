@@ -48,7 +48,18 @@ class CompleteWorkOrderView(UpdateView):
     template_name = os.path.join("jobcards", "completeworkorder.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
-    
+    def post(self, *args, **kwargs):
+        resp = super(CompleteWorkOrderView, self).post(*args, **kwargs)
+
+        wo = self.get_object()
+        for si in self.request.POST.getlist("spares_issued[]"):
+            wo.spares_issued.add(Spares.objects.get(stock_id=si))
+
+        for sr in self.request.POST.getlist("spares_returned[]"):
+            wo.spares_returned.add(Spares.objects.get(stock_id=sr))
+
+        wo.save()
+        return resp
 
 class NewPreventativeTaskView(CreateView):
     """New preventative task view.
@@ -59,26 +70,28 @@ class NewPreventativeTaskView(CreateView):
     template_name = os.path.join("jobcards", "newpreventativetask.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
-    def get(self, *args, **kwargs):
-        """The list of tasks that will be populated by Ajax requests"""
-        self.request.session["tasks"] = []
-        return super(NewPreventativeTaskView, self).get(*args, **kwargs)
-
     
     def post(self, *args, **kwargs):
+
         resp = super(NewPreventativeTaskView, self).post(*args, **kwargs)
-        if len(self.request.session.get("tasks")) == 0:
-            return HttpResponseRedirect(reverse("jobcards:new-preventative-task"))
         
-        p_task = PreventativeTask.objects.get(
-                            description=self.request.POST["description"])
-        for id, task in enumerate(self.request.session["tasks"]):
-            _task = Task(created_for="preventative_task",
-                task_number = id,
-                description=task)
-            _task.save()
-            p_task.tasks.add(_task)
-            p_task.save()
+        
+        p_task = PreventativeTask.objects.latest("pk")
+
+        n = 0
+        for t in self.request.POST.getlist("tasks[]"):
+            n += 1
+            p_task.tasks.create(created_for="preventative_task",
+                                task_number=n,
+                                description=t)
+            
+        for i in self.request.POST.getlist("assignments[]"): #LIFE SAVER!!!
+            p_task.assignments.add(Account.objects.get(username=i))
+
+        for i in self.request.POST.getlist("spares[]"): #LIFE SAVER!!!
+            p_task.required_spares.add(Spares.objects.get(stock_id=i))
+
+        p_task.save()
         self.request.session["tasks"] = []
         self.request.session.modified = True
         return resp
@@ -103,6 +116,16 @@ class CompletePreventativeTaskView(UpdateView):
         context = super(CompletePreventativeTaskView, self).get_context_data(*args, **kwargs)
         context["spares_form"] = SparesForm()
         return context
+
+    def post(self, *args, **kwargs):
+        resp = super(CompletePreventativeTaskView, self).post(*args, **kwargs)
+
+        p_task = self.get_object()
+        for s in self.request.POST.getlist("spares[]"):
+            p_task.spares_used.add(Spares.objects.get(stock_id=s))
+
+        p_task.save()
+        return resp
 
 class WorkOrderList(ListView):
         """
@@ -135,6 +158,9 @@ class WorkOrderList(ListView):
 
             return queryset
         
+def delete_preventative_task(request, pk=None):
+    PreventativeTask.objects.get(pk=pk).delete()
+    return HttpResponseRedirect(reverse_lazy("maintenance:planned-maintenance"))
 
 @csrf_exempt
 def get_resolvers(request):

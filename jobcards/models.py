@@ -32,7 +32,7 @@ class WorkOrder(models.Model):
     description = models.TextField()
     execution_date = models.DateField(default=datetime.date.today)
     estimated_labour_time = models.DurationField(choices = time_duration)
-    assigned_to = models.ManyToManyField("common_base.Account")
+    assigned_to = models.ForeignKey("common_base.Account")
     priority = models.CharField(max_length=4,
                                 choices=[("high", "High"), ("low", "Low")])
     costing = models.ForeignKey("Costing", null=True)

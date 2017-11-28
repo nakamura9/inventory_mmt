@@ -2,13 +2,26 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-4 bg-info">
+                <h3>Linked Spares data</h3>
+                {% if object.spares_data %}
+                
+                <p>Stock id: {{object.spares_data.stock_id}}</p>
+                <p>Quantity: {{object.spares_data.quantity}}</p>
+                <h5>Description:</h5>
+                <p>{{object.spares_data.description}}</p>
+                {% else %}
+                <p>Component Not linked to spares</p>
+                {% endif %}
             </div>
             <div class="col-sm-8">
                 <div class="well">
                 <h3>{{object.component_name}}</h3>
                 <p>Inventory Number: {{object.unique_id}}</p>
-                <p>Parent: {{object.subassembly}}</p> 
+                <p>Machine: {{object.machine}}</p>
+                <p>Section: {{object.section}}</p>
+                <p>SubUnit: {{object.subunit}}</p>
+                <p>SubAssembly: {{object.subassembly}}</p>
                 </div>
             </div>
         </div>

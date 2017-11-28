@@ -160,14 +160,21 @@ def get_combos(request):
     if s and _model:
         items = []
         if _model == "account":
-            get_account(s)
+            items += get_account(s)
             
         elif _model == "component":
-            items += get_component(s)
+            items += [c.component_name for c in get_component(s)]
         
         elif _model == "spares":
-            items += get_spares(s)
+            items += [sp.stock_id for sp in get_spares(s)]
         
+        elif _model == "inv":
+            # the third element is used client side to select the detail view
+            items += [[c.pk, c.component_name, c.machine.machine_name, 0] for c in  get_component(s)]
+            items += [[sp.pk, sp.stock_id, sp.name, 1] for sp in get_spares(s)]
+            items += [[sa.pk, sa.unit_name, sa.machine.machine_name, 2] for sa in get_subassy(s)]    
+
+
         return HttpResponse(json.dumps({"matches":items}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({"matches": []}))
@@ -175,14 +182,17 @@ def get_combos(request):
 
 def get_component(name):
     items = []
-    items += [c.component_name for c in inv_models.Component.objects.filter(component_name__startswith=name)]
-    items += [c.component_name for c in inv_models.Component.objects.filter(unique_id__startswith=name)] 
+    items += [c for c in inv_models.Component.objects.filter(component_name__startswith=name)]
+    items += [c for c in inv_models.Component.objects.filter(unique_id__startswith=name)] 
     return items
+
+def get_subassy(name):
+    return [sa for sa in inv_models.SubAssembly.objects.filter(unit_name__startswith=name)]
 
 def get_spares(name):
     items = []
-    items += [sp.name for sp in inv_models.Spares.objects.filter(stock_id__startswith=name)]
-    items += [sp.name for sp in inv_models.Spares.objects.filter(name__startswith=name)] 
+    items += [sp for sp in inv_models.Spares.objects.filter(stock_id__startswith=name)]
+    items += [sp for sp in inv_models.Spares.objects.filter(name__startswith=name)] 
     return items
 
 def get_account(name):

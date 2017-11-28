@@ -176,3 +176,5 @@ class Month(object):
                                         include = self.include)
                 day.get_agenda()
                 self.month_agenda[-1].append(day)
+
+                

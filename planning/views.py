@@ -32,6 +32,12 @@ class maintenanceMonthView(TemplateView):
         context = super(maintenanceMonthView, self).get_context_data(*args, 
                                                                     **kwargs)
 
+        if len(self.request.GET.values()) == 0:
+            today = datetime.date.today()
+            _month = calendar_objects.Month(today.year, today.month,
+                                            calendar_objects.MaintenanceDay,
+                                            include=["checks", "jobs"])
+
         #fix this. if year is not set, it wont filter
         if self.request.GET.get("year", None):
             _month = calendar_objects.Month(int(self.request.GET["year"]),
@@ -41,11 +47,6 @@ class maintenanceMonthView(TemplateView):
                                             filters = {"resolver":self.request.GET["resolver"],
                                                         "machine": self.request.GET["machine"]})
             
-        else:
-            _month = calendar_objects.Month(int(self.kwargs["year"]), 
-                                            int(self.kwargs["month"]),
-                                            calendar_objects.MaintenanceDay,
-                                            include=["checks", "jobs"])
         
         _month.get_month_agenda()
         context["mode"] = "maintenance"
@@ -64,7 +65,11 @@ class maintenanceWeekView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(maintenanceWeekView, self).get_context_data(*args, **kwargs)
 
+
+        
+        #when filtering
         if self.request.GET.get("year", None):
+            print self.request.GET.values()
             week = calendar_objects.Week(int(self.request.GET.get("year")),
                                         int(self.request.GET.get("month")),
                                         int(self.request.GET.get("week")),
@@ -76,7 +81,8 @@ class maintenanceWeekView(TemplateView):
             week = calendar_objects.Week(int(self.kwargs["year"]), 
                                         int(self.kwargs["month"]), 
                                         int(self.kwargs["week"]), 
-                                        calendar_objects.MaintenanceDay)
+                                        calendar_objects.MaintenanceDay,
+                                        include=["checks", "jobs"])
         week.get_week_agenda()
         context["week"] = week
         context["mode"] = "maintenance"
@@ -99,12 +105,16 @@ class maintenanceDayView(TemplateView):
             _day = datetime.datetime.strptime(self.request.GET["date"], "%m/%d/%Y").date()
             _filters = {"resolver":self.request.GET["resolver"],
                                                     "machine": self.request.GET["machine"]}
+            _include = get_include(self)
         else:
+            print "called"
             _day = datetime.date(int(self.kwargs["year"]),
                                 int(self.kwargs["month"]),
-                                int(self.kwargs["day"]))
+                                int(self.kwargs["day"]),
+                                )
+            _include=["checks", "jobs"]
         
-        day = calendar_objects.MaintenanceDay(_day, include=get_include(self),
+        day = calendar_objects.MaintenanceDay(_day, include=_include,
                                             filters=_filters)
         day.get_agenda()
         context["day"] =day 

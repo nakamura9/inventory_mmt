@@ -79,7 +79,7 @@
                 <tr>
                     {% for week in month.month_agenda %}
                         <tr>
-                            <td class="week"><a href="{% url 'planning:maintenance-week' year=month.year month=month.month week=forloop.counter %}"><h4>Week {{forloop.counter}}<h4></a></td>
+                            <td class="week"><a href="{% url 'planning:maintenance-week' year=month.year month=month.month week=forloop.counter0 %}"><h4>Week {{forloop.counter}}<h4></a></td>
                             {% for day in week %}
                                 <td>
                                     <svg width="150" height="100">

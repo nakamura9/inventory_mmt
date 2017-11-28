@@ -37,22 +37,24 @@ class PlannedMaintenanceView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(PlannedMaintenanceView, self).get_context_data(*args, **kwargs)
+
+        context["form"] = PlannedMaintenanceFilterForm(initial={
+            "checklists": "True",
+            "planned_jobs": "True",
+        })
+        if len(self.request.GET.values()) == 0:
+            context["checklists"]= Checklist.objects.all()
+            context["planned_jobs"] = PreventativeTask.objects.all()
+            return context
+
         jobs = self.request.GET.get("planned_jobs", None)
         checks  = self.request.GET.get("checklists", None)
         resolver  = self.request.GET.get("resolver", None)
         machine  = self.request.GET.get("machine", None)
         start  = self.request.GET.get("start_date", None)
         stop  = self.request.GET.get("end_date", None)
+        
 
-        context["form"] = PlannedMaintenanceFilterForm(initial={
-            "checklists": "True",
-            "planned_jobs": "True",
-        })
-
-        """if not resolver:
-            context["checklists"] = Checklist.objects.all()
-            context["planned_jobs"] =PreventativeTask.objects.all()
-        """    
         if checks:
             checklist_queryset = Checklist.objects.all()
             if resolver:
@@ -111,7 +113,7 @@ class MaintenanceInbox(ListView):
 
         user = Account.objects.get(username= user)
         context["message"] = "Hello %s." % user.username
-        context["jobs"] = [order for order in WorkOrder.objects.all() if user in order.assigned_to.all()]
+        context["jobs"] = [order for order in WorkOrder.objects.all() if user == order.assigned_to]
         context["planned"] = [task  for task in PreventativeTask.objects.all() if user in task.assignments.all()]
         context["checklists"] = Checklist.objects.filter(resolver = user)
 
