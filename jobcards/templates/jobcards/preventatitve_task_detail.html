@@ -1,0 +1,87 @@
+{% extends "window.html" %}
+{% block head_style %}
+._item {
+    background-color: #ccc;
+    padding: 3px;
+    min-height: 40px;
+    max-width: 200px;
+    margin: 3px;
+}
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-6 bg-info">
+            <h4>Scheduled Task Description:</h4>
+            <table class="table">
+                <tr>
+                    <th>Machine</th>
+                    <td>{{object.machine}}</td>
+                </tr>
+                <tr>
+                    <th>Section</th>
+                    <td>{{object.section}}</td>
+                </tr>
+                <tr>
+                    <th>SubUnit</th>
+                    <td>{{object.subunit}}</td>
+                </tr>
+                <tr>
+                    <th>SubAssembly</th>
+                    <td>{{object.subassembly}}</td>
+                </tr>
+                <tr>
+                    <th>Component</th>
+                    <td>{{object.component}}</td>
+                </tr>
+                <tr>
+                    <th>Frequency</th>
+                    <td>{{object.frequency}}</td>
+                </tr>
+            </table>
+            <hr />
+            <h4>Required_spares</p>
+            {% for spares in object.required_spares.all %}
+                <p>{{spares.stock_id}}</p>
+            {% endfor %}
+            <hr />
+            <h4>Description:</h4>
+            {{object.description}}
+            <hr />
+            <h4>Assigned to:</h4>
+            {%for i in object.assignments.all %}
+                <p>{{i.username}}</p>
+            {% endfor %}
+            <hr />
+            <h4>Tasks</h4>
+            <table class="table">
+                {% for task in object.tasks.all %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{task.description}}</td>
+                        
+                    </tr>
+            
+                 {% endfor %}
+            </table>
+            
+        </div>
+        <div class="col-sm-6 well ">
+            <h3>Spares Issued:</h3><hr />
+                <table class="table">
+                {% for spares in object.spares_issued.all %}
+                    <tr>
+                        <th>{{forloop.counter}}.</th>
+                        <td>{{spares.stock_id}}</td>
+                        <td>{{spares.name}}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+        </div>
+    
+    </div>
+</div>
+
+{% include "inv/engineering_inventory/create_update/spares_modal.html" %}
+
+{% endblock %}

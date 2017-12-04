@@ -31,7 +31,7 @@ class Task(models.Model):
                             ("preventative_task", "Preventative Task")
     ])
     task_number = models.IntegerField()
-    description = models.CharField(max_length=1024, unique=True)
+    description = models.CharField(max_length=1024)
 
 class Comment(models.Model):
     """The comment model represents a piece of communication during the execution of some job.

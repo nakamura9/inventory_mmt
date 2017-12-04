@@ -20,10 +20,17 @@
         </div>
         <div class="col-sm-4">
             <h3>Comment History:</h3>
-            <table>
-            {% for comment in object.comment_set.all %}
+            <table class="table">
+            {% for comment in object.comments.all %}
                 <tr>
-                    <td>{{comment.authored_date}}</td>
+                    <th>{{forloop.counter}}.</th>
+                </tr>
+                <tr>
+                    <th>Author:</th>
+                    <td>{{comment.author}}</td>
+                </tr>
+                <tr>
+                    <th>Comment content:</th>
                     <td>{{comment.content}}</td>
                 </tr>
             {% endfor %}

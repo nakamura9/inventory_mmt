@@ -13,9 +13,9 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from jobcards.models import WorkOrder, PreventativeTask
-from common_base.models import  Account, Task
+from common_base.models import  Account, Task, Comment
 from common_base.utilities import ajax_required
-from .forms import CheckListCreateForm
+from .forms import CheckListCreateForm, ChecklistUpdateForm
 from .models import *
 import inv
 
@@ -68,9 +68,10 @@ class ChecklistCompleteView(DetailView):
             if self.request.POST["comment"] != "":
                 auth =self.get_object().resolver
                 chk = self.get_object()
-                Comment(author=auth,
+                chk.comments.create(author=auth,
                 created_for="checklist",
-                content=self.request.POST["comment"]).save()
+                content=self.request.POST["comment"])
+                chk.save()
             return HttpResponseRedirect(reverse("inventory:inventory-home"))
 
         else:
@@ -103,21 +104,16 @@ class ChecklistCreateView(CreateView):
                                 task_number=n,
                                 description=t)
         
+
         checklist.save()
         return resp
 
 
 class ChecklistUpdateView(UpdateView):
     template_name = os.path.join("checklists","checklist_updateview.html")
-    form_class = CheckListCreateForm
+    form_class = ChecklistUpdateForm
     model = Checklist
     success_url = reverse_lazy("maintenance:inbox")
-
-    def get(self, *args, **kwargs):
-        """Prepares the session for the addition of tasks"""
-
-        self.request.session["tasks"] = []
-        return super(ChecklistUpdateView, self).get(*args, **kwargs)
 
 
     def post(self, *args, **kwargs):
@@ -125,26 +121,21 @@ class ChecklistUpdateView(UpdateView):
         
         Makes sure there is at least one task and that the tasks are associated with the checklist.
         """
-        
         resp = super(ChecklistUpdateView, self).post(*args, **kwargs)
-        checklist = self.get_object()
-        if len(self.request.session.get("tasks")) == 0 \
-         and checklist.task_set.count() == 0:
-            checklist.delete()
-            return HttpResponseRedirect(reverse("checklists:update_checklist", 
-                                        kwargs={"pk": self.kwargs["pk"]}))
+        checklist = Checklist.objects.latest("pk")
+
+        n = checklist.tasks.all().count()
+        for t in self.request.POST.getlist("tasks[]"):
+            n += 1
+            checklist.tasks.create(created_for="checklist",
+                                task_number=n,
+                                description=t)
         
-        
-        for id, task in enumerate(self.request.session["tasks"]):
-            _task = Task(created_for="checklist", task_number = id,
-                            description=task)
-            _task.save()
-            checklist.tasks.add(_task)
-            checklist.save()
-        
-        self.request.session["tasks"] = []
-        self.request.session.modified = True
-        
+        for r in self.request.POST.getlist("removed_tasks[]"):
+            checklist.tasks.get(task_number = r).delete()
+
+
+        checklist.save()
         return resp
 
 
@@ -175,9 +166,10 @@ def hold_checklist(request, pk):
     chk = Checklist.objects.get(pk=pk)
     auth = chk.resolver
     chk.on_hold = True
-    chk.save()
-    Comment(author=auth,
+    
+    chk.comments.create(author=auth,
             created_for="checklist",
-            content="HOLD:" + request.POST["reason"]).save()
+            content="Place on HOLD:" + request.POST["reason"])
+    chk.save()
     return HttpResponse(json.dumps({"authenticated":True}), 
                             content_type="application/json")

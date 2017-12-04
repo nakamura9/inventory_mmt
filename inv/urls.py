@@ -97,7 +97,7 @@ production_inventory_urls = [
 
 urlpatterns = [
     
-    url(r'^inventory-home/?$', views.invHome.as_view(), name="inventory-home"),   
+    url(r'^inventory-home/?$', views.invHome.as_view(), name="inventory-home"), url(r'^csv-panel/?$', views.CSVPanel.as_view(), name="csv-panel"),  
     url(r'^add_plant/?$', views.PlantCreateView.as_view(), name="add_plant"),
     url(r'^engineering-inventory/?$', views.EngineeringInventoryView.as_view(), 
             name='engineering-inventory'),

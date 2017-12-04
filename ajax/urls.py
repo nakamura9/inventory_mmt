@@ -11,5 +11,7 @@ urlpatterns = [
     url(r'^add_task/?$', add_task, name="add_task"),
     url(r'^remove_task/?$', remove_task,name="remove_task"),
     url(r'^add-category/?$', add_category,name="add-category"),
-    url(r'^get-combos$', get_combos, name="get-combos"),
+    url(r'^get-combos/?$', get_combos, name="get-combos"),
+    url(r'^process-file$', parse_csv_file, name="process-file"),
+    url(r'^get-process-updates$', get_run_data, name="get-process-updates"),
 ]

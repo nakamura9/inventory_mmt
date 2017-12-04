@@ -1,12 +1,14 @@
 import os
 from collections import namedtuple
-
+import threading
 
 from django.shortcuts import render, reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 import checklists
 import jobcards
@@ -14,22 +16,34 @@ from .models import *
 from .forms import *
 from common_base.forms import CategoryForm
 from common_base.models import Account, Category
+from common_base.utilities import role_test
 from checklists.models import Checklist
 from jobcards.models import PreventativeTask, WorkOrder
 
 
-class invHome(TemplateView):
+class invHome(UserPassesTestMixin,TemplateView):
     """
     Landing page for all inventory related content
     """
     template_name = os.path.join("inv", "inv_home.html")
-    
-class EngineeringInventoryView(TemplateView):
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
+
+
+class CSVPanel(TemplateView):
+    template_name = os.path.join("inv", "engineering_inventory", "csv_panel.html")
+
+class EngineeringInventoryView(UserPassesTestMixin , TemplateView):
     """
     Main page for all engineering inventory adjustments.
     """
     template_name = os.path.join("inv", "browse.html")
-    
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
+
+
     def get_context_data(self, *args, **kwargs):
         context = super(EngineeringInventoryView, self).get_context_data(*args, **kwargs)
         context["machines"] = Machine.objects.all()
@@ -91,16 +105,18 @@ class SparesDetail(DetailView):
     template_name = os.path.join("inv", "engineering_inventory", "details","spares_detail.html") 
     model = Spares
 
-class MachineCreateView(CreateView):
+class MachineCreateView(UserPassesTestMixin, CreateView):
     """Machine Create View"""
-
+    
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addmachine.html") 
     model = Machine
     form_class = MachineForm
     success_url = reverse_lazy("inventory:inventory-home")
-    
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
-class SubUnitCreateView(CreateView):
+class SubUnitCreateView(UserPassesTestMixin,CreateView):
     """SubUnit create view"""
 
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubunit.html")
@@ -108,9 +124,11 @@ class SubUnitCreateView(CreateView):
     form_class = SubUnitForm
     
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
-
-class SectionCreateView(CreateView):
+class SectionCreateView(UserPassesTestMixin,CreateView):
     """Section create view"""
 
     template_name = os.path.join("inv", "engineering_inventory", 
@@ -119,6 +137,10 @@ class SectionCreateView(CreateView):
     form_class = SectionForm
     
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
+
 
     def get_context_data(self):
         context = super(SectionCreateView, self).get_context_data()
@@ -126,7 +148,7 @@ class SectionCreateView(CreateView):
         return context
 
 
-class SectionUpdateView(UpdateView):
+class SectionUpdateView(UserPassesTestMixin,UpdateView):
     """Section update view"""
 
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsection.html")
@@ -134,6 +156,10 @@ class SectionUpdateView(UpdateView):
     form_class = SectionForm
     
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
+
 
     def get_context_data(self):
         context = super(SectionUpdateView, self).get_context_data()
@@ -143,7 +169,7 @@ class SectionUpdateView(UpdateView):
 
         
 
-class SubAssyCreateView(CreateView):
+class SubAssyCreateView(UserPassesTestMixin,CreateView):
     """SubAssembly create view"""
 
     template_name = os.path.join("inv","engineering_inventory", "create_update", "addsubassy.html")
@@ -151,16 +177,24 @@ class SubAssyCreateView(CreateView):
     form_class = SubAssyForm
     
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
-class PlantCreateView(CreateView):
+
+class PlantCreateView(UserPassesTestMixin,CreateView):
     """Plant create view"""
 
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addplant.html")
     model = Plant
     fields = ["plant_name"]
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
-class ComponentCreateView(CreateView):
+
+class ComponentCreateView(UserPassesTestMixin,CreateView):
     """Component create view"""
 
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addcomponent.html")
@@ -168,39 +202,73 @@ class ComponentCreateView(CreateView):
     form_class = ComponentForm
     
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
+    def post(self, *args, **kwargs):
+        resp = super(ComponentCreateView, self).post(*args, **kwargs)
+        if self.request.POST.get("spares_data", None):
+            cmp = self.get_object()
+            cmp.spares_data = Spares.objects.get(stock_id=self.request.POST["spares_data"])
+            cmp.save()
 
-class ComponentEditView(UpdateView):
+        return resp
+
+class ComponentEditView(UserPassesTestMixin,UpdateView):
     """Component update view"""
 
     model = Component
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addcomponent.html")
     form_class = ComponentForm
+    success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
 
+    def test_func(self):
+        return role_test(self.request.user)
 
-class MachineEditView(UpdateView):
+    def post(self, *args, **kwargs):
+        resp = super(ComponentEditView, self).post(*args, **kwargs)
+        if self.request.POST.get("spares_data", None):
+            cmp = self.get_object()
+            cmp.spares_data = Spares.objects.get(stock_id=self.request.POST["spares_data"])
+            cmp.save()
+
+        return resp
+
+class MachineEditView(UserPassesTestMixin,UpdateView):
     """Machine update view"""
 
     model = Machine
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addmachine.html")
     form_class = MachineForm
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
-
-class SubAssyEditView(UpdateView):
+class SubAssyEditView(UserPassesTestMixin,UpdateView):
     """SubAssembly update view"""
 
     model = SubAssembly
     form_class = SubAssyForm
-    template_name = os.path.join("inv", "engineering_inventory", "create_update","adFdsubassy.html")
-    
+    template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubassy.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
-class SubunitEditView(UpdateView):
+
+class SubunitEditView(UserPassesTestMixin,UpdateView):
     """SubUnit update view"""
 
     model = SubUnit
     form_class = SubUnitForm
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubunit.html")
+    success_url = reverse_lazy("inventory:inventory-home")
+    login_url ="/login/"
+    def test_func(self):
+        return role_test(self.request.user)
 
 
 ###############################################################################

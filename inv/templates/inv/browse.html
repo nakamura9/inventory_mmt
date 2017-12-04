@@ -44,11 +44,13 @@ row li{
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-4 bg-info"> <h3>Inventory Search</h3>
+        <div class="col-sm-4 bg-info" style="padding: 10px;"> <h3>Inventory Search</h3>
+            <p>Search for Components, Spares and subAssemblies.</p>
             <div class="input-group">
+                
                 <input class="form-control" placeholder="make query here..." type="search" list="inv-data" id="id_inv">
                 <span class="input-group-btn">
-                        <button class="btn btn-primary" onclick="clearList()">
+                        <button class="btn btn-primary" onclick="clearList()" t>
                             <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                         </button>
                 </span>     
@@ -59,9 +61,13 @@ row li{
             
             <div class="bg-info" id="message" style="padding: 20px;">
                     <h5>Import csv file</h5>
-                    <input type="file" name ="csv_file" id="id_csv_file" >
-                    <button class="btn btn-success" onclick>Process file</button>
-                <p>Not implemented yet</p> 
+                    <form method="POST" action="{% url 'ajax:process-file' %}">
+                        {% csrf_token%}
+                        <input type="file" name ="csv_file" id="id_csv_file" >
+                        <button class="btn btn-success" type="submit">Process file</button>        
+                    </form>
+                    
+                <p class="bg-danger">{{message}}</p> 
             </div>
             <p>Select a class below for item creation:</p>
             
@@ -140,7 +146,7 @@ row li{
                     var html = "";
                     for(i in result.subassemblies){
 
-                        html += `<li><div class='_item' onclick="reveal('#*', 'comp')" >`.replace("*", result.subassemblies[i][0]) + result.subassemblies[i][1] + `<span style='float:right'><a href="/inventory/subassembly_details/*">Details</a> | <a href=/"inventory/edit_subassembly/*">Edit</a> | <a href="/inventory/delete_subassembly/*">Delete</a></span></div><ul id="*" style="display: none;"></ul></li>`.split("*").join(result.subassemblies[i][0]);
+                        html += `<li><div class='_item' onclick="reveal('#*', 'comp')" >`.replace("*", result.subassemblies[i][0]) + result.subassemblies[i][1] + `<span style='float:right'><a href="/inventory/subassembly_details/*">Details</a> | <a href="/inventory/edit_subassembly/*">Edit</a> | <a href="/inventory/delete_subassembly/*">Delete</a></span></div><ul id="*" style="display: none;"></ul></li>`.split("*").join(result.subassemblies[i][0]);
                     }
                     $(cls).html(html);
                 }

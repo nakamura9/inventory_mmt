@@ -22,6 +22,32 @@
         <div class="col-sm-9">
             <h3>Open Jobs:</h3>
             <a class="btn btn-primary" href="{% url 'jobcards:new-work-order' %}"> New Unplanned Job</a>
+            <div class="row">
+                    <div>
+                        {% if is_paginated %}
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                            <li class="previous"><a href="?page={{page_obj.previous_page_number}}">Previous</a></li>
+                            {% else %}
+                            <li class="disabled"><span>Previous</span></li>
+                            {% endif %}
+                
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                <li class="active"><span>{{i}}</span></li>
+                                {% else %}
+                                <li><a href="?page={{i}}">{{i}}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                            <li class="next"><a href="?page={{page_obj.next_page_number}}">Next</a></li>
+                            {% else %}
+                            <li class="disabled"><span>Next</span></li>
+                            {% endif %}
+                            
+                        </ul>
+                        {% endif %}
+                    </div>
             <table  class="table table-striped">
                 <thead>
                     <tr>
@@ -43,7 +69,7 @@
                             <td>{{job.assigned_to}}</td>
                             <td>{{job.machine}}</td>
                             <td>{{job.description |truncatechars:40}}</td>
-                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:complete-work-order' pk=job.pk %}">Complete</a>| <a href="#">View</a></td>
+                            <td><a class="btn ntn-primary" href= "{% url 'jobcards:complete-work-order' pk=job.pk %}">Complete</a>| <a href="{% url 'jobcards:work-order-detail' pk=job.pk %}">View</a></td>
                         </tr>
                     {% endfor %}        
                 </tbody>

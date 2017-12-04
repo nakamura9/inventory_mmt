@@ -1,16 +1,28 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
+import threading
+import time
 
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
 from django.contrib.auth import authenticate
 
 from common_base.models import Category, Account
-from common_base.utilities import ajax_required
+from common_base.utilities import ajax_required, parse_file
 from inv import models as inv_models
 
+
+CSV_FILE_STATUS = {"messages":[],
+                    "successful": 0,
+                    "errors": 0,
+                    "start": 0.0,
+                    "stop": 0.0,
+                    "running": False,
+                    "finished": False,
+                    "file_length": 0,
+                    }
 """The views that correspond to the URLS """
 
 @csrf_exempt
@@ -101,6 +113,7 @@ def ajaxAuthenticate(request):
     Input: JSON -> "username": string, "password": string
     Output: HTTPResponse JSON-> "authenticated": Boolean
     """
+    print request.POST
     if authenticate(username=request.POST["username"], 
             password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":True}),
@@ -183,7 +196,7 @@ def get_combos(request):
 def get_component(name):
     items = []
     items += [c for c in inv_models.Component.objects.filter(component_name__startswith=name)]
-    items += [c for c in inv_models.Component.objects.filter(unique_id__startswith=name)] 
+    items += [c for c in inv_models.Component.objects.filter(unique_id__startswith=name) if c not in items] 
     return items
 
 def get_subassy(name):
@@ -192,7 +205,7 @@ def get_subassy(name):
 def get_spares(name):
     items = []
     items += [sp for sp in inv_models.Spares.objects.filter(stock_id__startswith=name)]
-    items += [sp for sp in inv_models.Spares.objects.filter(name__startswith=name)] 
+    items += [sp for sp in inv_models.Spares.objects.filter(name__startswith=name) if sp not in items] 
     return items
 
 def get_account(name):
@@ -200,9 +213,9 @@ def get_account(name):
     items += [a.username  for a in Account.objects.filter(
                 username__startswith=name)]
     items += [a.username  for a in Account.objects.filter(
-                first_name__startswith=name)]
+                first_name__startswith=name) if a.username not in items]
     items += [a.username  for a in Account.objects.filter(
-                last_name__startswith=name)]
+                last_name__startswith=name) if a.username not in items]
     
     return items
 
@@ -215,3 +228,44 @@ def add_category(request):
         data.pop("csrfmiddlewaretoken")
         Category(**data).save()
         return HttpResponse("0")
+
+def parse_csv_file(request):
+    file_name = request.POST.get("csv_file")
+    if not file_name.endswith(".csv"):
+        return render(request, "inv/browse.html",
+                        context={"message": "You have entered an incorrect file type. Make sure the extension is '.csv'. "})    
+
+    
+    global CSV_FILE_STATUS
+    CSV_FILE_STATUS["running"] = True
+    CSV_FILE_STATUS["start"] = time.time()
+   
+    t = threading.Thread(target=parse_file, args=(CSV_FILE_STATUS, file_name))
+    t.setDaemon(True)
+    t.start()
+
+    return HttpResponseRedirect(reverse("inventory:csv-panel"))
+
+def get_run_data(request):
+    global CSV_FILE_STATUS
+    start_time = time.strftime("%H:%M", time.localtime(
+        CSV_FILE_STATUS["start"]
+    ))
+
+    run_time = 0
+    if CSV_FILE_STATUS["running"]  and not CSV_FILE_STATUS["finished"]:
+        run_time = time.time() - CSV_FILE_STATUS["start"]
+        
+    elif CSV_FILE_STATUS["finished"]:
+        run_time = CSV_FILE_STATUS["stop"] - CSV_FILE_STATUS["start"]
+    
+    data = {"lines_run": CSV_FILE_STATUS["successful"],
+            "errors": CSV_FILE_STATUS["errors"],
+            "start_time": start_time,
+            "run_time": run_time,
+            "messages": CSV_FILE_STATUS["messages"],
+            "file_length": CSV_FILE_STATUS["file_length"]}
+            
+    
+    return HttpResponse(json.dumps(data), content_type="application/json")
+

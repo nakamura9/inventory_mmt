@@ -5,14 +5,20 @@
             <div class="col-sm-4 bg-info">
                 <h3>Linked Spares data</h3>
                 {% if object.spares_data %}
-                
+                <h5>Name of stock item: {{object.spares_data.name}}</h5>
                 <p>Stock id: {{object.spares_data.stock_id}}</p>
                 <p>Quantity: {{object.spares_data.quantity}}</p>
                 <h5>Description:</h5>
-                <p>{{object.spares_data.description}}</p>
+                {% if object.spares_data.description %}
+                   <p>{{object.spares_data.description}}</p>
+                {% else %}
+                    <p>No description available</p>
+                {% endif %}
+                <a class="btn btn-success" href="{% url 'inventory:spares-details' pk=object.spares_data.pk %}">View spares Detail</a>
                 {% else %}
                 <p>Component Not linked to spares</p>
                 {% endif %}
+                
             </div>
             <div class="col-sm-8">
                 <div class="well">

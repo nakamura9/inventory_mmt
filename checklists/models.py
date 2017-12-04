@@ -88,6 +88,8 @@ class Checklist(models.Model):
                                     ("bi-annually", "Every 6 Months"), 
                                     ("yearly", "Yearly")])
     on_hold = models.BooleanField(default=False)
+    # dont use foreign keys too much stress!
+    
     comments = models.ManyToManyField("common_base.Comment")
     tasks = models.ManyToManyField("common_base.Task")
     
@@ -115,3 +117,12 @@ class Checklist(models.Model):
     @property
     def get_type(self):
         return "checklist"
+
+    def delete(self, *args, **kwargs):
+        for task in self.tasks.all():
+            task.delete()
+
+        for comment in self.comments.all():
+            comment.delete()
+
+        super(Checklist,self).delete(*args, **kwargs)

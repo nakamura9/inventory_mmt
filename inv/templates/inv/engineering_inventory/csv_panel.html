@@ -1,0 +1,90 @@
+{% extends "window.html" %}
+{% block content %}
+
+
+<div class="row">
+    
+    <div class="jumbotron">
+        <div class="container">
+            <h1>CSV File Import Panel</h1>
+            <p>Running ...</p>
+
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-4">
+        
+        
+        <div class="panel panel-primary">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Run Statistics</h3>
+              </div>
+              <div class="panel-body">
+                    <p>Lines run: <span id="lines_run"></span></p>
+                    <p>Errors: <span id="errors"></span></p>
+                    <p>Start Time: <span id="start_time"></span></p>
+                    <p>Run Time: <span id="run_time"></span></p>
+              </div>
+        </div>
+        
+        
+    </div>
+    <div  class="col-sm-8 well">
+        
+        <div class="progress">
+            <div id="prog" class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" style="width: 400px;">
+                <span > <span id="cent"></span> % Complete</span>
+            </div>
+        </div>
+        <h3>Messages:</h3>
+        <hr />
+        <div id="messages" style="max-height:400px; overflow: scroll;"></div>
+
+
+    </div>
+</div>
+
+{% endblock %}
+{% block body_script %}
+    
+var interval_manager;
+
+$(document).ready(function () {
+    interval_manager = window.setInterval("update()", 1000);
+});
+    function update(){
+        $.ajax({
+            method: "GET",
+            url: "{% url 'ajax:get-process-updates' %}",
+            success: function(result){
+                console.log("success");
+                $("#messages").html("");
+                for(i in result.messages){
+                    $("#messages").append($("<p></p>").text(result.messages[i]));
+                }
+                $("#lines_run").text(result.lines_run);
+                $("#start_time").text(result.start_time);
+                $("#run_time").text(result.run_time);
+                $("#errors").text(result.errors);
+                console.log(result.errors);
+                console.log(result.lines_run);
+                console.log(result.file_length);
+                var progress = ((result.errors+ result.lines_run) / result.file_length) * 100;
+                progress = Math.round(Number(progress));
+                console.log(progress)
+                $("#prog").attr({
+                    "aria-valuenow": progress,
+                }).css("width","*%".replace("*", progress));
+                $("#cent").text(progress);
+            },
+            error: function(resp){
+                console.log("Update failed with an error");
+                window.clearInterval(interval_manager);
+            }
+        })
+    }
+
+
+{% endblock %}

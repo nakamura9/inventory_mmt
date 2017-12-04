@@ -98,3 +98,4 @@ class WorkOrderListFilterForm(forms.Form):
     machine = forms.ChoiceField(choices = [(mach.pk, mach.machine_name) \
                                         for mach in Machine.objects.all()],
                                         required = False)
+    status = forms.ChoiceField(choices = [("requested", "Requested"),("accepted", "Accepted"), ("completed", "Completed"), ("approved", "Approved")])

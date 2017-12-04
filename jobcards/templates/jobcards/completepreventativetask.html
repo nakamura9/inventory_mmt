@@ -72,17 +72,7 @@
                 {% csrf_token %}
                 <table class="table">
                 {{form.as_table}}
-                <tr>
-                        <th>Spares Issued:</th>
-                        <td>
-                        <div class="input-group">
-                            <input type="search" class="form-control" id="id_spares_issued" placeholder="Search" list="spares_issued_datalist">
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" onclick="addIssued()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-                            </span>
-                        </div>
-                        </td>
-                    </tr>
+                
                 </table>
             <button type="submit" class="btn btn-primary">Complete</button>
             </form>
@@ -91,6 +81,12 @@
         <div class="col-sm-4">
                 <div class="bg-info" style="padding: 10px;">
                     <h4>Spares Issued:</h4>
+                    <div class="input-group">
+                        <input type="search" class="form-control" id="id_spares_issued" placeholder="Search" list="spares_issued_datalist">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" onclick="addIssued()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                        </span>
+                    </div>
                     <div id="id_spares_issued_list"></div>
                     <hr />
                 </div>

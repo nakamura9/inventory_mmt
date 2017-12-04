@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import time 
 import datetime
+from itertools import chain
 
 from django.utils import timezone
 from django.db import models
@@ -26,10 +27,10 @@ class WorkOrder(models.Model):
     type = models.ForeignKey("common_base.Category")
     machine = models.ForeignKey("inv.Machine", null=True)
     section = models.ForeignKey("inv.Section", null=True)
-    subunit = models.ForeignKey("inv.SubUnit", null=True)
-    subassembly = models.ForeignKey("inv.SubAssembly", null=True)
-    component = models.ForeignKey("inv.Component", null=True)
-    description = models.TextField()
+    subunit = models.ForeignKey("inv.SubUnit", null=True, blank=True)
+    subassembly = models.ForeignKey("inv.SubAssembly", null=True, blank=True)
+    component = models.ForeignKey("inv.Component", null=True, blank=True)
+    description = models.TextField(unique=False)
     execution_date = models.DateField(default=datetime.date.today)
     estimated_labour_time = models.DurationField(choices = time_duration)
     assigned_to = models.ForeignKey("common_base.Account")
@@ -40,14 +41,17 @@ class WorkOrder(models.Model):
                             ("requested", "Requested"),
                         ("accepted", "Accepted"),
                         ("completed", "Completed"),
-                        ("approved", "Approved")
+                        ("approved", "Approved"),
+                        ("declined", "Declined"),
     ], default="requested")
+    
     resolver_action= models.TextField(null=True)
     actual_labour_time = models.DurationField(null=True, choices=time_duration)
     downtime = models.DurationField(null=True, choices=time_duration)
     completion_date = models.DateField(null=True)
     spares_issued = models.ManyToManyField("inv.Spares", related_name="%(class)s_spares_issued")
     spares_returned = models.ManyToManyField("inv.Spares",related_name="%(class)s_spares_returned")
+    comments = models.TextField(null =True)
 
 
 class PreventativeTask(models.Model):
@@ -78,7 +82,7 @@ class PreventativeTask(models.Model):
     subunit = models.ForeignKey("inv.SubUnit", null=True, blank=True)
     subassembly = models.ForeignKey("inv.SubAssembly", null=True, blank=True)
     component = models.ForeignKey("inv.Component", null=True, blank=True)
-    description = models.TextField()
+    description = models.TextField(unique=False)
     tasks = models.ManyToManyField("common_base.Task")
     frequency = models.CharField(max_length = 16, 
                         choices = [("once", "Once off"),
@@ -99,6 +103,7 @@ class PreventativeTask(models.Model):
     actual_downtime = models.DurationField(null=True,choices=time_duration)
     completed_date = models.DateField(null=True)
     spares_used = models.ManyToManyField("inv.Spares", related_name="%(class)s_spares_used")
+    comments  = models.TextField(null=True)
     
     @property
     def is_open(self):

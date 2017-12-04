@@ -2,6 +2,7 @@
 import os
 import json
 import datetime
+import pytz
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -10,15 +11,17 @@ from django import forms
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.edit import UpdateView
-import pytz
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 from common_base.utilities import filter_by_dates
 from common_base.models import Task
+from common_base.forms import LoginForm
 from common_base.models import Account
+from common_base.utilities import role_test
 from inv.models import *
 from .forms import *
 from .models import PreventativeTask, WorkOrder
@@ -51,6 +54,7 @@ class CompleteWorkOrderView(UpdateView):
     def get_context_data(self, *args, **kwargs):
         context = super(CompleteWorkOrderView, self).get_context_data(*args, **kwargs)
         context["spares_form"] = SparesForm()
+        context["login_form"] = LoginForm()
         return context
 
     def post(self, *args, **kwargs):
@@ -63,10 +67,12 @@ class CompleteWorkOrderView(UpdateView):
         for sr in self.request.POST.getlist("spares_returned[]"):
             wo.spares_returned.add(Spares.objects.get(stock_id=sr))
 
+        wo.status = "completed"
         wo.save()
+
         return resp
 
-class NewPreventativeTaskView(CreateView):
+class NewPreventativeTaskView(UserPassesTestMixin ,CreateView):
     """New preventative task view.
     
     Uses sessions to store the list of tasks."""
@@ -74,7 +80,10 @@ class NewPreventativeTaskView(CreateView):
     form_class = PreventativeTaskCreateForm
     template_name = os.path.join("jobcards", "newpreventativetask.html")
     success_url = reverse_lazy("inventory:inventory-home")
+    login_url = "/login/"
 
+    def test_func(self):
+        return role_test(self.request.user)
     def get_context_data(self, *args, **kwargs):
         context = super(NewPreventativeTaskView, self).get_context_data(*args, **kwargs)
         context["spares_form"] = SparesForm()
@@ -110,6 +119,22 @@ class EditNewPreventativeTaskView(UpdateView):
     template_name = os.path.join("jobcards", "newpreventativetask.html")
     success_url = reverse_lazy("inventory:inventory-home")
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(EditNewPreventativeTaskView, self).get_context_data(*args, **kwargs)
+        context["spares_form"] = SparesForm()
+        return context
+
+    def post(self, *args, **kwargs):
+        resp = super(EditNewPreventativeTaskView, self).post(*args, **kwargs)
+
+        p_task = self.get_object()
+        for s in self.request.POST.getlist("spares[]"):
+            p_task.spares_used.add(Spares.objects.get(stock_id=s))
+
+        p_task.save()
+        return resp
+
+
 class CompletePreventativeTaskView(UpdateView):
     """Complete view for preventative tasks."""
 
@@ -137,6 +162,7 @@ class WorkOrderList(ListView):
         """
         List of all unplanned Jobs in the works summary.
         """
+        paginate_by = 10
         model = WorkOrder
         template_name = os.path.join("jobcards", "work_order_list.html")
 
@@ -153,6 +179,7 @@ class WorkOrderList(ListView):
             end_date = self.request.GET.get("end_date", None)
             machine = self.request.GET.get("machine", None)
             resolver = self.request.GET.get("resolver", None)
+            status = self.request.GET.get("status", None)
             
             queryset = filter_by_dates(queryset, start_date, end_date)
 
@@ -162,8 +189,27 @@ class WorkOrderList(ListView):
             if resolver:
                 queryset = queryset.filter(assigned_to = resolver)
 
+            if status:
+                queryset = queryset.filter(status = status)
+
             return queryset
+
+class PreventativeTaskDetailView(DetailView):
+    template_name = os.path.join("jobcards", "preventatitve_task_detail.html")
+    model = PreventativeTask
         
+
+class WorkOrderDetailView(DetailView):
+    template_name = os.path.join("jobcards", "workorder_detail.html")
+    model = WorkOrder
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(WorkOrderDetailView, self).get_context_data(*args, **kwargs)
+        context["admin_user"] = True if Account.objects.get(pk=self.request.user.pk).role == "admin" else False
+        return context
+
+
+@user_passes_test(role_test, "/login/")
 def delete_preventative_task(request, pk=None):
     PreventativeTask.objects.get(pk=pk).delete()
     return HttpResponseRedirect(reverse_lazy("maintenance:planned-maintenance"))
@@ -176,3 +222,26 @@ def get_resolvers(request):
     return HttpResponse(json.dumps(
         {"resolvers": resolvers}
     ), content_type="application/json")
+
+@csrf_exempt
+def accept_job(request):
+    pk = request.POST.get("pk")
+    wo = WorkOrder.objects.get(pk=pk)
+    wo.status = 'accepted'
+    wo.save() 
+
+    return HttpResponse(json.dumps({'accepted': 'True'}), content_type="application/json")
+
+def approve_job(request, pk=None):
+    job = WorkOrder.objects.get(pk=pk)
+    job.status="approved"
+    job.save()
+    return HttpResponseRedirect(reverse_lazy("jobcards:work-order-list"))
+
+def decline_job(request):
+    job = WorkOrder.objects.get(pk=request.POST.get("job"))
+    job.status = "requested"
+    job.comments = request.POST.get("reason")
+    job.save()
+
+    return HttpResponse(json.dumps({"success": True}), content_type="application/json")

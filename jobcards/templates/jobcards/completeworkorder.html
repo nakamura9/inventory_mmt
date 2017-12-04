@@ -14,7 +14,11 @@
     <div class="row">
         <div class="col-sm-4 bg-info" style="padding: 10px;">
             <h3>Work Order Details</h3>
-            <table>
+            <table class="table">
+                <tr>
+                    <th>Work Order Number</th>
+                    <td>{{object.pk}}</td>
+                </tr>
                 <tr>
                     <th>Type</th>
                     <td>{{object.type}}</td>
@@ -47,6 +51,9 @@
             <hr />
             <b>Description:</b>
             <p>{{object.description}}</p>
+            {% if object.status == "requested" %}
+            <button id="accept_button" type="button" class="btn btn-success" onclick="acceptJob()" >Accept Job</button>
+            {% endif %}
         </div>
         <div class="col-sm-4 well ">
             <h3>Complete Work Order</h3>
@@ -54,32 +61,14 @@
                 {% csrf_token %}
                 <table>
                 {{form.as_table}}
-                <tr>
-                    <th>Spares Issued:</th>
-                    <td>
-                    <div class="input-group">
-                        <input type="search" class="form-control" id="id_spares_issued" placeholder="Search" list="spares_issued_datalist">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" onclick="addIssued()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-                        </span>
-                    </div>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Spares Returned:</th>
-                        <td>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="id_spares_returned" placeholder="Search" list="spares_returned_datalist">
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" onclick="addReturned()">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        </td>
-                    </tr>
                 </table>
-            <button type="submit" class="btn btn-primary">Complete Work Order</button>
+                {% for item in object.spares_issued.all %}
+                    <input type="hidden" id="{{item.stock_id}}" name="spares_issued[]" value="{{item.stock_id}}" >
+                {% endfor %}
+                {% for item in object.spares_returned.all %}
+                <input type="hidden" id="{{item.stock_id}}" name="spares_returned[]" value="{{item.stock_id}}" >
+                {% endfor %}
+            <button {% if object.status == "requested" %}disabled{% endif %} id="complete_button" type="submit" class="btn btn-primary">Complete Work Order</button>
             </form>
             <datalist id="spares_issued_datalist">
 
@@ -91,10 +80,51 @@
         <div class="col-sm-4">
             <div class="bg-info" style="padding: 10px;">
                     <h4>Spares Issued:</h4>
-                    <div id="id_spares_issued_list"></div>
+                    <table>
+                            <tr>
+                                    <th>Spares Issued:</th>
+                                    <td>
+                                    <div class="input-group">
+                                        <input type="search" class="form-control" id="id_spares_issued" placeholder="Search" list="spares_issued_datalist">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default" onclick="addIssued()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                                        </span>
+                                    </div>
+                                    </td>
+                                </tr>
+                    </table>
+                    <div id="id_spares_issued_list">
+                        
+                        {% for item in object.spares_issued.all %}
+                        <div class="_item" id="row_{{item.stock_id}}">{{item.name}}<span style='float: right; font-size:20px;'><button onclick='removeIssued("{{item.stock_id}}")'>
+                                <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
+                                </button></span></div>
+                        {% endfor %}
+                    </div>
                     <hr />
                     <h4>Spares Returned:</h4>     
-                    <div id="id_spares_returned_list"></div>   
+                    <table>
+                        <tr>
+                            <th>Spares Returned:</th>
+                                <td>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="id_spares_returned" placeholder="Search" list="spares_returned_datalist">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" onclick="addReturned()">
+                                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                                </td>
+                            </tr>
+                        </table>
+                    <div id="id_spares_returned_list">
+                            {% for item in object.spares_returned.all %}
+                            <div class="_item" id="row_{{item.stock_id}}">{{item.name}}<span style='float: right; font-size:20px;'><button onclick='removeIssued("{{item.stock_id}}")'>
+                                    <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
+                                    </button></span></div>
+                            {% endfor %}    
+                    </div>   
             </div>
             <h4>Tools:</h4>
             <p><a class="btn btn-primary" data-toggle="modal" href='#spares-modal'>Add Spares</a></p>
@@ -103,9 +133,39 @@
 </div>
 
 {% include "inv/engineering_inventory/create_update/spares_modal.html" %}
+{% include "common_base/modals/login.html"%}
 {% endblock %}
 {% block body_script %}
 $("#id_completion_date").datepicker();
+
+function acceptJob(){
+    $("#login-modal").modal("show");
+}
+
+function userLogin(){
+    $.ajax({
+        method: "POST",
+        url: "{% url 'ajax:ajax-authenticate' %}",
+        data: {
+            "csrfmiddlewaretoken": "{{csrf_token}}",
+            "username": $("#id_username").val(),
+            "password": $("#id_password").val()
+        },
+        success: function(result){
+            if(result.authenticated == true){
+                $("#login-modal").modal("hide");
+                $.post("{% url 'jobcards:accept-job' %}", data={"pk":"{{object.pk}}"});
+                $("#accept_button").hide();
+                $("#complete_button").removeAttr("disabled");
+            }else{
+                $("#login_message").text("Login Failed");
+            }
+        },
+        error: function(result){
+            $("#login_message").text("Login Failed because of error.");
+        }
+    });
+}
 
 $("#id_spares_issued").keyup(function(){
     if($("#id_spares_issued").val().length > 2){

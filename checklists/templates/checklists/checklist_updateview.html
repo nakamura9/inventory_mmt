@@ -1,4 +1,15 @@
 {% extends "window.html" %}
+
+{% block head_style %}
+._item {
+    background-color: #ccc;
+    padding: 3px;
+    min-height: 40px;
+    max-width: 200px;
+    margin: 3px;
+}
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -8,6 +19,7 @@
             <form class="form form-group" method="POST" action="" >
                 {% csrf_token %}
                 {{form.as_p}}
+                
             <button type="submit" class="btn btn-primary">Update</button>
             </form>
         </div>
@@ -20,7 +32,9 @@
             <div id="tasklist">
                 
             {% for task in object.tasks.all %}
-                <p>{{task.description}} <button class="btn btn-danger"  onclick="deleteTask(this)">Delete</button></p>
+                <div class="_item" id="_row_task_{{task.task_number}}">{{task.description}} <span style="float:right"><button  onclick="removeTask('task_{{forloop.counter}}')">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </button></span></div>
             {% endfor %}
 
             </div>
@@ -30,22 +44,19 @@
 {% endblock %}
 
 {% block body_script %}
+    var task_count = {{ object.tasks.all.count }};
 
     function addTask(){
-        $.post("{% url 'ajax:add_task' %}", data={"task":$("#task").val()}, editTasks(data));
+        task_count += 1;
+        var data = $("#task").val();
+        
+        addItemToList("task_list", data, task_count, "removeTask(" + task_count + ")");
+        addHiddenInput(task_count, "tasks[]", data);              
     }
 
-    function deleteTask(task){
-        var taskContent = task.parentElement.textContent.replace(" Delete", "");
-        $.post("{% url 'ajax:remove_task' %}", data={"task": taskContent});
-        $("p:contains('*')".replace("*", taskContent)).remove();
-    }
-    function editTasks(data){
-        var current = $("#task").val();
-        $("#tasklist").append(
-            "<p>" + current + " <button class='btn btn-danger'  onclick='deleteTask(this);'>Delete</button></p>"
-        );
-        $("#task").val("");
-
+    function removeTask(task){
+        addHiddenInput("removed_" + task, "removed_tasks[]", task);        
+        $("#task_list_item"+ task).remove();
+                
     }
 {% endblock %}

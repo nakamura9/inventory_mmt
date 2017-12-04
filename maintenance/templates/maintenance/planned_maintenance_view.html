@@ -9,6 +9,32 @@
         </div>
     </div>
     <hr />
+    <div class="row">
+            <div class="col-sm-12">
+                {% if is_paginated %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="previous"><a href="?page={{page_obj.previous_page_number}}">Previous</a></li>
+                    {% else %}
+                    <li class="disabled"><span>Previous</span></li>
+                    {% endif %}
+        
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <li class="active"><span>{{i}}</span></li>
+                        {% else %}
+                        <li><a href="?page={{i}}">{{i}}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="next"><a href="?page={{page_obj.next_page_number}}">Next</a></li>
+                    {% else %}
+                    <li class="disabled"><span>Next</span></li>
+                    {% endif %}
+                    
+                </ul>
+                {% endif %}
+            </div>
    
     <div class="row">
         <div class="col-sm-3 bg-info" >
@@ -30,6 +56,11 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <td>
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true"> | 
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        </span>
+                        </td>
                         <td>Resolver</td>
                         <td>Machine</td>
                         <td>Description</td>
@@ -37,30 +68,34 @@
                     </tr>
                 </thead>
                 <tbody>
-            {% for  checklist in checklists %}
+                
+            {% for item in object_list %}
+                {% if item.get_type == "job" %}
                 <tr>
-                    <td>{{checklist.resolver}}</td>
-                    <td>{{checklist.machine}}</td>
-                    <td>{{checklist.title | truncatechars:40}}</td>
+                    <td><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></td>
+                    <td>{{item.assignments.first }}</td>
+                    <td>{{item.machine}}</td>
+                    <td>{{item.description | truncatechars:40}}</td>
                     <td>
-                        <a href="{% url 'checklists:checklist_details' checklist.pk %}">Details</a> |
-                        <a href="{% url 'checklists:update_checklist' checklist.pk %}">Edit</a> | 
-                        <a href="{% url 'checklists:delete_checklist' checklist.pk %}">Delete</a>
-                        
+                        <a href="{% url 'jobcards:preventative-task-detail' pk=item.pk %}">Details</a> |
+                        <a href="{% url 'jobcards:edit-preventative-task' pk=item.pk %}">Edit</a> |
+                        <a href="{% url 'jobcards:delete-preventative-task' pk=item.pk %}">Delete</a>
                     </td>
                 </tr>
-            {% endfor %}
-            {% for job in planned_jobs %}
+                {% else %}
                 <tr>
-                    <td>{{job.resolver}}</td>
-                    <td>{{job.machine}}</td>
-                    <td>{{job.description | truncatechars:40}}</td>
-                    <td>
-                        <a href="{% url 'jobcards:complete-preventative-task' pk=job.pk %}">Details</a> |
-                        <a href="{% url 'jobcards:edit-preventative-task' pk=job.pk %}">Edit</a> |
-                        <a href="{% url 'jobcards:delete-preventative-task' pk=job.pk %}">Delete</a>
-                    </td>
-                </tr>
+                        <td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>
+                        <td>{{item.resolver}}</td>
+                        <td>{{item.machine}}</td>
+                        <td>{{item.title | truncatechars:40}}</td>
+                        <td>
+                            <a href="{% url 'checklists:checklist_details' item.pk %}">Details</a> |
+                            <a href="{% url 'checklists:update_checklist' item.pk %}">Edit</a> | 
+                            <a href="{% url 'checklists:delete_checklist' item.pk %}">Delete</a>
+                            
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
                 </tbody>
             </table>

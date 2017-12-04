@@ -122,7 +122,7 @@
                                                       
                                                       
                                                       <span class="badge">
-                                                            <a class="badge-link" href="{% url 'maintenance:inbox' %}">
+                                                            <a class="badge-link" href="{% url 'planning:maintenance-day' year=day.date.year month=day.date.month day=day.date.day %}?machine=&resolver=&planned_jobs=on&date={{day.date|date:"m/d/Y"}}">
                                                                     <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                                                                 {{day.job_count}}
                                                             </a>
@@ -135,7 +135,7 @@
                                                       <p>
                                                       
                                                       <span class="badge">
-                                                            <a class="badge-link" href="{% url 'maintenance:planned-maintenance' %}">
+                                                            <a class="badge-link" href="{% url 'planning:maintenance-day' year=day.date.year month=day.date.month day=day.date.day %}?machine=&resolver=&checklists=on&date={{day.date|date:"m/d/Y"}}">
                                                                     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{{day.checklist_count}}
                                                             </a>
                                                       </span>  
@@ -157,11 +157,4 @@
 {% block body_script %}
     $("#month_select").datepicker();
 
-    function selectMonth(){
-        var data_list = $("#month_select").val().split("/");
-        console.log(data_list);
-        var arg_string = "year=" + data_list[2] + " month=" + data_list[0];
-        window.location = "planning/production-month/" + data_list[2] + "/" +data_list[0]
-       
-    }
 {% endblock %}

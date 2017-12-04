@@ -1,6 +1,14 @@
 import datetime
 import pytz
 
+import pandas as pd
+from django.core.exceptions import *
+import time
+from inv import models as inv_models
+
+from common_base.models import Account
+
+
 def time_choices(start, stop, interval, delta=False):
     """
     Creates a list of times between start and stop separated by interval.
@@ -114,3 +122,96 @@ def ajax_required(ret_unexcepted):
         return wrapper
 
     return _ajax_required
+
+
+def role_test(user):
+    print user.username
+    try:
+        acc = Account.objects.get(username=user.username)
+    except:
+        return False
+    return acc.role == "admin" 
+
+def parse_file(status_store, file_name):
+    fil = pd.read_csv(file_name)
+    print "start"
+    
+    status_store["messages"].append("Starting...")
+    status_store["file_length"] = fil.shape[0]
+    i=0
+    while True:
+        try:
+            while True:
+                try:
+                    num = int(fil.iloc[i,0])
+                    break
+                except:
+                    status_store["errors"] += 1
+                    status_store["messages"].append("Error: row: %d: There is missing data in this row" % i)
+                    i += 1
+                
+            
+            id_string =  "0" + str(num)
+            name = fil.iloc[i,1]
+            name = "".join( [ j if ord(j) < 128 else ' ' for j in name] )
+            
+            if len(id_string) == 4:
+                #Section 
+                machine = inv_models.Machine.objects.get(pk=id_string[:2])
+                inv_models.Section(unique_id=id_string,
+                        section_name=name,
+                        machine=machine).save()
+                status_store["successful"] += 1
+            
+            elif len(id_string) == 6:
+                #Subt Unit
+                machine = inv_models.Machine.objects.get(pk=id_string[:2])
+                section = inv_models.Section.objects.get(pk=id_string[:4])
+                inv_models.SubUnit(unique_id=id_string,
+                        unit_name=name,
+                        machine=machine,
+                        section=section).save()
+                status_store["successful"] += 1
+
+            elif len(id_string) == 8:
+                #Sub assembly
+                machine = inv_models.Machine.objects.get(pk=id_string[:2])
+                section = inv_models.Section.objects.get(pk=id_string[:4])
+                subunit = inv_models.SubUnit.objects.get(pk=id_string[:6])
+                inv_models.SubAssembly(unique_id=id_string,
+                            unit_name=name,
+                            machine = machine,
+                            section = section,
+                            subunit = subunit).save()
+                status_store["successful"] += 1
+
+            elif len(id_string) == 10:
+                #Component
+                machine = inv_models.Machine.objects.get(pk=id_string[:2])
+                section = inv_models.Section.objects.get(pk=id_string[:4])
+                subunit = inv_models.SubUnit.objects.get(pk=id_string[:6])
+                subassy = inv_models.SubAssembly.objects.get(pk=id_string[:8])
+                inv_models.Component(unique_id=id_string,
+                            component_name=name,
+                            machine=machine,
+                            section=section,
+                            subunit=subunit,
+                            subassembly=subassy).save()
+                status_store["successful"] += 1
+
+            i = i +  1
+
+        except ObjectDoesNotExist as e:
+            status_store["errors"] += 1
+            status_store["messages"].append("Error: row %d: %s with id: %s" % (i, str(e), str(fil.iloc[i,0])))
+            i += 1
+        except IOError as e:
+            status_store["errors"] += 1
+            status_store["messages"].append("Error: row %d: %s" % (i, str(e)))
+        
+        except IndexError:
+            status_store["running"] = False
+            status_store["finished"] = True
+            status_store["messages"].append("Finished processing")
+            status_store["stop"] = time.time()
+            break

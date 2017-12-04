@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os
+from itertools import chain
 
 from django.shortcuts import render
 from django.views.generic import ListView, TemplateView
 from django.forms import widgets
 from django.contrib.auth import authenticate
+from django.core import paginator
 
 from checklists.models import Checklist
 from common_base.models import Account
@@ -20,6 +22,7 @@ class MachineOverView(ListView):
 
     model = Machine
     template_name = os.path.join("inv", "plantview.html")
+    paginate_by = 1
 
     def get_context_data(self, *args, **kwargs):
         context = super(MachineOverView, self).get_context_data(*args, **kwargs)
@@ -27,14 +30,56 @@ class MachineOverView(ListView):
         return context
 
 
-class PlannedMaintenanceView(TemplateView):
+class PlannedMaintenanceView(ListView):
     """Page responsible for displaying all the checklists and preventative tasks.
 
     Cannot use a ListView because 2 models are involved.
     Filter present.
     """
+    model = PreventativeTask
     template_name = os.path.join("maintenance", "planned_maintenance_view.html")
+    paginate_by =20
 
+    def get_queryset(self):
+        
+        
+        if len(self.request.GET.items()) == 1 or \
+            len(self.request.GET.items()) == 0:
+            jobs_queryset = PreventativeTask.objects.all()
+            checklist_queryset = Checklist.objects.all()
+        else:
+            jobs = self.request.GET.get("planned_jobs", None)
+            checks = self.request.GET.get("checklists", None)
+            resolver  = self.request.GET.get("resolver", None)
+            machine  = self.request.GET.get("machine", None)
+            start  = self.request.GET.get("start_date", None)
+            stop  = self.request.GET.get("end_date", None)
+            if jobs:
+                jobs_queryset = PreventativeTask.objects.all()
+                if resolver:
+                    jobs_queryset = jobs_queryset.filter(resolver = resolver)
+                if machine:
+                    jobs_queryset = jobs_queryset.filter(machine = machine)
+                jobs_queryset = filter_by_dates(jobs_queryset, start, stop)
+            else:
+                jobs_queryset = [] 
+            if checks:
+                checklist_queryset = Checklist.objects.all()
+                if resolver:
+                    checklist_queryset = checklist_queryset.filter(
+                                                            resolver=resolver)
+                if machine:
+                    checklist_queryset = checklist_queryset.filter(
+                                                            machine=machine)
+                
+                checklist_queryset = filter_by_dates(checklist_queryset, start, stop)
+            else:
+                checklist_queryset = []
+        
+        queryset = list(chain(jobs_queryset, checklist_queryset))
+        
+        return queryset
+            
     def get_context_data(self, *args, **kwargs):
         context = super(PlannedMaintenanceView, self).get_context_data(*args, **kwargs)
 
@@ -42,40 +87,6 @@ class PlannedMaintenanceView(TemplateView):
             "checklists": "True",
             "planned_jobs": "True",
         })
-        if len(self.request.GET.values()) == 0:
-            context["checklists"]= Checklist.objects.all()
-            context["planned_jobs"] = PreventativeTask.objects.all()
-            return context
-
-        jobs = self.request.GET.get("planned_jobs", None)
-        checks  = self.request.GET.get("checklists", None)
-        resolver  = self.request.GET.get("resolver", None)
-        machine  = self.request.GET.get("machine", None)
-        start  = self.request.GET.get("start_date", None)
-        stop  = self.request.GET.get("end_date", None)
-        
-
-        if checks:
-            checklist_queryset = Checklist.objects.all()
-            if resolver:
-                checklist_queryset = checklist_queryset.filter(
-                                                        resolver=resolver)
-            if machine:
-                checklist_queryset = checklist_queryset.filter(
-                                                        machine=machine)
-            checklist_queryset = filter_by_dates(checklist_queryset, start, 
-                                                stop)
-            context["checklists"] = checklist_queryset
-
-        if jobs:
-            jobs_queryset = PreventativeTask.objects.all()
-            if resolver:
-                jobs_queryset = jobs_queryset.filter(resolver = resolver)
-            if machine:
-                jobs_queryset = jobs_queryset.filter(machine = machine)
-            jobs_queryset = filter_by_dates(jobs_queryset, start, stop)
-            context["planned_jobs"] = jobs_queryset
-        
         return context
 
 

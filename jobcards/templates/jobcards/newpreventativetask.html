@@ -54,7 +54,7 @@
                 <div class="input-group">
                         <input placeholder="Search..." class="form-control" type="search" id="id_spares" list="spares_datalist">    
                         <span class="input-group-btn">
-                            <button  type="button" class="btn btn-primary" onclick="addSpares()">
+                            <button  type="button" class="btn btn-primary" onclick="addSparesToJob()">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                             </button>
                         </span>
@@ -139,7 +139,7 @@
     }
 
 
-    function addSpares(){
+    function addSparesToJob(){
         var data = $("#id_spares").val();
 
         $("<input>").attr({
@@ -219,7 +219,6 @@
     }
 
     function removeTask(id){
-        console.log(id);
         $("#task_row_*".replace("*", id)).remove();
         $("#*".replace("*", id)).remove();
     }

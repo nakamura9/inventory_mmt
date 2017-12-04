@@ -7,7 +7,7 @@ function updateSections(django_url, machine, section){
             "machine": machine,
         },
         success: function(result){
-            var sections =  "<option value='None'>-Select Section-</option> ";
+            var sections =  "<option value=''>-Select Section-</option> ";
 
     for(i in result.sections){
         sections += "<option value='*'>".replace('*', result.sections[i][0]) + result.sections[i][1] + "</option>";
@@ -30,7 +30,7 @@ function updateSubUnits(django_url, section, subunit){
                 "section": section,
             },
             success: function(result){
-                var units =  "<option value='None'>-Select SubUnit-</option> ";
+                var units =  "<option value=''>-Select SubUnit-</option> ";
 
         for(i in result.units){
             units += "<option value='*'>".replace('*', result.units[i][0]) + result.units[i][1] + "</option>";
@@ -53,7 +53,7 @@ function updateSubAssemblies(django_url, unit, subassembly){
                 "unit": unit,
             },
             success: function(result){
-                var units =  "<option value='None'>-Select SubAssembly-</option> ";
+                var units =  "<option value=''>-Select SubAssembly-</option> ";
 
         for(i in result.subassemblies){
             units += "<option value='*'>".replace('*', result.subassemblies[i][0]) + result.subassemblies[i][1] + "</option>";
@@ -74,7 +74,7 @@ function updateComponents(django_url, subassembly, component){
                 "subassy": subassembly,
             },
             success: function(result){
-                var units =  "<option value='None'>-Select Component-</option> ";
+                var units =  "<option value=''>-Select Component-</option> ";
 
         for(i in result.components){
             units += "<option value='*'>".replace('*', result.components[i][0]) + result.components[i][1] + "</option>";

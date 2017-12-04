@@ -66,33 +66,17 @@
     function addTask(){
             task_count += 1;
             var data = $("#task").val();
-            var _id = "task_" + task_count;
-            $("<input>").attr({
-                        type: "hidden",
-                        id: _id,
-                        name: "tasks[]",
-                        value: data
-                    }).appendTo("form");
             
-            var item = `<div class="_item" style="max-width:300px;" id="task_row_*">%<span style='float: right; font-size:20px;'><button onclick='removeTask("*")'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></button></span></div>`.split("*").join(_id).replace("%", data);
-            
-            $("#task_list").append(item);
-            
+            addItemToList("task_list", data, task_count, "removeTask(" + task_count + ")");
+            addHiddenInput(task_count, "tasks[]", data);
+                       
         }
     
-        function removeTask(id){
-            console.log(id);
-            $("#task_row_*".replace("*", id)).remove();
-            $("#*".replace("*", id)).remove();
+    function removeTask(id){
+            task_count -= 1;
+            $("#task_list_item_"+ id).remove();
+            $("#" + id).remove();
         }
-
-    function editTasks(data){
-        $("#tasklist").append(
-            "<p>" + num_tasks +". "+ $("#task").val() + "</p>"
-        );
-        $("#task").val("");
-        num_tasks += 1;
-    }
 
     function validateForm(){
         if(task_count == 0){

@@ -104,7 +104,7 @@ class ComponentForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Component
         fields = ["component_name", 
-                "machine", "section", "subunit", "subassembly", "unique_id", "spares_data"]
+                "machine", "section", "subunit", "subassembly", "unique_id"]
     
     def __init__(self, *args , **kwargs):
         super(ComponentForm, self).__init__(*args, **kwargs)

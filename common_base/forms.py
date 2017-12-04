@@ -35,5 +35,6 @@ class CategoryForm(forms.ModelForm, BootstrapMixin):
         model = Category
         fields = ["created_for", "name", "description"]
 
-class SearchComboWidget(forms.Widget):
-    pass
+class LoginForm(forms.Form):
+    username = forms.ChoiceField([(acc.username, acc.username) for acc in Account.objects.all()])
+    password = forms.CharField()

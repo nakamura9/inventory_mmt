@@ -1,0 +1,232 @@
+{% extends "window.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h1>Work Order Detail/Review </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+            <div class="panel panel-primary">
+                    <div class="panel-heading">
+                          <h3 class="panel-title">Work Order Details</h3>
+                    </div>
+                    <div class="panel-body">
+                          
+                          <table class="table table-hover">
+                              <thead>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                    <th>Work Order type:</th>  
+                                    <td>{{object.type}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>Machine:</th>  
+                                    <td>{{object.machine}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>Section:</th>  
+                                    <td>{{object.section}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>Sub Unit:</th>  
+                                    <td>{{object.subunit}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>SubAssembly:</th>  
+                                    <td>{{object.subassembly}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>Work Order type:</th>  
+                                    <td>{{object.type}}</td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                          
+                    </div>
+              </div>
+              
+    </div>
+    <div class="col-sm-4">
+        
+        <div class="panel panel-primary">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Resolution Information</h3>
+              </div>
+              <div class="panel-body">
+                    <table class="table table-hover">
+                            <thead>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Resolver</th>
+                                    <td>{{object.assigned_to}}</td>
+                                </tr>
+                                <tr>
+                                        <th>Execution Date</th>
+                                        <td>{{object.execution_date}}</td>
+                                    </tr>
+                                    <tr>
+                                            <th>Estimated Labour Time</th>
+                                            <td>{{object.assigned_to}}</td>
+                                        </tr>
+                                        <tr>
+                                                <th>Priority</th>
+                                                <td>{{object.priority}}</td>
+                                            </tr>
+                                            <tr>
+                                                    <th>Job Status </th>
+                                                    <td>{{object.status}}</td>
+                                            </tr>
+                                
+                            </tbody>
+                        </table>
+              </div>
+        </div>
+        
+
+            
+    </div> 
+    <div class="col-sm-4">
+        
+        <div class="panel panel-info">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Description of Job</h3>
+              </div>
+              <div class="panel-body">
+                    <p>{{object.description}}</p>
+              </div>
+        </div>
+            
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-8">
+        
+        <div class="panel panel-success">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Work Order Execution Details</h3>
+              </div>
+              <div class="panel-body">
+                    
+                    <table class="table table-hover">
+                        <thead>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Resolver Action:</th>
+                                <td><p>{{object.resolver_action}}</p></td>
+                            </tr>
+                            <tr>
+                                <th>Actual Labour Time</th>
+                                <td>{{object.actual_labour_time}}</td>
+                            </tr>
+                            <tr>
+                                <th>Downtime</th>
+                                <td>{{object.downtime}}</td>
+                            </tr>
+                            <tr>
+                                <th>Date Completed</th>
+                                <td>{{object.completion_date}}</td>
+                            </tr>
+                            {% if object.comments %}
+                            <tr>
+                                <th>Comments:</th>
+                                <td>
+                                    <p>This job had previously been REJECTED for this reason:</p>
+                                    <p>{{object.comments}}</p>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    
+              </div>
+        </div>
+        
+    </div>
+    <div class="col-sm-4">
+        
+        <div class="panel panel-info">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Spares List</h3>
+              </div>
+              <div class="panel-body">
+                    <h4>Spares Issued:</h4>
+                    <table>
+                        <tbody>
+                            {% for s in object.spares_issued.all %}
+                                <tr>
+                                    <th>{{forloop.counter}}.</th>
+                                    <td>{{s.stock_id}}</td>
+                                    <td>{{s.name}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                        <h4>Spares Returned:</h4>
+                        <table>
+                            <tbody>
+                                {% for s in object.spares_returned.all %}
+                                    <tr>
+                                        <th>{{forloop.counter}}.</th>
+                                        <td>{{s.stock_id}}</td>
+                                        <td>{{s.name}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                    </table>
+              </div>
+        </div>
+        
+    </div>
+</div>
+{% if admin_user and object.status == "completed" %}
+<div class="row well">
+    <div class="col-sm-12" id="review-tasks">
+        <h3>Work Order Review Actions:</h3>
+        <h5>Current Status: {{object.status}}</h5>
+        <a class="btn btn-success" href="{% url 'jobcards:approve-job' pk=object.pk %}">Approve Job</a>
+        <button class="btn btn-danger" onclick="declineJob()">Decline Job</button>
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}
+{% block body_script %}
+
+function declineJob(){
+    // check if text input is present
+    if($("#reason").length){
+        if($("#reason").val() == ""){
+            alert("Please supply a reason for declining the Job");
+            $("#reason").css("border", "3px solid red");
+            $("#reason").focus();
+            
+        }else{
+            $.ajax({
+                method: "POST",
+                url: "{% url 'jobcards:decline-job' %}",
+                data: {"csrfmiddlewaretoken": "{{csrf_token}}",
+                        "reason": $("#reason").val(),
+                        "job": "{{object.pk}}" },
+                success: function(result){
+                    window.location = "{% url 'jobcards:work-order-list' %}"
+                }
+            });
+        }
+    }else{
+        var reason = $("<input>").attr({
+            "class": "form-control",
+            "placeholder": "State reason...",
+            "id": "reason"
+        });
+        $("#review-tasks").append(reason);
+    }
+    
+}
+
+{% endblock %}

@@ -10,6 +10,21 @@
                 <table>
                 {{form.as_table}}
                 </table>
+                <h4>Link Spares:</h4>
+                <hr />
+                <div class="input-group">
+                    <input id="search_spares" type="search" list="spares_datalist" placeholder="Search spares..." class="form-control">
+                    <datalist id="spares_datalist"></datalist>
+                    <span class="input-group-btn">
+                        <button type="button" onclick="addSpares()" class="btn btn-default">
+                            
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        </button>
+                    </span>
+                </div>
+                <div id="selected_spares">
+                    <h5>Selected Spares</h5>
+                </div>
             <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
@@ -18,6 +33,34 @@
 </div>
 {% endblock %}
 {% block body_script %}
+    //add client side validation
+
+
+    $("#search_spares").keyup(function(){
+        if($("#search_spares").val().length > 2){
+            updateDatalist("search_spares", "spares", "spares_datalist");
+        }
+        
+    })
+
+    function addSpares(){
+        if(!($("#selected_spares_item_1").length)){
+            var val = $("#search_spares").val();
+
+            //validate the value of spares
+            
+            addHiddenInput("id_spares_data","spares_data", val);
+            addItemToList("selected_spares", val, "1", "removeSpares()");
+        }
+    }
+
+    function removeSpares(){
+        $("#id_spares_data").remove();
+        $("#selected_spares_item_1").remove();
+
+    }
+
+
     function prepSectionUpdate(){
         var url = "{% url 'ajax:update_section' %}";
         var machine = $('#id_machine').val();

@@ -1,8 +1,46 @@
 {% extends "window.html" %}
 {% block content %}
-<h4>Spares Item: {{object.pk}}</h4>
-<p>{{object.stock_id}}</p>
-<p>{{object.category}}</p>
-<p>{{object.quantity}}</p>
-<p>{{object.reorder_level}}</p>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4 bg-info" style="max-height:500px; overflow:scroll;">
+                <h3>Linked Component data</h3>
+                
+                
+                {% if object.component_set.all.count > 0 %}
+                
+                {% for c in object.component_set.all %}
+
+                <hr />
+                <h3>{{c.component_name}}</h3>
+                <p>Inventory Number: {{c.unique_id}}</p>
+                <p>Machine: {{c.machine}}</p>
+                <p>Section: {{c.section}}</p>
+                <p>SubUnit: {{c.subunit}}</p>
+                <p>SubAssembly: {{c.subassembly}}</p>
+                {% endfor %}
+
+                {% else %}
+                <p>Spares not linked to any components</p>
+                {% endif %}
+            </div>
+
+            <div class="col-sm-8">
+                <div class="well">
+                        <h3>{{object.name}}</h3>
+                        <p>Stock id: {{object.stock_id}}</p>
+                        <p>{{object.category}}</p>
+                        <hr />
+                        <h5>Description:</h5>
+                        <p>{{object.spares_data.description}}</p>
+                        <hr />
+                        <h5>Quantitative data</h5>
+                        <p>Quantity(In stock): {{object.quantity}}</p>
+                        <p>Reorder Level: {{object.reorder_level}}</p>
+                        <p>Reorder Quantity: {{object.reorder_quantity}}</p>
+                        <p>Last Order Price: {{object.last_order_price}}</p>
+
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
