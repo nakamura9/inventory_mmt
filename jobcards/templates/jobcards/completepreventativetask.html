@@ -13,7 +13,7 @@
     <div class="row">
         <div class="col-sm-4 bg-info">
             <h4>Scheduled Task Description:</h4>
-            <table>
+            <table class="table">
                 <tr>
                     <th>Machine</th>
                     <td>{{object.machine}}</td>
@@ -105,45 +105,23 @@
     
     $("#id_spares_issued").keyup(function(){
         if($("#id_spares_issued").val().length > 2){
-            $.ajax({
-                url: "{% url 'ajax:get-combos' %}",
-                data: {"str": $("#id_spares_issued").val(),
-                        "model": "spares"},
-                method:"POST",
-                success: function(result){
-                    console.log(result.matches);
-                    var html = "";
-                    for(i in result.matches){
-                        html += "\n<option value='*' >".replace("*", result.matches[i]);
-                    } 
-                    $("#spares_issued_datalist").html(html);
-                }
-        
-            })
+            updateDatalist("id_spares_issued", "spares", "spares_issued_datalist");
         }
-        return false;    
     })
 
     function addIssued(){
         var data = $("#id_spares_issued").val();
+        if(checkInput("id_spares_issued")){
+            addHiddenInput(data, "spares[]", data);
+            var id = saferId(data, true);
+            addItemToList("id_spares_issued_list", data, id, "removeIssued('"+id+"')");
+        }
         
-                $("<input>").attr({
-                    type: "hidden",
-                    id: data.replace(" ", ""),
-                    name: "spares[]",
-                    value: data
-                }).appendTo("form");
-        
-                var item = `<div class="_item" id="row_*">*<span style='float: right; font-size:20px;'><button onclick='removeIssued("*")'>
-                <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
-                </button></span></div>`.split("*").join(data);
-        
-                $("#id_spares_issued_list").append(item);
     }
 
     function removeIssued(id){
-        $("#row_*".replace("*", id.replace(" ", ""))).remove();
-        $("#*".replace("*", id.replace(" ", ""))).remove();
+        $("#id_spares_issued_list_item_"+id).remove();
+        $("#"+id).remove();
     }
 
     function prepSectionUpdate(){

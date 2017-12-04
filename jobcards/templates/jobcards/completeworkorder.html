@@ -12,7 +12,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-4 bg-info" style="padding: 10px;">
+        <div id="work-order-details" class="col-sm-4 bg-info" style="padding: 10px;">
             <h3>Work Order Details</h3>
             <table class="table">
                 <tr>
@@ -51,8 +51,13 @@
             <hr />
             <b>Description:</b>
             <p>{{object.description}}</p>
+            <p>Assigned To: {{object.assigned_to}}</p>
             {% if object.status == "requested" %}
             <button id="accept_button" type="button" class="btn btn-success" onclick="acceptJob()" >Accept Job</button>
+            <p>Accept Job if you want to transfer it to another resolver.</p>
+            {% endif %}
+            {% if object.status != "requested" %}
+            <button class="btn btn-warning" onclick="transferJob()">Transfer to another Resolver</button>
             {% endif %}
         </div>
         <div class="col-sm-4 well ">
@@ -137,6 +142,44 @@
 {% endblock %}
 {% block body_script %}
 $("#id_completion_date").datepicker();
+
+function transferJob(){
+    //check if select exists
+    if($("#user-choices").length){
+        $.ajax({
+            method:"POST",
+            url: "{% url 'jobcards:transfer-job' %}",
+            data: {
+                "csrfmiddlewaretoken": "{{csrf_token}}",
+                "job": "{{object.pk}}",
+                "resolver": $("#user-choices").val()
+            },
+            success: function(result){
+                window.location = "{% url 'jobcards:work-order-list' %}";
+            }
+        })
+        
+    }else{
+        $.ajax({
+            method: "GET",
+            url: "{% url 'ajax:get-users' %}",
+            success: function(result){
+                var sel = $("<select>").attr({
+                    "id": "user-choices",
+                    "class": "form-control"    
+                });
+                for(i in result.users){
+                    sel.append($("<option>").attr({
+                        "value": result.users[i][0]    
+                    }).text(result.users[i][1]));
+                }
+                $("#work-order-details").append(sel);
+            }
+        });
+        
+    }
+    
+}
 
 function acceptJob(){
     $("#login-modal").modal("show");

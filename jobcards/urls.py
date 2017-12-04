@@ -12,7 +12,8 @@ workorder_urls = [
     url(r'^accept-job/?$', jc_views.accept_job, name="accept-job"),
     url(r'^work-order-detail/(?P<pk>[\w]+)/?$', jc_views.WorkOrderDetailView.as_view(), name="work-order-detail"),
     url(r'^approve-job/(?P<pk>[\w ]+)$', jc_views.approve_job, name="approve-job"),
-    url(r'^decline-job$', jc_views.decline_job, name="decline-job" )
+    url(r'^decline-job$', jc_views.decline_job, name="decline-job" ),
+    url(r'^transfer-job/?$', jc_views.transfer_job, name="transfer-job")
 ]
 preventative_task_urls = [
     url(r"^new-preventative-task/?$", jc_views.NewPreventativeTaskView.as_view(), name="new-preventative-task"),

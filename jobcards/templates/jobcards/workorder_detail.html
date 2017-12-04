@@ -90,15 +90,39 @@
             
     </div> 
     <div class="col-sm-4">
-        
-        <div class="panel panel-info">
-              <div class="panel-heading">
-                    <h3 class="panel-title">Description of Job</h3>
-              </div>
-              <div class="panel-body">
-                    <p>{{object.description}}</p>
-              </div>
+        <div>
+                <div class="panel panel-info">
+                        <div class="panel-heading">
+                              <h3 class="panel-title">Description of Job</h3>
+                        </div>
+                        <div class="panel-body">
+                              <p>{{object.description}}</p>
+                        </div>
+                  </div>
+                  
+                  <div class="panel panel-info">
+                        <div class="panel-heading">
+                              <h3 class="panel-title">Events</h3>
+                        </div>
+                        <div class="panel-body">
+                              <table class="table">
+                                  <tbody>
+                                      {% for e in object.comments.all %}
+                                        <tr>
+                                            <td>{{forloop.counter}}</td>
+                                            <td>{{e.authored_date}}</td>
+                                            <td>{{e.author}}</td>
+                                            <td>{{e.content}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                  </tbody>
+                              </table>
+                        </div>
+                  </div>
+                  
         </div>
+        
+        
             
     </div>
 </div>
@@ -131,15 +155,6 @@
                                 <th>Date Completed</th>
                                 <td>{{object.completion_date}}</td>
                             </tr>
-                            {% if object.comments %}
-                            <tr>
-                                <th>Comments:</th>
-                                <td>
-                                    <p>This job had previously been REJECTED for this reason:</p>
-                                    <p>{{object.comments}}</p>
-                                </td>
-                            </tr>
-                            {% endif %}
                         </tbody>
                     </table>
                     

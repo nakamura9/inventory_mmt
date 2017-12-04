@@ -26,6 +26,12 @@ CSV_FILE_STATUS = {"messages":[],
 """The views that correspond to the URLS """
 
 @csrf_exempt
+def get_users(request):
+    data = {"users": [[u.pk, u.username] for u in Account.objects.all()]}
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@csrf_exempt
 @ajax_required(HttpResponseBadRequest)
 def update_section(request):
     """Takes json from request and returns the list of sections under the provided machine.
@@ -113,7 +119,6 @@ def ajaxAuthenticate(request):
     Input: JSON -> "username": string, "password": string
     Output: HTTPResponse JSON-> "authenticated": Boolean
     """
-    print request.POST
     if authenticate(username=request.POST["username"], 
             password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":True}),
@@ -122,46 +127,6 @@ def ajaxAuthenticate(request):
         return HttpResponse(json.dumps({"authenticated":False}),
                             content_type="application/json")
 
-@csrf_exempt
-@ajax_required(HttpResponseBadRequest)
-def add_task(request):
-    """Adds tasks to the current session
-    
-    Input: JSON -> "task": string
-    Output: HttpResponse -> '0' or '-1'
-
-    Adds each task to a list called 'tasks' in the current session
-    Afterwards force updates the session
-    """
-    if request.POST != "":
-        request.session["tasks"].append(request.POST["task"])
-        request.session.modified = True
-        return HttpResponse("0")
-    else:
-        return HttpResponse("-1")
-
-@csrf_exempt
-@ajax_required(HttpResponseBadRequest)
-def remove_task(request):
-    """Removes a task from the session and the database if stored
-    
-    Input: JSON -> "task":string
-    Output: HttpResponse '0' or '-1' 
-    """
-
-    if request.POST == "" or \
-        "tasks" not in request.session:
-        return HttpResponse("-1")
-
-    if request.POST["task"] in request.session["tasks"]:
-        request.session["tasks"].pop(request.POST["task"])
-        request.session.modified = True
-    try:
-        Task.objects.get(description=request.POST["task"]).delete()
-    except:#specify the exception 
-        pass
-
-    return HttpResponse("0")
 
 @csrf_exempt
 @ajax_required(HttpResponseBadRequest)
@@ -248,6 +213,7 @@ def parse_csv_file(request):
 
 def get_run_data(request):
     global CSV_FILE_STATUS
+    global CURRENT_CSV_THREAD
     start_time = time.strftime("%H:%M", time.localtime(
         CSV_FILE_STATUS["start"]
     ))
@@ -268,4 +234,3 @@ def get_run_data(request):
             
     
     return HttpResponse(json.dumps(data), content_type="application/json")
-

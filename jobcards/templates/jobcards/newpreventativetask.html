@@ -80,93 +80,47 @@
     //datalist functionality
     $("#id_assignments").keyup(function(){
         if($("#id_assignments").val().length > 2){
-            $.ajax({
-                url: "{% url 'ajax:get-combos' %}",
-                data: {"str": $("#id_assignments").val(),
-                        "model": "account"},
-                method:"POST",
-                success: function(result){
-                    console.log(result.matches);
-                    var html = "";
-                    for(i in result.matches){
-                        html += "\n<option value='*' >".replace("*", result.matches[i]);
-                    } 
-                    $("#assignments_datalist").html(html);
-                }
-        
-            })
+            updateDatalist("id_assignments", "account", "assignments_datalist");
         }
-        return false;    
     })
 
 
     $("#id_spares").keyup(function(){
         if($("#id_spares").val().length > 2){
-            $.ajax({
-                url: "{% url 'ajax:get-combos' %}",
-                data: {"str": $("#id_spares").val(),
-                        "model": "spares"},
-                method:"POST",
-                success: function(result){
-                    console.log(result.matches);
-                    var html = "";
-                    for(i in result.matches){
-                        html += "\n<option value='*' >".replace("*", result.matches[i]);
-                    } 
-                    $("#spares_datalist").html(html);
-                }
-        
-            })
+            updateDatalist("id_spares", "spares", "spares_datalist");
         }
-        return false;    
     })
 
     function addAssigned(){
         var data = $("#id_assignments").val();
-
-        $("<input>").attr({
-            type: "hidden",
-            id: data.replace(" ", ""),
-            name: "assignments[]",
-            value: data
-        }).appendTo("form");
-
-        var item = `<div class="_item" id="row_*">*<span style='float: right; font-size:20px;'><button onclick='removeAssigned("*")'>
-        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
-        </button></span></div>`.split("*").join(data);
-
-        $("#assigned_list").append(item);
+        if(checkInput("id_assignments")){
+            addHiddenInput(data, "assignments[]", data);
+            var id = saferId(data, true);
+            addItemToList("assigned_list", data, id, "removeAssigned('"+id+"')");
+        }
     }
 
 
     function addSparesToJob(){
         var data = $("#id_spares").val();
-
-        $("<input>").attr({
-            type: "hidden",
-            id: data.replace(" ", ""),
-            name: "spares[]",
-            value: data
-        }).appendTo("form");
-
-        var item = `<div class="_item" id="spares_row_*">%<span style='float: right; font-size:20px;'><button onclick='removeSpares("*")'>
-        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
-        </button></span></div>`.split("*").join(data.replace(" ", "")).replace("%", data);
-
-        $("#spares_list").append(item);
+        if(checkInput("id_spares")){
+            addHiddenInput(data, "spares[]", data)
+            var id = saferId(data, true);
+            addItemToList("spares_list", data, id, "removeSpares('"+id+"')");
+        }
     }
 
 
     function removeAssigned(data){
         console.log(data);
-        $("#row_*".replace("*", data.replace(" ", ""))).remove();
-        $("#*".replace("*", data.replace(" ", ""))).remove();
+        $("#assigned_list_item_"+data).remove();
+        $("#"+ data).remove();
     }
 
     function removeSpares(data){
         console.log(data);
-        $("#spares_row_*".replace("*", data)).remove();
-        $("#*".replace("*", data)).remove();
+        $("#spares_list_item_"+data).remove();
+        $("#"+data).remove();
     }
 
     //script to make sure the modal does not refresh the page
@@ -205,22 +159,15 @@
         task_count += 1;
         var data = $("#task").val();
         var _id = "task_" + task_count;
-        $("<input>").attr({
-                    type: "hidden",
-                    id: _id,
-                    name: "tasks[]",
-                    value: data
-                }).appendTo("form");
+        addHiddenInput(_id, "tasks[]", data);
+        addItemToList("task_list", data, _id, "removeTask('"+_id+"')");
         
-        var item = `<div class="_item" style="max-width:300px;" id="task_row_*">%<span style='float: right; font-size:20px;'><button onclick='removeTask("*")'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></button></span></div>`.split("*").join(_id).replace("%", data);
-        
-        $("#task_list").append(item);
         
     }
 
     function removeTask(id){
-        $("#task_row_*".replace("*", id)).remove();
-        $("#*".replace("*", id)).remove();
+        $("#task_list_item_"+id).remove();
+        $("#"+id).remove();
     }
 
 

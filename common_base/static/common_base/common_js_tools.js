@@ -3,11 +3,13 @@ functions
 
 1. saferId(str) makes sure the id's are valid.
 2. addHiddenInput(id, name, v) simplifies the process of supplying aux data to a form
-3. addItemToList(list, value, callback) creates a consistent div with a delete button
-4. updateDatalist(source, model, datalist) performs ajax request to update a datalist*/
+3. addItemToList(list, value, id, callback) creates a consistent div with a delete button
+4. updateDatalist(source, model, datalist) performs ajax request to update a datalist
+5. checkInput(list_id) validates the value submitted in a for returns bool*/
 
 
-function saferId(str){
+
+function saferId(str, partial){
     //check if id exists
     var str = str.toString();
     if(str == ""){
@@ -16,8 +18,9 @@ function saferId(str){
     }
     var val = str.split(" ").join("-");
     _check = $("#" + val);
-    if(_check.length){
-        alert("There is an element that already has this id");
+    if(_check.length && !(partial)){
+        //find a way to reject some duplicates
+        console.log("There is an element that already has this id");
         return null;
     }
     return val;
@@ -28,7 +31,7 @@ function addHiddenInput(id, name, v){
     if(saferId(id)){
         $("<input>").attr({
             type: "hidden",
-            id: saferId(id),
+            id: saferId(id, false),
             name: name,
             value: v
         }).appendTo("form");
@@ -52,14 +55,17 @@ function addItemToList(list, value, id, callback){
     var block;
     var block_content;
     var dismiss_button;
-    var id_tail= saferId(id);
+    var id_tail= saferId(id, true);
     if(!id_tail){
         alert("Invalid value");
         return null;
     }
-    
+    var block_id = saferId(list + "_item_" + id_tail, false);
+    if(!block_id){
+        return null;
+    }
     block = $("<div>").attr({
-        "id": list + "_item_" + id_tail
+        "id": block_id
     });
     
     block.css({
@@ -94,6 +100,7 @@ function addItemToList(list, value, id, callback){
 }
 
 function updateDatalist(source, model, datalist){
+    $("#" + datalist).html("");
     $.ajax({
         url: "/ajax/get-combos/",
         data: {"str": $("#"+ source).val(),
@@ -114,4 +121,20 @@ function updateDatalist(source, model, datalist){
     })
 }
 
-//function to validate datalist entry
+function checkInput(list_id){
+    //function to validate datalist entry
+
+    var input = $("#" + list_id);
+    var val = $("#" + list_id).val();
+    var list = input.attr("list");
+
+    match = $("#"+list+ " option").filter(function(){
+        return ($(this).val() == val);
+    });
+    if(match.length > 0){
+        return true;
+    }else{
+        alert("Please select a value from the list");
+        return false;
+    }
+}

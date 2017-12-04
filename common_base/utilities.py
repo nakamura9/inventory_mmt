@@ -8,7 +8,6 @@ from inv import models as inv_models
 
 from common_base.models import Account
 
-
 def time_choices(start, stop, interval, delta=False):
     """
     Creates a list of times between start and stop separated by interval.
@@ -83,7 +82,7 @@ def filter_by_dates(queryset, start, stop):
         elif 'scheduled_for' in dir(sample):
             queryset = queryset.filter(scheduled_for__gte = start)
         else:
-            print "not found"        
+            pass        
             
 
     if stop:
@@ -98,7 +97,7 @@ def filter_by_dates(queryset, start, stop):
         elif 'scheduled_for' in dir(sample):
             queryset = queryset.filter(scheduled_for__lte = stop)
         else:
-            print "not found"
+            pass
     
     return queryset
 
@@ -125,21 +124,21 @@ def ajax_required(ret_unexcepted):
 
 
 def role_test(user):
-    print user.username
     try:
         acc = Account.objects.get(username=user.username)
     except:
         return False
     return acc.role == "admin" 
 
+
 def parse_file(status_store, file_name):
     fil = pd.read_csv(file_name)
-    print "start"
+    global running
     
     status_store["messages"].append("Starting...")
     status_store["file_length"] = fil.shape[0]
     i=0
-    while True:
+    while running:
         try:
             while True:
                 try:

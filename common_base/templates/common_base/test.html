@@ -8,13 +8,12 @@
     <button class="btn btn-primary" onclick="doSafer()">Do Safer</button>
     <button class="btn btn-success" onclick="prepAddItemToList()">Add to List</button>
     <button class="btn btn-default" onclick="hiddenField()">Add hiddenField</button>
+    
+    <button type="button" onclick="checkInput('search')" class="btn btn-large btn-block btn-warning">Check input</button>
+    
 </div>
 <div id="list"></div>
-<form>
 
-</form>
-        
-        
 
 
 {% endblock %}
@@ -28,8 +27,10 @@ function hiddenField(){
 function doSafer(){
     
     var v = $("#search").val();
-    var a = saferId(v);
+    var a = saferId(v, false);
 }
+
+
 
 
 function prepAddItemToList(){
@@ -37,7 +38,7 @@ function prepAddItemToList(){
     var v = $("#search").val();
     var attrs = {"style": "background-color: red;"};
 
-    addItemToList("list", v, attrs, "removeItem()");
+    addItemToList("list", v, saferId(v, false), "removeItem()");
 }
 function removeItem(){
     alert("removed");

@@ -51,7 +51,7 @@ class WorkOrder(models.Model):
     completion_date = models.DateField(null=True)
     spares_issued = models.ManyToManyField("inv.Spares", related_name="%(class)s_spares_issued")
     spares_returned = models.ManyToManyField("inv.Spares",related_name="%(class)s_spares_returned")
-    comments = models.TextField(null =True)
+    comments = models.ManyToManyField("common_base.Comment")
 
 
 class PreventativeTask(models.Model):

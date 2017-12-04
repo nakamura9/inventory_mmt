@@ -8,6 +8,7 @@ from django.views.generic import ListView, TemplateView
 from django.forms import widgets
 from django.contrib.auth import authenticate
 from django.core import paginator
+from django.contrib.auth import login as auth_login
 
 from checklists.models import Checklist
 from common_base.models import Account
@@ -104,6 +105,29 @@ class MaintenanceInbox(ListView):
     model = Checklist
     template_name = os.path.join("maintenance","inbox.html")
 
+    def post(self, request, *args,**kwargs):
+        context = {}
+        context["users"] =widgets.Select(attrs= {"class": "form-control"},
+                                    choices= ((u.username, u.username) \
+                                    for u in Account.objects.all())).render(
+                                        "username", "None")
+        user =self.request.POST.get("username", None)
+        pwd = self.request.POST.get("pwd", None)
+        auth = authenticate(username=user, password=pwd)
+        if not auth:
+            context["message"] = "Wrong password"
+            
+        else:
+            auth_login(request, auth)
+            user = Account.objects.get(username= user)
+            context["message"] = "%s: Hello %s." % (user.role, user.username)
+            context["jobs"] = [order for order in WorkOrder.objects.all() if user == order.assigned_to]
+            context["planned"] = [task  for task in PreventativeTask.objects.all() if user in task.assignments.all()]
+            context["checklists"] = Checklist.objects.filter(resolver = user)
+
+        return render(self.request, self.template_name, context)
+
+
     def get_context_data(self, *args, **kwargs):
         context = super(MaintenanceInbox, self).get_context_data(*args, **kwargs)
         context["message"] = ""
@@ -111,21 +135,14 @@ class MaintenanceInbox(ListView):
                                     choices= ((u.username, u.username) \
                                     for u in Account.objects.all())).render(
                                         "username", "None")
-                                        
-        user =self.request.GET.get("username", None)
+        # if a user is already logged in
+
         
-        if not user:
-            context["message"] = "No user logged in" 
+        if self.request.user:
+            user = Account.objects.get(pk= self.request.user.pk)
+            context["message"] = "%s:Hello %s." % (user.role, user.username)
+            context["jobs"] = [order for order in WorkOrder.objects.all() if user == order.assigned_to]
+            context["planned"] = [task  for task in PreventativeTask.objects.all() if user in task.assignments.all()]
+            context["checklists"] = Checklist.objects.filter(resolver = user)
+
             return context
-
-        if not authenticate(username=user, password=self.request.GET["pwd"]):
-            context["message"] = "Wrong password"
-            return context
-
-        user = Account.objects.get(username= user)
-        context["message"] = "Hello %s." % user.username
-        context["jobs"] = [order for order in WorkOrder.objects.all() if user == order.assigned_to]
-        context["planned"] = [task  for task in PreventativeTask.objects.all() if user in task.assignments.all()]
-        context["checklists"] = Checklist.objects.filter(resolver = user)
-
-        return context

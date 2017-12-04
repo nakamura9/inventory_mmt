@@ -17,11 +17,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 
-from common_base.utilities import filter_by_dates
-from common_base.models import Task
+from common_base.utilities import role_test, filter_by_dates
+from common_base.models import Task, Account, Comment
 from common_base.forms import LoginForm
-from common_base.models import Account
-from common_base.utilities import role_test
 from inv.models import *
 from .forms import *
 from .models import PreventativeTask, WorkOrder
@@ -241,7 +239,21 @@ def approve_job(request, pk=None):
 def decline_job(request):
     job = WorkOrder.objects.get(pk=request.POST.get("job"))
     job.status = "requested"
-    job.comments = request.POST.get("reason")
+    user = Account.objects.get(pk= request.user.pk)
+    job.comments.create(created_for="work_order",
+                        author= user,
+                        content = "JOB DECLINED BY:  %s. REASON:" % request.user.username +request.POST.get("reason"))
     job.save()
 
+    return HttpResponse(json.dumps({"success": True}), content_type="application/json")
+
+def transfer_job(request):
+    job = WorkOrder.objects.get(pk=request.POST.get("job"))
+    job.assigned_to = Account.objects.get(pk = request.POST.get("resolver"))
+    job.status = "requested"
+    user = Account.objects.get(pk= request.user.pk)
+    job.comments.create(created_for="work_order",
+                        author= user,
+                        content = "Job Transferred from %s to %s" %(request.user.username, job.assigned_to.username))
+    job.save()
     return HttpResponse(json.dumps({"success": True}), content_type="application/json")

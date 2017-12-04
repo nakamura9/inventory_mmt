@@ -3,10 +3,11 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-12 bg-info">
-            <form method="GET" action="" role="form">
+            <form method="POST" action="" role="form">
                 <span style="float:left; font-size:24px;">{{message}}</span>
                 <table style="float:right; margin: 5px;">
                     <tr>
+                        {% csrf_token %}
                         <td>{{users}}</td>
                         <td><input type="password" name="pwd" class="form-control" ></td>
                         <td><button type="submit" class="btn btn-default">Login</button> </td>
