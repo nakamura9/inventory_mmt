@@ -27,6 +27,12 @@ CSV_FILE_STATUS = {"messages":[],
 
 @csrf_exempt
 def get_users(request):
+    """ajax response used to create a list of users for a form
+    
+    method: GET
+    returns: users -> a list of 2 element lists consisting of pks and 
+                        usernames"""
+
     data = {"users": [[u.pk, u.username] for u in Account.objects.all()]}
     return HttpResponse(json.dumps(data), content_type="application/json")
 
@@ -131,6 +137,19 @@ def ajaxAuthenticate(request):
 @csrf_exempt
 @ajax_required(HttpResponseBadRequest)
 def get_combos(request):
+    """
+    Used along with other functions to provide information used to populate
+    search input datalists
+
+    method: POST
+    Input : 
+        str -> search string
+        model -> the models to be searched
+
+    Output: 
+        matches -> a list of matching data corresponding to the search string
+    """
+
     s = request.POST.get("str", None)
     _model = request.POST.get("model", None)
 
@@ -159,21 +178,27 @@ def get_combos(request):
 
 
 def get_component(name):
+    """Searches a component by name, and id"""
+
     items = []
     items += [c for c in inv_models.Component.objects.filter(component_name__startswith=name)]
     items += [c for c in inv_models.Component.objects.filter(unique_id__startswith=name) if c not in items] 
     return items
 
 def get_subassy(name):
+    """Searches subassemblies by name"""
+
     return [sa for sa in inv_models.SubAssembly.objects.filter(unit_name__startswith=name)]
 
 def get_spares(name):
+    """searches spares by name and stock_id """
     items = []
     items += [sp for sp in inv_models.Spares.objects.filter(stock_id__startswith=name)]
     items += [sp for sp in inv_models.Spares.objects.filter(name__startswith=name) if sp not in items] 
     return items
 
 def get_account(name):
+    """Searches accounts by username, first name and last name"""
     items = []
     items += [a.username  for a in Account.objects.filter(
                 username__startswith=name)]
@@ -195,6 +220,14 @@ def add_category(request):
         return HttpResponse("0")
 
 def parse_csv_file(request):
+    """Asynchronous way of importing data as csv.
+    
+    Input:
+        csv_file-> the local path to the file to be imported.
+        
+    Output:
+        None - the application starts a new thread and calls the parse_file funtion which iterates over the whole file and classifies the data according to the unique ids that follow some regular pattern."""
+
     file_name = request.POST.get("csv_file")
     if not file_name.endswith(".csv"):
         return render(request, "inv/browse.html",
@@ -212,6 +245,19 @@ def parse_csv_file(request):
     return HttpResponseRedirect(reverse("inventory:csv-panel"))
 
 def get_run_data(request):
+    """Function called repeatedly to display the current status of a data import process
+    
+    method: GET
+    
+    Input: None
+    Output:
+        lines_run - > int
+        errors -> int
+        start_time -> time string
+        run_time - int
+        messages -> list of strings
+        file_length -> int number of lines of data in total
+        """
     global CSV_FILE_STATUS
     global CURRENT_CSV_THREAD
     start_time = time.strftime("%H:%M", time.localtime(
@@ -228,7 +274,7 @@ def get_run_data(request):
     data = {"lines_run": CSV_FILE_STATUS["successful"],
             "errors": CSV_FILE_STATUS["errors"],
             "start_time": start_time,
-            "run_time": run_time,
+            "run_time": int(run_time),
             "messages": CSV_FILE_STATUS["messages"],
             "file_length": CSV_FILE_STATUS["file_length"]}
             

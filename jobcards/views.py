@@ -82,6 +82,7 @@ class NewPreventativeTaskView(UserPassesTestMixin ,CreateView):
 
     def test_func(self):
         return role_test(self.request.user)
+    
     def get_context_data(self, *args, **kwargs):
         context = super(NewPreventativeTaskView, self).get_context_data(*args, **kwargs)
         context["spares_form"] = SparesForm()
@@ -90,6 +91,7 @@ class NewPreventativeTaskView(UserPassesTestMixin ,CreateView):
     def post(self, *args, **kwargs):
         resp = super(NewPreventativeTaskView, self).post(*args, **kwargs)
         p_task = PreventativeTask.objects.latest("pk")
+
 
         n = 0
         for t in self.request.POST.getlist("tasks[]"):
@@ -105,18 +107,20 @@ class NewPreventativeTaskView(UserPassesTestMixin ,CreateView):
             p_task.required_spares.add(Spares.objects.get(stock_id=i))
 
         p_task.save()
-        self.request.session["tasks"] = []
-        self.request.session.modified = True
         return resp
 
-class EditNewPreventativeTaskView(UpdateView):
+class EditNewPreventativeTaskView(UserPassesTestMixin, UpdateView):
     """Edits a new preventative task """
 
-    form_class = PreventativeTaskCreateForm
+    form_class = PreventativeTaskEditForm
     model = PreventativeTask
-    template_name = os.path.join("jobcards", "newpreventativetask.html")
-    success_url = reverse_lazy("inventory:inventory-home")
-
+    template_name = os.path.join("jobcards", "edit_preventative_task.html")
+    success_url = reverse_lazy("maintenance:inbox")
+    login_url = "/login/"
+    
+    def test_func(self):
+        return role_test(self.request.user)
+    
     def get_context_data(self, *args, **kwargs):
         context = super(EditNewPreventativeTaskView, self).get_context_data(*args, **kwargs)
         context["spares_form"] = SparesForm()
@@ -126,8 +130,32 @@ class EditNewPreventativeTaskView(UpdateView):
         resp = super(EditNewPreventativeTaskView, self).post(*args, **kwargs)
 
         p_task = self.get_object()
+
+        if self.request.POST.get("removed_tasks[]", None):
+            for t in self.request.POST.getlist("removed_tasks[]"):
+                p_task.tasks.get(task_number=t).delete()
+
+        if self.request.POST.get("removed_spares[]", None):
+            for s in self.request.POST.getlist("removed_spares[]"):
+                p_task.required_spares.remove(Spares.objects.get(stock_id=s))
+
+        
+        if self.request.POST.get("removed_resolvers[]", None):
+            for r in self.request.POST.getlist("removed_resolvers[]"):
+                p_task.assignments.remove(Account.objects.get(username=r))
+                
         for s in self.request.POST.getlist("spares[]"):
-            p_task.spares_used.add(Spares.objects.get(stock_id=s))
+            p_task.required_spares.add(Spares.objects.get(stock_id=s))
+
+        for i in self.request.POST.getlist("assignments[]"): #LIFE SAVER!!!
+            p_task.assignments.add(Account.objects.get(username=i))
+
+        n = p_task.tasks.all().count()
+        for t in self.request.POST.getlist("tasks[]"):
+            n += 1
+            p_task.tasks.create(created_for="preventative_task",
+                                task_number=n,
+                                description=t)
 
         p_task.save()
         return resp

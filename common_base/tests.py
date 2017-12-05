@@ -97,7 +97,7 @@ class TestDataMixin(object):
                             name="Test Category",
                             description="Test Description").save()
 
-        inv_models.InventoryItem(serial_number="100",
+        """inv_models.InventoryItem(serial_number="100",
                                 name="Test Inventory Item",
                                 order_number=1,
                                 quantity=100,
@@ -123,7 +123,7 @@ class TestDataMixin(object):
                             datetime.timedelta(days=5),
                         customer="Test Customer",
                         production_status="planned",
-                        delivery_status="storage").save()
+                        delivery_status="storage").save()"""
 
 
     @classmethod

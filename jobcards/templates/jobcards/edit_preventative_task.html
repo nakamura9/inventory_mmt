@@ -1,0 +1,273 @@
+{% extends "window.html" %}
+{% block head_style %}
+    ._item {
+        background-color: #ccc;
+        padding: 3px;
+        min-height: 40px;
+        min-width: 200px;
+        margin: 3px;
+    }
+{% endblock %}
+{% block content %}
+
+{% load safer_id %}
+    <div class="row">
+        
+        <div class="col-sm-4 well ">
+            <h3>Edit Scheduled Preventative Task</h3>
+            <form class="form-group" method="POST" action="" onsubmit="return validateForm()" id="id_preventatitve_task_form">
+                {% csrf_token %}
+                <table>
+                {{form.as_table}}
+                
+                </table>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <datalist id="assignments_datalist">
+            </datalist>
+            <datalist id="spares_datalist"></datalist>
+
+        </div>
+        <div class="col-sm-4">
+            <h4>Tasks:</h4>
+            <div id="task_list">
+                {% for task in object.tasks.all %}
+                    <div class="_item" id="task_{{forloop.counter}}">
+                        {{task.description}}
+                        <span style="float:right;">
+                            <button class="btn btn-default" onclick="removeTaskExisting('task_{{forloop.counter}}', '{{forloop.counter}}')">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </button>
+                            
+                        </span>
+                    </div>
+                {% endfor %}
+            </div>
+            <p><textarea id="task" rows="3" cols="48"></textarea></p>
+            <button type="button" onclick="addTask()" class="btn btn-warning">+ Add Task</button>
+            <hr />
+            </tr>
+            <div class="bg-info" style="padding: 20px;">
+                <h5>Assignments</h5>
+                
+                <div class="input-group">
+                    <input placeholder="Search..." class="form-control" type="search" id="id_assignments" list="assignments_datalist">
+                    <span class="input-group-btn">
+                        <button  type="button" class="btn btn-primary" onclick="addAssigned()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>        
+                    </span>
+                </div>
+                
+                
+                <div id="assigned_list">
+                    {% for user in object.assignments.all %}
+                    <div class="_item" id="assigned_list_item_{{user.username}}">
+                        {{user.username}}
+                        <span style="float:right;">
+                            <button class="btn btn-default" onclick="removeAssignedExisting('{{user.username}}')">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </button>
+                            
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="bg-info" style="padding: 20px;">
+                <h5>Required Spares</h5>
+                <div class="input-group">
+                        <input placeholder="Search..." class="form-control" type="search" id="id_spares" list="spares_datalist">    
+                        <span class="input-group-btn">
+                            <button  type="button" class="btn btn-primary" onclick="addSparesToJob()">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>    
+                <div id="spares_list">
+                    {% for spare in object.required_spares.all %}
+                    <div class="_item" id="spares_list_item_{{spare.stock_id | safer_id }}">
+                        {{spare.name}}
+                        <span style="float:right;">
+                            <button class="btn btn-default" onclick="removeSparesExisting('{{spare.stock_id |safer_id}}', '{{spare.stock_id}}')">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </button>
+                            
+                        </span>
+                    </div>
+                    
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-4">
+            <h4>Tools:</h4>
+            <p><a class="btn btn-info" data-toggle="modal" href='#category-modal-view'>Add Category</a></p>
+            <p><a class="btn btn-info" href="#spares-modal" data-toggle="modal">Add Spares</a></p>
+            
+        </div>
+    </div>
+
+{% include "common_base/modals/category_modal.html" %}
+{% include "inv/engineering_inventory/create_update/spares_modal.html" %}
+{% endblock %}
+{% block body_script %}
+    $("#id_scheduled_for").datepicker();
+
+    //datalist functionality
+    $("#id_assignments").keyup(function(){
+        if($("#id_assignments").val().length > 2){
+            updateDatalist("id_assignments", "account", "assignments_datalist");
+        }
+    })
+
+
+    $("#id_spares").keyup(function(){
+        if($("#id_spares").val().length > 2){
+            updateDatalist("id_spares", "spares", "spares_datalist");
+        }
+    })
+
+    function addAssigned(){
+        var data = $("#id_assignments").val();
+        if(checkInput("id_assignments")){
+            addHiddenInput(data, "assignments[]", data);
+            var id = saferId(data, true);
+            addItemToList("assigned_list", data, id, "removeAssigned('"+id+"')");
+        }
+    }
+
+
+    function addSparesToJob(){
+        var data = $("#id_spares").val();
+        if(checkInput("id_spares")){
+            addHiddenInput(data, "spares[]", data)
+            var id = saferId(data, true);
+            addItemToList("spares_list", data, id, "removeSpares('"+id+"')");
+        }
+    }
+
+
+    function removeAssigned(data){
+        $("#assigned_list_item_"+data).remove();
+        $("#"+ data).remove();
+    }
+
+    function removeAssignedExisting(data){
+        removeAssigned(data);
+        addHiddenInput(data, "removed_resolvers[]", data);
+    }
+
+    function removeSpares(data){
+        $("#spares_list_item_"+data).remove();
+        $("#"+data).remove();
+    }
+
+    function removeSparesExisting(data, stock_id){
+        removeSpares(data);
+        alert(stock_id);
+        addHiddenInput(data, "removed_spares[]", stock_id);
+    }
+
+    //script to make sure the modal does not refresh the page
+    
+    function prepSectionUpdate(){
+        var url = "{% url 'ajax:update_section' %}";
+        var machine = $('#id_machine').val();
+        var section = $('#id_section');
+        updateSections(url, machine, section);
+}
+
+
+    function prepSubUnitUpdate(){
+        var url = "{% url 'ajax:update_subunit' %}";
+        var section = $('#id_section').val();
+        var subunit = $('#id_subunit');
+        updateSubUnits(url, section, subunit);
+    }
+
+    function prepSubAssemblyUpdate(){
+        var url = "{% url 'ajax:update_subassembly' %}";
+        var subunit = $('#id_subunit').val();
+        var subassembly = $('#id_subassembly');
+        updateSubAssemblies(url, subunit, subassembly);
+    }
+
+    function prepComponentUpdate(){
+        var url = "{% url 'ajax:update_component' %}";
+        var subassembly = $('#id_subassembly').val();
+        var component = $('#id_component');
+        updateComponents(url, subassembly, component);
+    }
+    var task_count = {{object.tasks.all.count}};
+
+    function addTask(){
+        task_count += 1;
+        var data = $("#task").val();
+        var _id = "task_" + task_count;
+        addHiddenInput(_id, "tasks[]", data);
+        addItemToList("task_list", data, _id, "removeTask('"+_id+"')");
+        
+        
+    }
+
+    function removeTask(id){
+        $("#task_list_item_"+id).remove();
+        $("#"+id).remove();
+    }
+
+    function removeTaskExisting(id, pk){
+        removeTask(id);
+        addHiddenInput(id, "removed_tasks[]", pk);
+
+    }
+
+    function validateForm(){
+        if(task_count == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    //modal forms
+
+    function addCategory(){
+        $.ajax({
+            method: "POST",
+            url: "{% url 'ajax:add-category' %}",
+            data: {
+                "created_for": $("#id_created_for").val(),
+                "name" :$("#id_name").val(),
+                "description": $("#id_description").val(),
+                "csrfmiddlewaretoken": "{{csrf_token}}"
+            },
+            success: function(result){
+                $("#category-modal-view").modal("hide");
+            }
+        });
+    }
+
+    function addSpares(){
+        $.ajax({
+            method: "POST",
+            url: "{% url 'inventory:spares-create' %}",
+            data: { "name": $("#id_name").val(),
+                    "description": $("#id_description").val(),
+                    "stock_id": $("#id_stock_id").val(),
+                    "quantity": $("#id_quantity").val(),
+                    "reorder_level": $("#id_reorder_level").val(),
+                    "reorder_quantity": $("#id_reorder_quantity").val(),
+                    "last_order_price": $("#id_last_order_price").val(),
+                    "category": $("#id_category").val(),
+                    "csrfmiddlewaretoken": "{{csrf_token}}"
+            },
+            success: function(result){
+                $("#spares-modal").modal("hide");
+            },
+            error: function(resp){
+                console.log(resp);
+            }
+        })
+    }
+{% endblock %}

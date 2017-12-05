@@ -67,6 +67,30 @@ class PreventativeTaskCreateForm(forms.ModelForm, BootstrapMixin):
         fields = [ "machine", "section", "subunit", "subassembly", "component", "scheduled_for","description",  "frequency", "estimated_labour_time", "estimated_downtime" ]# tasks are handled in the POST
 
 
+class PreventativeTaskEditForm(forms.ModelForm, BootstrapMixin):
+    """Class for creating preventative tasks.
+
+    Fields:"""
+
+    def __init__(self, *args, **kwargs):
+        super(PreventativeTaskEditForm, self).__init__(*args, **kwargs)
+        
+        pt = kwargs["instance"]
+        if pt.section:
+            self.fields["section"].widget.choices= [(pt.section.pk, pt.section)]
+        if pt.component:
+            self.fields["component"].widget.choices= [(pt.component.pk, pt.component)]
+        if pt.subunit:
+            self.fields["subunit"].widget.choices= [(pt.subunit.pk, pt.subunit)]
+        if pt.subassembly:
+            self.fields["subassembly"].widget.choices= [(pt.subassembly.pk, pt.subassembly)]
+        
+    
+
+    class Meta:
+        model = PreventativeTask
+        fields = [ "machine", "section", "subunit", "subassembly", "component", "scheduled_for","description",  "frequency", "estimated_labour_time", "estimated_downtime" ]# tasks are handled in the POST
+
 class PreventativeTaskCompleteForm(forms.ModelForm, BootstrapMixin):
     """Class for completing preventative tasks.
 
