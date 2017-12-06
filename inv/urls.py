@@ -1,9 +1,10 @@
 from django.conf.urls import url
 import views
 spares_urls = [
-    url(r'^spares-details/(?P<pk>[\d]+)/?$', views.SparesDetail.as_view(), name="spares-details"),
+    url(r'^spares-details/(?P<pk>[\w ]+)/?$', views.SparesDetail.as_view(), name="spares-details"),
     url(r'^spares-create/?$', views.SparesCreate.as_view(), name="spares-create"),
-    url(r'^spares-update/(?P<pk>[\d]+)/?$', views.SparesUpdate.as_view(), name="spares-update"),
+    url(r'^spares-update/(?P<pk>[\w ]+)/?$', views.SparesUpdate.as_view(), name="spares-update"),
+    url(r'^spares-list/$', views.SparesListView.as_view(), name="spares-list")
     ]
 
 

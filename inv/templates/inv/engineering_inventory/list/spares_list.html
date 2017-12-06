@@ -1,0 +1,122 @@
+{% extends "window.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-4">
+        <div class="bg-info" style="padding:10px;">
+            <h3>Search</h3>
+            
+            <div class="input-group">
+                <input type="search" class="form-control" id="search" placeholder="make query..." list="search_datalist">
+                <span class="input-group-btn">
+                    <button onclick="searchSpares()" type="button" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </button>
+                </span>
+            </div>
+            
+            <datalist id="search_datalist"></datalist>
+        </div>
+        <div class="panel panel-info">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Filters</h3>
+              </div>
+              <div class="panel-body">
+                  <form method="GET">
+                        {{spares_filter_form}}
+                        <input type="submit" class="btn btn-primary" value="Submit">
+                  </form>
+                    
+              </div>
+        </div>
+    </div>
+        <div class="col-sm-8">
+
+            {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="previous"><a href="?page={{page_obj.previous_page_number}}&{{current_filters}}">
+                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                </a></li>
+                {% else %}
+                <li class="disabled"><span>
+                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                </span></li>
+                {% endif %}
+    
+                {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <li class="active"><span>{{i}}</span></li>
+                    {% else %}
+                    <li><a href="?page={{i}}&{{current_filters}}">{{i}}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="next"><a href="?page={{page_obj.next_page_number}}&{{current_filters}}">
+                <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                </a></li>
+                {% else %}
+                <li class="disabled"><span>
+                <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                </span></li>
+                {% endif %}
+                
+            </ul>
+            {% endif %}
+        
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Details</td>
+                        <td>Stock ID</td>
+                        <td>Name</td>
+                        <td>Description</td>
+                        <td>Quantity</td>
+                        <td>Last Order Price</td>
+                        <td>Linked?</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in object_list %}
+                        <tr>
+                            <td><a href="{% url 'inventory:spares-details' pk=s.pk %}">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                
+                        </a></td>
+                            <td>{{s.stock_id}}</td>
+                            <td>{{s.name}}</td>
+                            <td>{{s.description|truncatechars:30}}</td>
+                            <td>{{s.quantity}}</td>
+                            <td>{{s.last_order_price}}</td>
+                            {% if s.component_set.all.count > 0 %}
+                            <td>Yes</td>
+                            {% else %}
+                            <td>No</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+
+{% endblock %}
+{% block body_script %}
+$("#search").keyup(
+    function(){
+        if($("#search").val().length > 2){
+            updateDatalist("search", "spares", "search_datalist");    
+        }
+    }
+)
+
+function searchSpares(){
+    var val = $("#search").val();
+    if(checkInput("search")){
+        window.location = "/inventory/spares-list/?search=" + val;
+    }
+}
+
+
+{% endblock %}

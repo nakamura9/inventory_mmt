@@ -14,6 +14,22 @@ class SparesForm(forms.ModelForm, BootstrapMixin):
             "description": forms.widgets.Textarea
         }
 
+class SparesFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(SparesFilterForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            field = self.fields.get(field)
+            field.widget.attrs['class'] ="form-control"
+
+    sort_by = forms.ChoiceField(choices=[("last_order_price", "Price - Ascending"),
+                                    ("quantity", "Quantity - Ascending"),
+                                    ("-last_order_price", "Price - Descending"),
+                                    ("-quantity", "Quantity - Descending")])
+    show_linked_only = forms.BooleanField(required=False)
+    #machine = forms.ChoiceField(choices=[(mach.pk, mach.machine_name) \
+    #                                    for mach in Machine.objects.all()],
+    #                                    required = False)
+
 class AssetForm(forms.ModelForm, BootstrapMixin):
     """Form used to create asset objects"""
 

@@ -8,6 +8,7 @@ from inv import models as inv_models
 
 from common_base.models import Account
 
+
 def time_choices(start, stop, interval, delta=False):
     """
     Creates a list of times between start and stop separated by interval.
@@ -82,7 +83,7 @@ def filter_by_dates(queryset, start, stop):
         elif 'scheduled_for' in dir(sample):
             queryset = queryset.filter(scheduled_for__gte = start)
         else:
-            pass        
+            print "not found"        
             
 
     if stop:
@@ -97,7 +98,7 @@ def filter_by_dates(queryset, start, stop):
         elif 'scheduled_for' in dir(sample):
             queryset = queryset.filter(scheduled_for__lte = stop)
         else:
-            pass
+            print "not found"
     
     return queryset
 
@@ -124,6 +125,7 @@ def ajax_required(ret_unexcepted):
 
 
 def role_test(user):
+    print user.username
     try:
         acc = Account.objects.get(username=user.username)
     except:
@@ -131,14 +133,46 @@ def role_test(user):
     return acc.role == "admin" 
 
 
+
+def parse_spares_file(status_store, file_name):
+    fil =  pd.read_csv(file_name)
+    file_length = fil.shape[0]
+    status_store["messages"].append("Starting...")
+    status_store["file_length"] = file_length
+
+    """cols
+    warehouse | product | alpha | unit_code | description | supplier | quantity physical | quantity on order | current_cost | min_stock_level 
+    """
+
+    i= 0
+    while i < file_length:
+        try:
+            inv_models.Spares(name = fil.iloc[i, 1],
+            description = fil.iloc[i, 4],
+            stock_id = fil.iloc[i,1],
+            quantity = fil.iloc[i, 10],
+            last_order_price = fil.iloc[i, 12],
+            reorder_quantity = int(fil.iloc[i, 11])).save()
+            status_store["successful"] += 1
+        except Exception as e:
+            status_store["messages"].append(str(e))
+            status_store["errors"] += 1
+        finally:
+            i += 1
+    
+    status_store["running"] = False
+    status_store["finished"] = True
+    status_store["messages"].append("Finished processing")
+    status_store["stop"] = time.time()
+
 def parse_file(status_store, file_name):
     fil = pd.read_csv(file_name)
-    global running
-    
+    file_length = fil.shape[0]
     status_store["messages"].append("Starting...")
-    status_store["file_length"] = fil.shape[0]
+    
+    status_store["file_length"] = file_length
     i=0
-    while running:
+    while i < file_length:
         try:
             while True:
                 try:
@@ -146,12 +180,16 @@ def parse_file(status_store, file_name):
                     break
                 except:
                     status_store["errors"] += 1
-                    status_store["messages"].append("Error: row: %d: There is missing data in this row" % i)
+                    status_store["messages"].append("Error: %s row: %d: There is missing data in this row" % (str(fil.iloc[i,0]), i))
                     i += 1
                 
+            if len(str(num)) % 2 != 0:
+                id_string =  "0" + str(num)
+            else:
+                id_string = str(num)
             
-            id_string =  "0" + str(num)
-            name = fil.iloc[i,1]
+            
+            name = str(fil.iloc[i,1])
             name = "".join( [ j if ord(j) < 128 else ' ' for j in name] )
             
             if len(id_string) == 4:
@@ -202,7 +240,7 @@ def parse_file(status_store, file_name):
 
         except ObjectDoesNotExist as e:
             status_store["errors"] += 1
-            status_store["messages"].append("Error: row %d: %s with id: %s" % (i, str(e), str(fil.iloc[i,0])))
+            status_store["messages"].append("Error: row %d: %s with id: %s -> %s" % (i, str(e), id_string, name))
             i += 1
         except IOError as e:
             status_store["errors"] += 1
@@ -214,6 +252,3 @@ def parse_file(status_store, file_name):
             status_store["messages"].append("Finished processing")
             status_store["stop"] = time.time()
             break
-
-
-

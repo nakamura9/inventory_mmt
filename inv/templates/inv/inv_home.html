@@ -3,7 +3,7 @@
 {% load static %}
 <div class="row">
     
-    <div class="col-sm-4 ">
+    <div class="col-sm-2 ">
         <!-- Will need to restore to 2-->
         
     </div>
@@ -43,7 +43,6 @@
     </div>
 -->
     <div class="col-sm-4">
-        <h3>Engineering</h3>
         <div class="panel panel-primary">
               <div class="panel-heading">
                     <h3 class="panel-title">Engineering Inventory</h3>
@@ -51,16 +50,36 @@
               <div class="panel-body">
                     <center>
                         <a href="{% url 'inventory:engineering-inventory' %}">
+                            
+                            <span class="glyphicon glyphicon-icon" aria-hidden="true"></span>
+                            
                             <img class="img-responsive" width="480" height="480" src="{% static 'common_base/gears.png' %}" alt="Paper" >
                         </a>
                     </center>
               </div>
         </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                  <h3 class="panel-title">Spares List</h3>
+            </div>
+            <div class="panel-body">
+                  <center>
+                      <a href="{% url 'inventory:spares-list' %}">
+                          
+                          <img class="img-responsive" width="480" height="480" src="{% static 'common_base/spares.png' %}" alt="Paper" >
+                      </a>
+                  </center>
+            </div>
+      </div>
+    </div>
+        
         
     </div>
     
     
-    <div class="col-sm-4 ">
+    <div class="col-sm-2 ">
         <!-- will need to restore to 2 -->
     </div>
     

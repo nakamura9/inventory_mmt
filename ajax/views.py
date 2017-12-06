@@ -10,7 +10,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect,HttpResponse
 from django.contrib.auth import authenticate
 
 from common_base.models import Category, Account
-from common_base.utilities import ajax_required, parse_file
+from common_base.utilities import ajax_required, parse_file, parse_spares_file
+from common_base.feature_testing import parse_file as pf
 from inv import models as inv_models
 
 
@@ -219,6 +220,12 @@ def add_category(request):
         Category(**data).save()
         return HttpResponse("0")
 
+def test_parse_csv_file(request):
+    file_name = request.POST.get("csv_file")
+    print file_name
+    pf(file_name)
+    return HttpResponseRedirect(reverse("inventory:inventory-home"))
+
 def parse_csv_file(request):
     """Asynchronous way of importing data as csv.
     
@@ -237,8 +244,13 @@ def parse_csv_file(request):
     global CSV_FILE_STATUS
     CSV_FILE_STATUS["running"] = True
     CSV_FILE_STATUS["start"] = time.time()
-   
-    t = threading.Thread(target=parse_file, args=(CSV_FILE_STATUS, file_name))
+    
+    if request.POST.get("data_type") == "machines":
+        target = parse_file
+    else:
+        target = parse_spares_file
+        
+    t = threading.Thread(target=target, args=(CSV_FILE_STATUS, file_name))
     t.setDaemon(True)
     t.start()
 

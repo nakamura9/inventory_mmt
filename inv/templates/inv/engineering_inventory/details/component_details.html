@@ -5,19 +5,23 @@
             <div class="col-sm-4 bg-info">
                 <h3>Linked Spares data</h3>
                 {% if object.spares_data %}
-                <h5>Name of stock item: {{object.spares_data.name}}</h5>
-                <p>Stock id: {{object.spares_data.stock_id}}</p>
-                <p>Quantity: {{object.spares_data.quantity}}</p>
+                {% for spare in object.spares_data.all %}
+
+                <h5>Name of stock item: {{spare.name}}</h5>
+                <p>Stock id: {{spare.stock_id}}</p>
+                <p>Quantity: {{spare.quantity}}</p>
                 <h5>Description:</h5>
-                {% if object.spares_data.description %}
-                   <p>{{object.spares_data.description}}</p>
+                {% if spare.description %}
+                   <p>{{spare.description}}</p>
                 {% else %}
                     <p>No description available</p>
                 {% endif %}
-                <a class="btn btn-success" href="{% url 'inventory:spares-details' pk=object.spares_data.pk %}">View spares Detail</a>
+                <a class="btn btn-success" href="{% url 'inventory:spares-details' pk=spare.pk %}">View spares Detail</a>
+                {% endfor %}
                 {% else %}
                 <p>Component Not linked to spares</p>
                 {% endif %}
+               
                 
             </div>
             <div class="col-sm-8">

@@ -1,6 +1,7 @@
 import os
 from collections import namedtuple
 import threading
+from itertools import chain
 
 from django.shortcuts import render, reverse, get_object_or_404
 from django.urls import reverse_lazy
@@ -87,6 +88,61 @@ class SparesCreate(CreateView):
 
     def form_invalid(self, form):
         return super(SparesCreate, self).form_invalid(form)
+
+class SparesListView(ListView):
+    paginate_by = 20
+    model = Spares
+    template_name = os.path.join("inv", "engineering_inventory", "list", "spares_list.html")
+
+
+    def get_queryset(self, *args, **kwargs):
+        print self.request.GET
+
+        sort = self.request.GET.get("sort_by", None)
+        search = self.request.GET.get("search", None)
+        #machine = self.request.GET.get("machine", None)
+        linked_only = self.request.GET.get("show_linked_only", None)
+        queryset = None
+        
+        if search:
+            return self.model.objects.filter(stock_id=search)
+        if sort:
+            queryset = self.model.objects.all().order_by(sort)
+
+        if linked_only == "on":
+            if queryset:
+                queryset = queryset.filter(component__gt=0)
+            else:
+                queryset = self.model.objects.filter(component_set__gt=0)
+        
+        """if machine:
+            if queryset:
+                queryset = queryset.filter()
+            else:
+                queryset = self.model.objects.filter(component_set__gt=0) 
+            l = []
+            for s in queryset:
+                for c in s.component_set.all():
+                    if c.machine.pk == machine:
+                        l.append(s)
+
+            queryset = chain(l)"""
+
+        
+
+        if len(self.request.GET.items()) == 1 and self.request.GET.get("page", None):
+            queryset = self.model.objects.all()
+        if len(self.request.GET.items()) == 0:
+            queryset = self.model.objects.all()
+
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(SparesListView, self).get_context_data(*args, **kwargs)
+        context["spares_filter_form"] = SparesFilterForm
+        
+        context["current_filters"] = "&".join([i[0]+"="+i[1] for i in self.request.GET.items() if i[0] != "page"])
+        return context
 
 class SparesUpdate(UpdateView):
     """Spares Updating view"""

@@ -34,7 +34,7 @@ class Spares(models.Model):
     name = models.CharField(max_length = 32)
     description = models.CharField(max_length= 128, null=True, blank=True)
     stock_id = models.CharField(max_length=32)
-    category = models.ForeignKey("common_base.Category")
+    category = models.ForeignKey("common_base.Category", null = True)
     quantity = models.IntegerField( default = 0)
     reorder_level = models.IntegerField(default = 0)
     reorder_quantity = models.IntegerField( default = 0)
@@ -223,7 +223,7 @@ class Component(models.Model):
     section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
     subunit = models.ForeignKey("SubUnit", null=True, on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("SubAssembly", null=True, on_delete=models.SET_NULL)
-    spares_data=models.ForeignKey("Spares", null=True, blank=True, verbose_name="linked spares")
+    spares_data=models.ManyToManyField("Spares",verbose_name="linked spares")
 
     
     def __str__(self):
