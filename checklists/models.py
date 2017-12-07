@@ -70,11 +70,13 @@ class Checklist(models.Model):
                                             "06:30:00", "17:30:00", "00:30:00"))
     machine = models.ForeignKey("inv.Machine")
     section = models.ForeignKey("inv.Section", 
-                null=True, on_delete=models.SET_NULL)
+                null=True, blank=True, on_delete=models.SET_NULL)
     subunit = models.ForeignKey("inv.SubUnit", 
-                null=True, on_delete=models.SET_NULL)
+                null=True, blank=True, on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("inv.SubAssembly", 
-                null=True, on_delete=models.SET_NULL)
+                null=True, blank=True, on_delete=models.SET_NULL)
+    component = models.ForeignKey("inv.Component", 
+                null=True, blank=True, on_delete=models.SET_NULL)
     resolver = models.ForeignKey("common_base.Account")
     category = models.CharField(max_length = 64,
                     choices=[("electrical", "Electrical"),

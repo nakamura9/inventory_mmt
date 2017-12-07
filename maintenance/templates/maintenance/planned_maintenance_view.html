@@ -57,10 +57,9 @@
                 <thead>
                     <tr>
                         <td>
-                        <span class="glyphicon glyphicon-cog" aria-hidden="true"> | 
-                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                        </span>
+                        Type
                         </td>
+                        <td>Status</td>
                         <td>Resolver</td>
                         <td>Machine</td>
                         <td>Description</td>
@@ -73,6 +72,7 @@
                 {% if item.get_type == "job" %}
                 <tr>
                     <td><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></td>
+                    <td>{% if item.is_open %}Open{% else %}Complete{% endif %}</td>
                     <td>{{item.assignments.first }}</td>
                     <td>{{item.machine}}</td>
                     <td>{{item.description | truncatechars:40}}</td>
@@ -85,6 +85,7 @@
                 {% else %}
                 <tr>
                         <td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>
+                        <td>{% if item.is_open %}Open{% else %}Complete{% endif %}
                         <td>{{item.resolver}}</td>
                         <td>{{item.machine}}</td>
                         <td>{{item.title | truncatechars:40}}</td>

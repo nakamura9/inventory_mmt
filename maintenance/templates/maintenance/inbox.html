@@ -30,6 +30,7 @@
                 <div id="unplanned" class="tab-pane fade in active">
                     <h3>Unplanned Jobs:</h3>
                     {% for job in jobs %}
+                    {% if job.is_open %}
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 {{job.description | truncatechars:40 }}
@@ -41,11 +42,13 @@
                                 <a href= "{% url 'jobcards:complete-work-order' pk=job.pk %}"class="btn btn-primary" >View</a>
                             </div>
                         </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
                 <div id="planned" class="tab-pane fade">
                     <h3>Planned Jobs:</h3>
                     {% for job in planned %}
+                    {% if job.is_open %}
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             {{job.description | truncatechars:40 }}
@@ -57,6 +60,7 @@
                             <a href= "{% url 'jobcards:complete-preventative-task' pk=job.pk %}"class="btn btn-primary" >View</a>
                         </div>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
                 <div class="tab-pane fade" id="checklists"> 

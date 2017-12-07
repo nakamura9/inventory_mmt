@@ -249,6 +249,17 @@ def get_resolvers(request):
         {"resolvers": resolvers}
     ), content_type="application/json")
 
+
+@csrf_exempt
+def accept_p_task(request):
+    pk = request.POST.get("pk")
+    resolver = request.POST.get("resolver")
+    p_task = PreventativeTask.objects.get(pk=pk)
+    p_task.assignments_accepted.add(Account.objects.get(username=resolver))
+    p_task.save()
+    return HttpResponse(json.dumps({'accepted': 'True'}), content_type="application/json")
+
+
 @csrf_exempt
 def accept_job(request):
     pk = request.POST.get("pk")

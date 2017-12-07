@@ -12,71 +12,159 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-6 bg-info">
-            <h4>Scheduled Task Description:</h4>
-            <table class="table">
-                <tr>
-                    <th>Machine</th>
-                    <td>{{object.machine}}</td>
-                </tr>
-                <tr>
-                    <th>Section</th>
-                    <td>{{object.section}}</td>
-                </tr>
-                <tr>
-                    <th>SubUnit</th>
-                    <td>{{object.subunit}}</td>
-                </tr>
-                <tr>
-                    <th>SubAssembly</th>
-                    <td>{{object.subassembly}}</td>
-                </tr>
-                <tr>
-                    <th>Component</th>
-                    <td>{{object.component}}</td>
-                </tr>
-                <tr>
-                    <th>Frequency</th>
-                    <td>{{object.frequency}}</td>
-                </tr>
-            </table>
-            <hr />
-            <h4>Required_spares</p>
-            {% for spares in object.required_spares.all %}
-                <p>{{spares.stock_id}}</p>
-            {% endfor %}
-            <hr />
-            <h4>Description:</h4>
-            {{object.description}}
-            <hr />
-            <h4>Assigned to:</h4>
-            {%for i in object.assignments.all %}
-                <p>{{i.username}}</p>
-            {% endfor %}
-            <hr />
-            <h4>Tasks</h4>
-            <table class="table">
-                {% for task in object.tasks.all %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td>{{task.description}}</td>
-                        
-                    </tr>
             
-                 {% endfor %}
-            </table>
+            <div class="panel panel-primary">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Scheduled Task Description:</h3>
+                  </div>
+                  <div class="panel-body">
+                        <table class="table">
+                                <tr>
+                                    <th>Machine</th>
+                                    <td>{{object.machine}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Section</th>
+                                    <td>{{object.section}}</td>
+                                </tr>
+                                <tr>
+                                    <th>SubUnit</th>
+                                    <td>{{object.subunit}}</td>
+                                </tr>
+                                <tr>
+                                    <th>SubAssembly</th>
+                                    <td>{{object.subassembly}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Component</th>
+                                    <td>{{object.component}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Frequency</th>
+                                    <td>{{object.frequency}}</td>
+                                </tr>
+                            </table>
+                  </div>
+            </div>
             
+            <div class="panel panel-default">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Description </h3>
+                  </div>
+                  <div class="panel-body">
+                        {{object.description}}            
+                  </div>
+            </div>
+            
+        <div class="row">
+            <div class="col-sm-6">
+                    <div class="panel panel-default">
+                            <div class="panel-heading">
+                                  <h3 class="panel-title">Required_spares</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    {% for spares in object.required_spares.all %}
+                                    <tr>
+                                        <td>{{spares.stock_id}}</td>
+                                    </tr>
+                                    {% endfor %}    
+                                </table>                                    
+                            </div>
+                      </div>
+            </div>
+            <div class="col-sm-6">
+                
+                <div class="panel panel-default">
+                      <div class="panel-heading">
+                            <h3 class="panel-title">Spares Used</h3>
+                      </div>
+                      <div class="panel-body">
+                            <table class="table">
+                                {% if object.spares_used.all.count == 0 %}
+                                <tr>
+                                    <td colspan="2">None</td>
+                                </tr>
+                                {% else %}
+                                {% for spares in object.spares_used.all %}
+                                        
+                                        <tr>
+                                            <th>{{forloop.counter}}.</th>
+                                            <td>{{spares.stock_id}}</td>
+                                            <td>{{spares.name}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </table>
+                      </div>
+                </div>
+                
+            </div>
         </div>
-        <div class="col-sm-6 well ">
-            <h3>Spares Issued:</h3><hr />
-                <table class="table">
-                {% for spares in object.spares_issued.all %}
-                    <tr>
-                        <th>{{forloop.counter}}.</th>
-                        <td>{{spares.stock_id}}</td>
-                        <td>{{spares.name}}</td>
-                    </tr>
+        
+        <div class="panel panel-primary">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Assigned To</h3>
+              </div>
+              <div class="panel-body">
+                    {%for i in object.assignments.all %}
+                    <p>{{i.username}}</p>
                 {% endfor %}
-                </table>
+              </div>
+        </div>
+        </div>
+        <div class="col-sm-6">
+            
+            <div class="panel panel-primary">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Tasks</h3>
+                  </div>
+                  <div class="panel-body">
+                        <table class="table">
+                                {% for task in object.tasks.all %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{task.description}}</td>
+                                        
+                                    </tr>
+                            
+                                 {% endfor %}
+                            </table>
+                  </div>
+            </div>
+            
+            <div class="panel panel-success">
+                  <div class="panel-heading">
+                        <h3 class="panel-title">Resolution Information</h3>
+                  </div>
+                  <div class="panel-body">
+                        <table class="table">
+                            <tr>
+                                <th>Actual Downtime:</th>
+                                <td>{{object.actual_downtime}}</td>
+                            </tr>
+                            <tr>
+                                <th>Last completed date:</th>
+                                <td>{{object.completed_date}}</td>
+                            </tr>
+                            <tr>
+                                <th>Resolvers Used:</th>
+                                <td>
+                                    <ul>
+                                        {% for r in object.assignments_accepted.all %}
+                                        <li>{{r.username}}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                        <div>
+                            <h4>Resolver Feedback:</h4>
+                            <p>{{object.feedback}}</p>
+                        </div>
+                </div>
+            </div>
+            
         </div>
     
     </div>

@@ -73,7 +73,8 @@
                 {% for item in object.spares_returned.all %}
                 <input type="hidden" id="{{item.stock_id}}" name="spares_returned[]" value="{{item.stock_id}}" >
                 {% endfor %}
-            <button {% if object.status == "requested" %}disabled{% endif %} id="complete_button" type="submit" class="btn btn-primary">Complete Work Order</button>
+            <button {% if object.status == "requested" %}disabled{% endif %} id="complete_button" type="button" onclick="completeJob()" class="btn btn-primary">Complete Work Order</button>
+
             </form>
             <datalist id="spares_issued_datalist">
 
@@ -181,6 +182,45 @@ function transferJob(){
     
 }
 
+function completeJob(){
+    if($("#resolver_password").length){
+        if($("#resolver_password").val() == ""){
+            alert("Please provide a password");
+        }else{
+            $.ajax({
+                method: "POST",
+                url: "{% url 'ajax:ajax-authenticate' %}",
+                data: {
+                    "csrfmiddlewaretoken": "{{csrf_token}}",
+                    "username": "{{object.assigned_to.username}}",
+                    "password": $("#resolver_password").val()
+                },
+                success: function(result){
+                    if(result.authenticated == true){
+                        alert("authenticated successfully");
+                        $("#complete_button").attr("type", "submit");
+                        $("#resolver_password").remove();
+                        $("#complete_button").removeAttr("onclick");
+                    }else{
+                        alert("You were not able to authenticate as {{object.assigned_to}}.");
+                    }
+                }
+            })
+        }
+    }else{
+        var pass_form = $("<div>").append(
+                $("<p>").text("Password:")
+            ).append(
+                $("<input>").attr({
+            "type":"password",
+            "id": "resolver_password"
+        }))
+        
+        $("form").append(pass_form);
+    }
+}
+
+
 function acceptJob(){
     $("#login-modal").modal("show");
 }
@@ -197,104 +237,72 @@ function userLogin(){
         success: function(result){
             if(result.authenticated == true){
                 $("#login-modal").modal("hide");
-                $.post("{% url 'jobcards:accept-job' %}", data={"pk":"{{object.pk}}"});
-                $("#accept_button").hide();
-                $("#complete_button").removeAttr("disabled");
+                if("{{object.assigned_to}}" != $("#id_username").val()){
+                    alert("You authenticated as "+ $("#id_username").val() + " but the job was assigned to {{object.assigned_to}}. Transfer the job if you are now attending to it.");
+                    return true;
+                }else{
+                    if($("#accept_button").length){
+                        //authenticate when first accepting a job
+                        $.post("{% url 'jobcards:accept-job' %}", data={"pk":"{{object.pk}}"});
+                        $("#accept_button").remove();
+                        $("#complete_button").removeAttr("disabled");
+                    }else{
+                        return true;
+                    }
+                    
+                }
             }else{
                 $("#login_message").text("Login Failed");
+                return false;
             }
         },
         error: function(result){
             $("#login_message").text("Login Failed because of error.");
+            return false;
         }
     });
 }
 
 $("#id_spares_issued").keyup(function(){
     if($("#id_spares_issued").val().length > 2){
-        $.ajax({
-            url: "{% url 'ajax:get-combos' %}",
-            data: {"str": $("#id_spares_issued").val(),
-                    "model": "spares"},
-            method:"POST",
-            success: function(result){
-                console.log(result.matches);
-                var html = "";
-                for(i in result.matches){
-                    html += "\n<option value='*' >".replace("*", result.matches[i]);
-                } 
-                $("#spares_issued_datalist").html(html);
-            }
-    
-        })
-    }
-    return false;    
-})
+        updateDatalist("id_spares_issued", "spares", "spares_issued_datalist");
+        }
+    })
 
 
 $("#id_spares_returned").keyup(function(){
     if($("#id_spares_returned").val().length > 2){
-        $.ajax({
-            url: "{% url 'ajax:get-combos' %}",
-            data: {"str": $("#id_spares_returned").val(),
-                    "model": "spares"},
-            method:"POST",
-            success: function(result){
-                console.log(result.matches);
-                var html = "";
-                for(i in result.matches){
-                    html += "\n<option value='*' >".replace("*", result.matches[i]);
-                } 
-                $("#spares_returned_datalist").html(html);
-            }
-    
-        })
+        updateDatalist("id_spares_returned", "spares", "spares_returned_datalist"); 
     }
-    return false;    
 })
 
 function addIssued(){
     var data = $("#id_spares_issued").val();
-    
-            $("<input>").attr({
-                type: "hidden",
-                id: data.replace(" ", ""),
-                name: "spares_issued[]",
-                value: data
-            }).appendTo("form");
-    
-            var item = `<div class="_item" id="row_*">*<span style='float: right; font-size:20px;'><button onclick='removeIssued("*")'>
-            <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
-            </button></span></div>`.split("*").join(data);
-    
-            $("#id_spares_issued_list").append(item);
+    if(checkInput("id_spares_issued")){
+        addHiddenInput(data, "spares_issued[]", data);
+        var id= saferId(data, true);
+        addItemToList("id_spares_issued_list", data, id, "removeIssued('"+id+"')");
+    }
+}
+
+function removeIssued(id){
+    $("#id_spares_issued_list_item_" +id).remove();
+    $("#"+id).remove();
 }
 
 function addReturned(){
     var data = $("#id_spares_returned").val();
-    
-            $("<input>").attr({
-                type: "hidden",
-                id: data.replace(" ", ""),
-                name: "spares_returned[]",
-                value: data
-            }).appendTo("form");
-    
-            var item = `<div class="_item" id="row_*">*<span style='float: right; font-size:20px;'><button onclick='removeReturned("*")'>
-            <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
-            </button></span></div>`.split("*").join(data);
-    
-            $("#id_spares_returned_list").append(item);
+    if(checkInput("id_spares_returned")){
+        addHiddenInput(data, "spares_returned[]", data);
+        var id = saferId(data, true);
+        addItemToList("id_spares_returned_list", data, id, "removeReturned('"+id+"')");
+    }
 }
 
-function removeIssued(id){
-    $("#row_*".replace("*", id.replace(" ", ""))).remove();
-    $("#*".replace("*", id.replace(" ", ""))).remove();
-}
 
 function removeReturned(id){
-    $("#row_*".replace("*", id.replace(" ", ""))).remove();
-    $("#*".replace("*", id.replace(" ", ""))).remove();
+    $("#id_spares_returned_list_item_"+id).remove();
+    $("#"+id).remove();
 }
 
 function addSpares(){

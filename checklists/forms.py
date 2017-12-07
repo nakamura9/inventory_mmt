@@ -17,18 +17,21 @@ class CheckListCreateForm(forms.ModelForm, BootstrapMixin):
         self.fields["section"].widget.choices= [('', '--------')]
         self.fields["subunit"].widget.choices= [('', '--------')]
         self.fields["subassembly"].widget.choices= [('', '--------')]
+        self.fields["component"].widget.choices= [('', '--------')]
         self.fields["machine"].widget.attrs["onchange"] = \
             "prepSectionUpdate()"
         self.fields["section"].widget.attrs["onchange"] = \
             "prepSubUnitUpdate()"
         self.fields["subunit"].widget.attrs["onchange"] = \
                 "prepSubAssemblyUpdate()"
+        self.fields["subassembly"].widget.attrs["onchange"] = \
+                "prepComponentUpdate()"
         
 
     class Meta:
         model= Checklist
         fields = ["title", "creation_date", 'estimated_time', 'start_time',
-                    "machine", "section","subunit", "subassembly", "resolver", 
+                    "machine", "section","subunit", "subassembly", "component","resolver", 
                     "category", "frequency"]
 
 

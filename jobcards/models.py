@@ -53,6 +53,10 @@ class WorkOrder(models.Model):
     spares_returned = models.ManyToManyField("inv.Spares",related_name="%(class)s_spares_returned")
     comments = models.ManyToManyField("common_base.Comment")
 
+    @property
+    def is_open(self):
+        return self.status == "requested" or self.status == "accepted"
+    
     def save(self, *args, **kwargs):
         obj = super(WorkOrder, self).save(*args, **kwargs)
         net_spares = [sp for sp in self.spares_issued.all() if sp not in \
@@ -110,13 +114,19 @@ class PreventativeTask(models.Model):
     estimated_downtime = models.DurationField(choices=time_duration)
     scheduled_for = models.DateField()
     required_spares = models.ManyToManyField("inv.Spares", related_name="%(class)s_required_spares")
-    assignments = models.ManyToManyField("common_base.Account")
+    assignments = models.ManyToManyField("common_base.Account", related_name="%(class)s_assignments_made")
+    assignments_accepted = models.ManyToManyField("common_base.Account", related_name="%(class)s_assignments_accepted")
     feedback = models.TextField(null=True)
     actual_downtime = models.DurationField(null=True,choices=time_duration)
     completed_date = models.DateField(null=True)
     spares_used = models.ManyToManyField("inv.Spares", related_name="%(class)s_spares_used")
     comments  = models.TextField(null=True)
     
+
+    @property
+    def outstanding_responses(self):
+        return list(chain([a for a in self.assignments.all() if a not in self.assignments_accepted.all()]))
+
     @property
     def is_open(self):
         if self.completed_date is None:

@@ -1,3 +1,4 @@
+<!--LOging when opening a preventative task -->
 {% extends "window.html" %}
 {% block head_style %}
 ._item {
@@ -53,6 +54,19 @@
                 <p>{{i.username}}</p>
             {% endfor %}
             <hr />
+            {% if object.assignments_accepted.all.count < object.assignments.all.count %}
+                <div class="well" id="login">
+                    <h4>Accept Job Form</h4>
+                    <select id="resolver" class="form-control" >
+                        {% for resolver in object.outstanding_responses %}
+                        <option value="{{resolver.username}}">{{resolver.username}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="password" id="pass" class="form-control">
+                    <button class="btn btn-success" onclick="acceptTask()">Accept Task</button>
+                </div>
+            {% endif %}
+
             <h4>Tasks</h4>
             <table class="table">
                 {% for task in object.tasks.all %}
@@ -74,7 +88,7 @@
                 {{form.as_table}}
                 
                 </table>
-            <button type="submit" class="btn btn-primary">Complete</button>
+                <button id="complete_button" type="button" onclick="completeJob()" class="btn btn-primary" {% if object.assignments_accepted.all.count == 0 %} disabled{% endif %} >Complete Work Order</button>
             </form>
             <datalist id="spares_issued_datalist"></datalist>
         </div>
@@ -97,11 +111,93 @@
 </div>
 
 {% include "inv/engineering_inventory/create_update/spares_modal.html" %}
+{% include "common_base/modals/login.html"%}
 
 {% endblock %}
 {% block body_script %}
 
     $("#id_completed_date").datepicker();
+
+    function acceptTask(){
+        var user = $("#resolver").val();
+        var pass = $("#pass").val();
+
+        $.ajax({
+            method:"POST",
+            url: "{% url 'ajax:ajax-authenticate' %}",
+            user: user,
+            data:{"csrfmiddlewaretoken": "{{csrf_token}}",
+                "username": user,
+                "password": pass},
+            success: function(result){
+                if(result.authenticated == true){
+                    $.ajax({
+                        method: "POST",
+                        url: "{% url 'jobcards:accept-p-task' %}",
+                        data: {
+                            "pk": "{{object.pk}}",
+                            "resolver": this.user
+                        }, 
+                        success: function(resp){
+                            alert("Authenticated Successfully.");
+                            $("#login").remove();
+                            $("#complete_button").removeAttr("disabled");
+                    }
+                });
+                    
+                }else{
+                    alert("Failed to authenticate as "+ user);
+                }
+            }
+        });
+    }
+    
+    function completeJob(){
+        if($("#resolver_password").length){
+            if($("#resolver_password").val() == ""){
+                alert("Please provide a password");
+            }else{
+                $.ajax({
+                    method: "POST",
+                    url: "{% url 'ajax:ajax-authenticate' %}",
+                    data: {
+                        "csrfmiddlewaretoken": "{{csrf_token}}",
+                        "username": $("#resolver_username").val(),
+                        "password": $("#resolver_password").val()
+                    },
+                    success: function(result){
+                        if(result.authenticated == true){
+                            alert("authenticated successfully");
+                            $("#complete_button").attr("type", "submit");
+                            $("#resolver_password").remove();
+                            $("#complete_button").removeAttr("onclick");
+                        }else{
+                            alert("You were not able to authenticate as "+ $("#resolver_username").val());
+                        }
+                    }
+                })
+            }
+        }else{
+            var pass_form = $("<div>").addClass("well");
+            pass_form.append($("<h4>").text("Authenticate:"));
+            var select_widget = $("<select>").attr({
+                                                "id": "resolver_username",
+                                                "class":"form-control",               
+                                            });
+
+            {% for r in object.assignments_accepted.all %}
+            select_widget.append($("<option>").text("{{r.username}}").attr("value", "{{r.username}}"));
+            {% endfor %}
+            pass_form.append(select_widget);
+            pass_form.append($("<input>").attr({
+                "type":"password",
+                "class": "form-control",
+                "id": "resolver_password"
+            }));
+            
+            $("form").append(pass_form);
+        }
+    }
     
     $("#id_spares_issued").keyup(function(){
         if($("#id_spares_issued").val().length > 2){

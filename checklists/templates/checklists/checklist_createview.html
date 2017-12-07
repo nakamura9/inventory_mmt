@@ -60,6 +60,13 @@
         updateSubAssemblies(url, subunit, subassembly);
     }
 
+    function prepComponentUpdate(){
+        var url = "{% url 'ajax:update_component' %}";
+        var subassembly = $('#id_subassembly').val();
+        var component = $('#id_component');
+        updateComponents(url, subassembly, component);
+    }
+
 
     var task_count = 0;
     

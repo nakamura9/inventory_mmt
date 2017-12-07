@@ -21,6 +21,7 @@ preventative_task_urls = [
     url(r"^edit-preventative-task/(?P<pk>[\w]+)/?$", jc_views.EditNewPreventativeTaskView.as_view(), name="edit-preventative-task"),
     url(r"^preventative-task-detail/(?P<pk>[\w]+)/?$", jc_views.PreventativeTaskDetailView.as_view(), name="preventative-task-detail"),
     url(r'^delete-preventative-task/(?P<pk>[\w]+)/?$', jc_views.delete_preventative_task, name="delete-preventative-task"),
+    url(r'^accept-p-task/?$', jc_views.accept_p_task, name="accept-p-task"),
 ]
 
 
