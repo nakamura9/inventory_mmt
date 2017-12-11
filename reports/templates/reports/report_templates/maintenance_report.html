@@ -1,0 +1,92 @@
+{% extends "window.html" %}
+{% block content %}
+<h2>Maintenance Report</h2>
+<h4><b><u>Report Summary</u></b></h4>
+<ul>
+    <li>The report covers the period from {{object.start_period}} to {{object.end_period}}</li>
+    <li>The equipment covered in this report consists of %</li>
+
+    <li>Over this period, there were {{wos.all.count}} breakdowns resulting in {{total_downtime}} hours of downtime </li>
+    <li>This equates to equipment availability of %</li>
+</ul>
+
+<h3><u><b>Planned maintenance over the period</b></u></h3>
+<h4><b>Preventative Tasks</b></h4>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Machine</th>
+            <th>Planned Hours</th>
+            <th>Actual Hours Taken</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in p_tasks %}
+        <tr>
+            <td>{{task.completed_date}}</td>
+            <td>{{task.machine}}</td>
+            <td>{{task.estimated_labour_time}}</td>
+            <td>{{task.actual_downtime}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4><b>Checklists</b></h4>
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Machine</th>
+            <th>Title</th>
+            <th>Time Taken</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for check in checks %}
+        <tr>
+            <td>{{check.last_completed_date}}</td>
+            <td>{{check.machine}}</td>
+            <td>{{check.title}}</td>
+            <td>{{check.estimated_time}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<h3><u><b>Breakdowns over period</b></u></h3>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Machine</th>
+            <th>Problem</th>
+            <th>Time Taken</th>
+            <th>Root Cause</th>
+            <th>Corrective action</th>
+        </tr>
+
+    </thead>
+    <tbody>
+            {% for wo in wos %}
+        <tr>
+            
+            <td>{{wo.machine}}</td>
+            <td>{{wo.description}}</td>
+            <td>{{wo.actual_labour_time}}</td>
+            <td>{{wo.root_cause}}</td>
+            <td>{{wo.resolver_action}}</td>
+            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<p>This report was authored by {{object.author.first_name}} {{object.author.last_name}} on the {{object.created}}. </p>
+{% endblock %}

@@ -8,6 +8,7 @@ from django.shortcuts import render, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
 from django.contrib.auth import authenticate
+from django.core import serializers
 
 from common_base.models import Category, Account
 from common_base.utilities import ajax_required, parse_file, parse_spares_file
@@ -134,7 +135,23 @@ def ajaxAuthenticate(request):
     else:
         return HttpResponse(json.dumps({"authenticated":False}),
                             content_type="application/json")
-
+@csrf_exempt
+def add_equipment(request):
+    models = {"machine": inv_models.Machine,
+            "section": inv_models.Section,
+            "subunit": inv_models.SubUnit,
+            "subassembly": inv_models.SubAssembly,
+            "component": inv_models.Component}
+    pk = request.POST.get("pk")
+    model_type = request.POST.get("type")
+    if pk == "*":
+        equipment = inv_models.Machine.objects.all()
+        
+    else:
+        equipment = [models[model_type].objects.get(pk=pk)]
+    print equipment
+    data = serializers.serialize("json", equipment)
+    return HttpResponse(data, content_type="application/json")
 
 @csrf_exempt
 @ajax_required(HttpResponseBadRequest)
@@ -160,7 +177,19 @@ def get_combos(request):
         items = []
         if _model == "account":
             items += get_account(s)
-            
+
+        elif _model == "machine":
+            items += [m.machine_name for m in get_machine(s)]
+
+        elif  _model == "section":
+            items += [s.section_name for s in get_section(s)]
+
+        elif _model == "subunit":
+            items += [s.unit_name for s in get_subunit(s)]
+
+        elif _model == "subassembly":
+            items += [s.unit_name for s in get_subassy(s)]
+
         elif _model == "component":
             items += [c.component_name for c in get_component(s)]
         
@@ -174,10 +203,39 @@ def get_combos(request):
             items += [[sa.pk, sa.unit_name, sa.machine.machine_name, 2] for sa in get_subassy(s)]    
 
 
+        if len(items) > 20:
+            items = items[:20]
+            
         return HttpResponse(json.dumps({"matches":items}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({"matches": []}))
 
+def get_machine(name):
+    items = []
+    items += [m for m in inv_models.Machine.objects.filter(pk__startswith=name)]
+    items += [m for m in inv_models.Machine.objects.filter(machine_name__contains=name) if m not in items ]
+    
+
+    return items
+
+def get_section(name):
+    items = []
+    items += [s for s in inv_models.Section.objects.filter(pk__startswith=name)]
+    items += [s for s in inv_models.Section.objects.filter(section_name__contains=name) if s not in items]
+    
+    return items 
+
+def get_subunit(name):
+    items = []
+    items += [s for s in inv_models.SubUnit.objects.filter(pk__startswith=name)]
+    items += [s for s in inv_models.SubUnit.objects.filter(unit_name__startswith=name) if s not in items ]
+    
+    return items 
+
+def get_subassy(name):
+    """Searches subassemblies by name"""
+
+    return [sa for sa in inv_models.SubAssembly.objects.filter(unit_name__startswith=name)]
 
 def get_component(name):
     """Searches a component by name, and id"""
@@ -187,10 +245,7 @@ def get_component(name):
     items += [c for c in inv_models.Component.objects.filter(unique_id__startswith=name) if c not in items] 
     return items
 
-def get_subassy(name):
-    """Searches subassemblies by name"""
 
-    return [sa for sa in inv_models.SubAssembly.objects.filter(unit_name__startswith=name)]
 
 def get_spares(name):
     """searches spares by name and stock_id """

@@ -31,9 +31,9 @@ class Spares(models.Model):
     Fields: name, description, stock_id, category, quantity, reorder_level, reorder_quanity, last_order_price
     """
     
-    name = models.CharField(max_length = 32)
+    name = models.CharField(max_length = 32)#make unique
     description = models.CharField(max_length= 128, null=True, blank=True)
-    stock_id = models.CharField(max_length=32)
+    stock_id = models.CharField(max_length=32, unique=True)
     category = models.ForeignKey("common_base.Category", null = True)
     quantity = models.IntegerField( default = 0)
     reorder_level = models.IntegerField(default = 0)
@@ -79,7 +79,10 @@ class Machine(models.Model):
     manufacturer = models.CharField(max_length=128)
     asset_data = models.ForeignKey("Asset", null=True, blank=True, verbose_name="Linked Asset Data")
     commissioning_date = models.DateField(blank = True, null=True)
+    daily_run_hours = models.FloatField(null=True, blank=True)
+    weekly_run_days = models.IntegerField(null=True, blank=True)
 
+ 
     def __str__(self):
         return self.machine_name
 

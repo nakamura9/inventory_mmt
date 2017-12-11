@@ -13,17 +13,18 @@
         <link rel="stylesheet" href="{% static 'common_base/bootstrap/css/bootstrap.min.css' %}" >
         <link rel="stylesheet" href="{% static 'common_base/jquery-ui-1.12.1.custom/jquery-ui.theme.css' %}">
         <link rel="stylesheet" href="{% static 'common_base/jquery-ui-1.12.1.custom/jquery-ui.structure.css' %}">
-    </head>
-    <body style="background-image: url( {% static 'common_base/bg.gif' %}); ">
-        {%block _content %}
-        {% endblock %}
-        
         <script src="{% static 'common_base/jquery-2.2.2.js' %}" ></script>
         <script src="{% static 'common_base/bootstrap/js/bootstrap.min.js' %}" ></script>
         <script src="{% static 'ajax/ajax_forms.js' %}"></script>
         <script src="{% static 'common_base/jquery-ui-1.12.1.custom/jquery-ui.js' %}"></script>
         <script src="{% static 'common_base/jquery.form.js' %}"></script>
         <script src="{% static 'common_base/common_js_tools.js' %}"></script>
+    </head>
+    <body style="background-image: url( {% static 'common_base/bg.gif' %}); ">
+        {%block _content %}
+        {% endblock %}
+        
+        
         <script>{%block _body_script %}{% endblock %}</script>
     </body>
 </html>

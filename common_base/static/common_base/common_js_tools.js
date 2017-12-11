@@ -5,7 +5,9 @@ functions
 2. addHiddenInput(id, name, v) simplifies the process of supplying aux data to a form
 3. addItemToList(list, value, id, callback) creates a consistent div with a delete button
 4. updateDatalist(source, model, datalist) performs ajax request to update a datalist
-5. checkInput(list_id) validates the value submitted in a for returns bool*/
+5. checkInput(list_id) validates the value submitted in a for returns bool
+6. removeArrayElement(array, element)
+*/
 
 
 
@@ -136,5 +138,13 @@ function checkInput(list_id){
     }else{
         alert("Please select a value from the list");
         return false;
+    }
+}
+
+function removeArrayElement(array, element) {
+    var index = array.indexOf(element);
+    
+    if (index !== -1) {
+        array.splice(index, 1);
     }
 }

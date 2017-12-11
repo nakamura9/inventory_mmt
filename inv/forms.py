@@ -69,7 +69,7 @@ class MachineForm(forms.ModelForm, BootstrapMixin):
         model = Machine
         fields = ["commissioning_date", "machine_name", 
                  "manufacturer", "asset_data",
-                "unique_id"]
+                "unique_id", "daily_run_hours", "weekly_run_days"]
         
 
 class SectionForm(forms.ModelForm, BootstrapMixin):

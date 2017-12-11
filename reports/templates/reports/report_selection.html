@@ -1,0 +1,66 @@
+{% extends "window.html" %}
+{% block content %}
+{% load static %}
+
+<style>
+    .shadow-box {
+        box-shadow: 5px 10px #ccc;
+        height: 300px;
+        width: 300px;
+        margin:10px;
+    }
+    .box-heading {
+        border-bottom: 1px solid black;
+    }
+</style>
+
+<div class="row">
+        
+    <div class="col-sm-4">
+        <div class="shadow-box">
+            <div class="box-heading"><a href="{% url 'reports:maintenance-report-form' %}"><h3>Maintenance Review</h3></a></div>
+        <img width="240" height="240" alt="maintenance-review" src="{% static 'reports/review.svg' %}">
+    </div>
+    </div>
+    <div class="col-sm-4">  
+            <div class="shadow-box">
+                <div class="box-heading"><h3>Breakdown Report</h3></div>    
+                <img width="240" height="240" alt="maintenance-review" src="{% static 'reports/breakdown.svg' %}">
+            </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="shadow-box">
+                <div class="box-heading"><h3>Maintenance Plan</h3></div>
+                <img width="240" height="240" alt="maintenance-review" src="{% static 'reports/calendar.svg' %}">
+        </div>
+    </div>
+</div>
+<div class="row">
+        <div class="col-sm-4">
+                <div class="shadow-box">
+                        <div class="box-heading"><h3>Component Failure Analysis</h3></div>
+                        <img width="240" height="240" alt="maintenance-review" src="{% static 'reports/find.svg' %}">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                    <div class="shadow-box">
+                            <div class="box-heading"><h3>Spares Requirements</h3></div>
+                            <img width="240" height="240" alt="maintenance-review" src="{% static 'reports/spares-required.svg' %}">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                        <div class="shadow-box">
+                                <div class="box-heading"><h3>Spares Usage Report</h3></div>
+                                <img width="240" height="240" alt="maintenance-review" src="{% static 'reports/spares-used.svg' %}">
+                        </div>
+                    </div>
+</div>
+<div class="row">
+        <div class="col-sm-4">
+                <div class="shadow-box">
+                        <div class="box-heading"><h3>+</h3></div>
+                </div>
+</div>
+
+{% endblock %}
+

@@ -38,3 +38,15 @@ class CategoryForm(forms.ModelForm, BootstrapMixin):
 class LoginForm(forms.Form):
     username = forms.ChoiceField([(acc.username, acc.username) for acc in Account.objects.all()])
     password = forms.CharField()
+
+
+class UpdateableSelectWidget(forms.widgets.Select):
+    def __init__(self, callback, *args, **kwargs):
+        super(UpdateableSelectWidget, self).__init__(*args, **kwargs)
+        self.attrs["onchange"] = callback
+        self.choices = [("", "------")]
+
+class EquipmentSelectWidget(forms.widgets.MultiWidget):
+    def __init__(self, attrs=None):
+        _widgets = ()
+        super(EquipmentSelectWidget, self).__init__(_widgets, attrs)

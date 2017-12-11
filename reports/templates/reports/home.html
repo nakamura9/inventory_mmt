@@ -1,0 +1,73 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="row">
+    
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Reporting Portal</h1>
+            <p>Report creation, review and annotation</p>
+            <a class="btn btn-primary" href="{% url 'reports:report-selection' %}">Create New Report</a>
+        </div>
+    </div>
+    <h2>Report History</h2>
+    <div class="well">
+            {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="previous"><a href="?page={{page_obj.previous_page_number}}">
+                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                </a></li>
+                {% else %}
+                <li class="disabled"><span>
+                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                </span></li>
+                {% endif %}
+    
+                {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <li class="active"><span>{{i}}</span></li>
+                    {% else %}
+                    <li><a href="?page={{i}}">{{i}}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="next"><a href="?page={{page_obj.next_page_number}}">
+                <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                </a></li>
+                {% else %}
+                <li class="disabled"><span>
+                <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                </span></li>
+                {% endif %}
+                
+            </ul>
+            {% endif %}
+    </div>
+    <div class="table-responsive well">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Period</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in object_list %}
+                <tr>
+                    <td>{{r.created}}</td>
+                    <td>{{r.scope}}</td>
+                    <td>{{r.author}}</td>
+                    <td>{{r.start_period}} to {{r.end_period}}</td>
+                    <td><a href="{% url 'reports:maintenance-report' pk=r.pk %}">View</a> | <a href="{% url 'reports:delete-report' pk=r.pk %}">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    
+</div>
+{% endblock %}

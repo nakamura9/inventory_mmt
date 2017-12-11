@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import time 
+import time
 import datetime
 from itertools import chain
 
@@ -13,13 +13,13 @@ from common_base.utilities import time_choices
 time_duration = [] + time_choices("00:05:00", "00:30:00", "00:05:00",
             delta=True) + time_choices("00:30:00", "02:00:00", "00:15:00",
             delta=True) + time_choices("02:00:00", "08:00:00", "00:30:00",
-            delta=True)  
+            delta=True)
 
 class WorkOrder(models.Model):
     """Model that represents a job assigned ad-hoc i.e. a breakdown.
 
     Fields: type, machine, section, subunit, subassembly, component,
-            description, execution_date,estimated_labour_time,assigned_to, 
+            description, execution_date,estimated_labour_time,assigned_to,
             priority, costing, status, resolver_action, actual_labour_time,
             downtime,completion_date, spares_issued, spares_returned"""
 
@@ -44,7 +44,7 @@ class WorkOrder(models.Model):
                         ("approved", "Approved"),
                         ("declined", "Declined"),
     ], default="requested")
-    
+
     resolver_action= models.TextField(null=True)
     actual_labour_time = models.DurationField(null=True, choices=time_duration)
     downtime = models.DurationField(null=True, choices=time_duration)
@@ -56,7 +56,7 @@ class WorkOrder(models.Model):
     @property
     def is_open(self):
         return self.status == "requested" or self.status == "accepted"
-    
+
     def save(self, *args, **kwargs):
         obj = super(WorkOrder, self).save(*args, **kwargs)
         net_spares = [sp for sp in self.spares_issued.all() if sp not in \

@@ -56,7 +56,10 @@ class Category(models.Model):
     created_for = models.CharField(max_length=24, choices=[
                             ("checklist", "Checklist"),
                             ("work_order", "Work Order"),
-                            ("preventative_task", "Preventative Task")
+                            ("preventative_task", "Preventative Task"),
+                            ("reports", "Reports"),
+                            ("spares", "Spares"),
+                            ("inventory", "Inventory")
     ])
     name = models.CharField(max_length= 32, unique=True)
     description = models.TextField()

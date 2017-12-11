@@ -7,12 +7,14 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,reverse
+from django.forms import ModelChoiceField
 
 from .forms import userForm
 from .models import Account
+from inv.models import Machine
 
 def test_features(request):
-    return render(request, os.path.join("common_base", "test.html"), context={})
+    return render(request, os.path.join("common_base", "test.html"), )
 
 
 def login(request):

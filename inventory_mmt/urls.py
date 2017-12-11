@@ -35,5 +35,6 @@ urlpatterns = [
     url(r'^rca/', include("rca.urls", namespace="rca")),
     url(r'^planning/', include("planning.urls", namespace="planning")),
     url(r'^ajax/', include("ajax.urls", namespace = "ajax")),
+    url(r'reports/', include("reports.urls",  namespace="reports")),
     url(r'^maintenance/', include("maintenance.urls", namespace="maintenance")),
 ]

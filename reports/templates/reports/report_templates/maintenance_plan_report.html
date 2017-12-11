@@ -1,0 +1,112 @@
+{% extends window.html %}
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <span class="right">
+        <button type="button" class="btn btn-default">Print</button>
+        </span>
+    </div>
+</div>
+<div class="row">
+        <h3>Maintenance Plan Report</h3>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="panel panel-default">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Report Information</h3>
+              </div>
+              <div class="panel-body">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>Author</th>
+                                <td>{{object.author}}</td>
+                                <th>Target</th>
+                                <td>{{object.target.first}}</td>
+                                <th>Date Created</th>
+                                <td>{{object.created}}</td>
+                            </tr>
+                        </tbody>
+                    </table>      
+              </div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        
+        <div class="panel panel-default">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Report Parameters</h3>
+              </div>
+              <div class="panel-body">
+                    
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>Period(From):</th>
+                                <td>{{object.start_period}}</td>
+                            </tr>
+                            <tr>
+                                <th>Period(To):</th>
+                                <td>{{object.end_period}}</td>
+                            </tr>
+                            <tr>
+                                <th>Machine:</th>
+                                <td>{{object.machine}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+              </div>
+        </div>
+        
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        {% for task in task_list %}
+        
+        <div class="panel panel-info">
+              <div class="panel-heading">
+                    <h3 class="panel-title">{{task.description|truncatechars:100}}</h3>
+              </div>
+              <div class="panel-body">
+                    
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>Date</th>
+                                <td>{{task.scheduled_for}}</td>
+                            </tr>
+                            <tr>
+                                    <th>Number of tasks</th>
+                                    <td>{{task.tasks.all.count}}</td>
+                                </tr>
+                                <tr>
+                                        <th>Work Hours</th>
+                                        <td>{{task.estimated_labour_time}}</td>
+                                    </tr>
+                                    <tr>
+                                            <th>Estimated DownTime</th>
+                                            <td>{{task.estimated_downtime}}</td>
+                                        </tr>
+                                        <tr>
+                                                <th>Assigned to</th>
+                                                <td>{{task.assignments.first.username}}</td>
+                                            </tr>
+                        </tbody>
+                    </table>
+                    
+              </div>
+        </div>
+        
+        {% endfor %}
+    </div>
+</div>
+<div class="row">
+    <span class="right"><button class="btn btn-success">Annotate</button></span>
+    <textarea hidden class="form-control"></textarea>
+</div>
+
+{% endblock %}
