@@ -96,7 +96,6 @@ class SparesListView(ListView):
 
 
     def get_queryset(self, *args, **kwargs):
-        print self.request.GET
 
         sort = self.request.GET.get("sort_by", None)
         search = self.request.GET.get("search", None)
@@ -168,6 +167,11 @@ class MachineCreateView(UserPassesTestMixin, CreateView):
     login_url ="/login/"
     def test_func(self):
         return role_test(self.request.user)
+
+    def get_context_data(self):
+        context = super(MachineCreateView, self).get_context_data()
+        context["run_data_form"] = RunDataForm()
+        return context
 
 class SubUnitCreateView(UserPassesTestMixin,CreateView):
     """SubUnit create view"""
@@ -293,12 +297,17 @@ class MachineEditView(UserPassesTestMixin,UpdateView):
     """Machine update view"""
 
     model = Machine
-    template_name = os.path.join("inv", "engineering_inventory", "create_update","addmachine.html")
+    template_name = os.path.join("inv", "engineering_inventory", "create_update","update_machine.html")
     form_class = MachineForm
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
     def test_func(self):
         return role_test(self.request.user)
+
+    def get_context_data(self):
+        context = super(MachineEditView, self).get_context_data()
+        context["run_data_form"] = RunDataForm()
+        return context
 
 class SubAssyEditView(UserPassesTestMixin,UpdateView):
     """SubAssembly update view"""
@@ -557,3 +566,7 @@ def delete_order(request, pk):
 
     get_object_or_404(Order, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
+
+def delete_run_data(request, pk=None, mech_pk=None):
+    get_object_or_404(RunData, pk=pk).delete()
+    return HttpResponseRedirect(reverse("inventory:edit_machine", kwargs={"pk":mech_pk}))

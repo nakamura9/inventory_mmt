@@ -18,7 +18,7 @@ from inv.models import Machine, Section, SubUnit, SubAssembly, Component
 from .forms import *
 from common_base.utilities import filter_by_dates
 from common_base.models import Account
-from .report_creator import list_jobs
+from .report_creator import list_jobs, plot_downtime_by_machine, plot_availability_by_machine, plot_availability_for_machine_over_period
 
 
 class ReportingHome(ListView):
@@ -86,7 +86,13 @@ class MaintenanceReport(DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super(MaintenanceReport, self).get_context_data(*args, **kwargs)
         context["p_tasks"], context["wos"], context["checks"] = list_jobs(self.object)
-        time= sum((t.actual_labour_time.seconds  for  t in context["wos"] if t.actual_labour_time))
+        time= sum((t.downtime.seconds  for  t in context["wos"] if t.actual_labour_time))
+        plot_downtime_by_machine(self.object)
+        plot_availability_by_machine(self.object)
+        for mech in Machine.objects.all():
+            plot_availability_for_machine_over_period(self.object, mech)
+        
+
       
         context["total_downtime"] = round(float(time) / 3600.0 ,2) 
         return context 
@@ -102,7 +108,6 @@ class MaintenanceReportForm(TemplateView):
 
     def post(self, request):
         data = request.POST.items()
-        print data
         scope = request.POST.get("scope")
         equipment = request.POST.getlist("equipment[]")
 
@@ -122,7 +127,7 @@ class MaintenanceReportForm(TemplateView):
                 scope="maintenance plan").save()
         r = Report.objects.latest("pk")
 
-
+    
         for i in equipment:
             if len(i) == 2:
                 r.machine.add(Machine.objects.get(pk=i))

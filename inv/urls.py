@@ -104,6 +104,7 @@ urlpatterns = [
             name='engineering-inventory'),
     url(r'^raw-materials/?$', views.CategoryList.as_view(), name='raw-materials'),
     url(r'^new-category/?$', views.CategoryCreateView.as_view(), name='new-category'),
+    url(r'^delete-run-data/(?P<pk>[\d ]+)/(?P<mech_pk>[\w ]+)/?$', views.delete_run_data, name="delete-run-data")
 
 ] + component_urls + machine_urls + subassembly_urls + subunit_urls + \
     order_urls + production_inventory_urls + section_urls + asset_urls + \

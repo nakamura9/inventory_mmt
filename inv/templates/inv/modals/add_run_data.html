@@ -1,0 +1,70 @@
+
+<div class="modal fade" id="run-data-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Run Data Form</h4>
+            </div>
+            <div class="modal-body">
+                <table>
+                        {{run_data_form}}
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="addRunData()">
+                Create</button>
+                <button type="button" class="btn btn-default"  data-dismiss="modal">Close</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#id_start_date").datepicker();
+
+function isChecked(sel){
+    if(sel.is(":checked")){
+        return "on";
+    }else{
+        return null;
+    }
+}
+function addRunData(){
+    //validation
+    if ($("#id_start_date").val() == "" || $("#id_machine").val() == "" || 
+    $("#id_run_days").val() == "" || $("#id_run_hours").val() == "" ){
+        alert("Please enter all the values");
+    }else{
+        $.ajax({
+            method: "POST",
+            url: "{% url 'ajax:add-run-data' %}",
+            data: {
+                "csrfmiddlewaretoken": "{{csrf_token}}",
+                "start_date": $("#id_start_date").val(),
+                "machine": $("#id_machine").val(),
+                "run_hours": $("#id_run_hours").val(),
+                "run_days": $("#id_run_days").val(),
+                "monday": isChecked($("#id_monday")),
+                "tuesday": isChecked($("#id_tuesday")),
+                "wednesday": isChecked($("#id_wednesday")),
+                "thursday": isChecked($("#id_thursday")),
+                "friday": isChecked($("#id_friday")),
+                "saturday": isChecked($("#id_saturday")),
+                "sunday": isChecked($("#id_sunday")),
+            },
+            success: function(result){
+                if(result.success){
+                    alert("success");
+                    window.location.href = "{% url 'inventory:edit_machine' pk=object.pk %}"
+                }else{
+                    alert("failure");
+                }
+                    
+            }
+        });
+    }
+
+    
+}
+</script>

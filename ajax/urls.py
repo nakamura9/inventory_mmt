@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^test-process-file$', test_parse_csv_file, name="test-process-file"),
     url(r'^get-process-updates$', get_run_data, name="get-process-updates"),
     url(r'^get-equipments$', add_equipment, name="get-equipment"),
+    url(r'^add-run-data$', add_run_data, name="add-run-data"),
 ]

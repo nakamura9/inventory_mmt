@@ -1,0 +1,92 @@
+{% extends 'window.html' %}
+{% block content %}
+<style>
+    .time {
+        background-color: #337ab7;; 
+        color:white; 
+        padding:5px; 
+        margin:2px;
+        min-width: 100px;
+        min-height: 20px;
+        text-align: center;
+        border-bottom: 1px solid white;
+    }
+
+    .task {
+        border: 1px solid blue;
+        min-width: 400px;
+        text-align: center;
+    }
+    .item{
+        border: 1px solid #337ab7;
+        padding: 5px;
+    }
+    .title{
+        padding: 2px;
+        height: 40px;
+        font-size: 24px;
+
+    }
+
+    .white-link{
+        color: white;
+        text-decoration: none;
+    }
+</style>
+    <div class="row">
+        <div class="col-sm-3 well">
+            <h2>Day View:</h2><hr />
+            <h3>Select view</h3>
+            <a  class="btn btn-primary" href = "{% url 'planning:production-month' year=day.date.year month=day.date.month %}" >Month</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:production-week' year=day.date.year month=day.date.month week=1 %}">Week</a>
+            <a  class="btn btn-primary" href = "{% url 'planning:production-day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
+            <div class="bg-info">
+                <form action="" method="GET" role="form">
+                    <legend>Filters</legend>
+                
+                    <div class="form-group">
+                        <table>
+                            {{form.as_table}}
+                        </table>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="panel panel-primary" >
+                <div class="panel-heading ">
+                    <h3>{{day.weekday.1}}, {{day.date}}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if day.agenda.length == 0 %}
+                        <p>There is no production scheduled for this day</p>
+                    {% else %}
+                        
+                            <div>
+                                {% for pe in day.agenda %}
+                                    
+                                    <div class="panel panel-info">
+                                          <div class="panel-heading">
+                                                <h3 class="panel-title">{{pe.machine.machine_name}}</h3>
+                                          </div>
+                                          <div class="panel-body">
+                                                <p>Planned Run Hours: <b>{{pe.running_hours}}</b></p>
+                                                <p>Planned Down Time: <b>- {{pe.planned_downtime}}</b></p>
+                                                <p>______________________</p>
+                                                <p><b>Net Up Time: {{pe.net_up_time}}</b></p>
+                                          </div>
+                                    </div>
+                                    
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>
+{% endblock %}
+{% block body_script %}
+$("#id_date").datepicker();
+{% endblock %}

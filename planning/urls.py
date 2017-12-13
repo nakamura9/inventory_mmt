@@ -4,6 +4,8 @@ import views
 
 
 production_urls = [
+    url(r'^production/month/?$', 
+    views.productionMonthView.as_view(), name="production-month"),
     url(r'^production/month/(?P<year>[\d]+)/(?P<month>[\d]+)/?$', 
     views.productionMonthView.as_view(), name="production-month"),
     url(r'^production/day/(?P<year>[\d]+)/(?P<month>[\d]+)/(?P<day>[\d]+)/?$', 
@@ -15,6 +17,8 @@ production_urls = [
 
 
 maintenance_urls = [
+    url(r'^maintenance/month/?$', 
+    views.maintenanceMonthView.as_view(), name="maintenance-month"),
     url(r'^maintenance/month/(?P<year>[\d]+)/(?P<month>[\d]+)/?$', 
     views.maintenanceMonthView.as_view(), name="maintenance-month"),
     url(r'^maintenance/month/?$', 

@@ -16,9 +16,12 @@
         <div class="col-sm-4">
             <h4>Tools:</h4>
             <a class="btn btn-info" href="{% url 'inventory:asset-create' %}">Create Asset</a>
+            <p><a class="btn btn-primary" data-toggle="modal" href='#run-data-modal'>Add RunData</a></p>
+            
         </div>
     </div>
 </div>
+{% include "inv/modals/add_run_data.html" %}
 {% endblock %}
 {% block body_script %}
 $("#id_commissioning_date").datepicker({changeMonth:true,

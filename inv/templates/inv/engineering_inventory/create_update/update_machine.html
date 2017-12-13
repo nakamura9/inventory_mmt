@@ -1,0 +1,60 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>Run Data</h3>
+            <p><b>Note:</b> remove a run data element will result in the previous period extending beyond the removed element.</p>
+            <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Start Date</th>
+                            <th>Run Hours(per day)</th>
+                            <th>Run Days(per week)</th>
+                            <th>Total Run Hours for period</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in object.run_data.all %}
+                        <tr>
+                                <td>{{r.start_date}}</td>
+                                <td>{{r.run_hours}}</td>
+                                <td>{{r.run_days}}</td>
+                                <td>{{r.total_run_hours}}</td>
+                                <td><a href="{% url 'inventory:delete-run-data' pk=r.pk mech_pk=object.pk %}" class="btn btn-danger">Delete</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <td colspan="3"><b>Total:</b></td>
+                        <td>{{object.total_time}}</td>
+                        <td></td>
+                    </tfoot>
+                </table>
+        </div>
+        <div class="col-sm-4 well ">
+            <h3> Machine Form:</h3>
+            <form class="form form-group" method="POST" action="" >
+                {% csrf_token %}
+                <table>
+                    {{form.as_table}}
+                </table>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="col-sm-4">
+            <h4>Tools:</h4>
+            <a class="btn btn-info" href="{% url 'inventory:asset-create' %}">Create Asset</a>
+            <p><a class="btn btn-primary" data-toggle="modal" href='#run-data-modal'>Add RunData</a></p>
+            
+        </div>
+    </div>
+</div>
+{% include "inv/modals/add_run_data.html" %}
+{% endblock %}
+{% block body_script %}
+$("#id_commissioning_date").datepicker({changeMonth:true,
+                                        changeYear: true,
+                                        showButtonPanel:true});
+{% endblock %}

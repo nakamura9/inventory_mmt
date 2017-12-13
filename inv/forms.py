@@ -2,6 +2,17 @@ from django import forms
 from .models import *
 from common_base.forms import BootstrapMixin
 
+class RunDataForm(forms.ModelForm, BootstrapMixin):
+    def __init__(self, *args, **kwargs):
+        super(RunDataForm, self).__init__(*args, **kwargs)
+        for f in self.fields:
+            if isinstance(self.fields[f], forms.BooleanField):
+                self.fields[f].widget.attrs["required"] = "False"
+    class Meta:
+        model =RunData
+        fields = ["start_date", "run_days", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+    machine = forms.ModelChoiceField(Machine.objects.all())
 
 class SparesForm(forms.ModelForm, BootstrapMixin):
     """Form used to create Spares items."""
@@ -26,9 +37,9 @@ class SparesFilterForm(forms.Form):
                                     ("-last_order_price", "Price - Descending"),
                                     ("-quantity", "Quantity - Descending")])
     show_linked_only = forms.BooleanField(required=False)
-    #machine = forms.ChoiceField(choices=[(mach.pk, mach.machine_name) \
-    #                                    for mach in Machine.objects.all()],
-    #                                    required = False)
+    machine = forms.ChoiceField(choices=[(mach.pk, mach.machine_name) \
+                                        for mach in Machine.objects.all()],
+                                        required = False)
 
 class AssetForm(forms.ModelForm, BootstrapMixin):
     """Form used to create asset objects"""
@@ -69,7 +80,7 @@ class MachineForm(forms.ModelForm, BootstrapMixin):
         model = Machine
         fields = ["commissioning_date", "machine_name", 
                  "manufacturer", "asset_data",
-                "unique_id", "daily_run_hours", "weekly_run_days"]
+                "unique_id"]
         
 
 class SectionForm(forms.ModelForm, BootstrapMixin):

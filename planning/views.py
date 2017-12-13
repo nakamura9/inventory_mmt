@@ -32,13 +32,9 @@ class maintenanceMonthView(TemplateView):
         context = super(maintenanceMonthView, self).get_context_data(*args, 
                                                                     **kwargs)
 
-        if len(self.request.GET.values()) == 0:
-            context["month_string"] = datetime.datetime.strftime(datetime.date(int(self.kwargs["year"]), int(self.kwargs["month"]), 1),"%b, %Y")
-            today = datetime.date.today()
-            _month = calendar_objects.Month(today.year, today.month,
-                                            calendar_objects.MaintenanceDay,
-                                            include=["checks", "jobs"])
+        
 
+        
         #fix this. if year is not set, it wont filter
         if self.request.GET.get("year", None):
             m = int(self.request.GET.get("month"))
@@ -50,9 +46,21 @@ class maintenanceMonthView(TemplateView):
                                             filters = {"resolver":self.request.GET["resolver"],
                                                         "machine": self.request.GET["machine"]})
             
+        elif self.kwargs.get("year", None):
+            context["month_string"] = datetime.datetime.strftime(datetime.date(int(self.kwargs["year"]), int(self.kwargs["month"]), 1),"%b, %Y")
+            today = datetime.date.today()
+            _month = calendar_objects.Month(today.year, today.month,
+                                            calendar_objects.MaintenanceDay,
+                                            include=["checks", "jobs"])
+                                            
+        else:
+            today =datetime.date.today()
+            context["month_string"] =today
+            _month = calendar_objects.Month(today.year, 
+                                        today.month,
+                                        calendar_objects.MaintenanceDay,include=["checks", "jobs"])
         
         _month.get_month_agenda()
-        context["mode"] = "maintenance"
         context["month"] = _month
         
         context["form"] = MonthViewFilterForm()
@@ -133,7 +141,7 @@ class productionMonthView(TemplateView):
 
     uses calender_objects.Month to generate a calender based on the filtered data."""
     
-    template_name=os.path.join("planning","month_view.html")
+    template_name=os.path.join("planning","production","month_view.html")
 
     def get_context_data(self, *args, **kwargs):
         context = super(productionMonthView, self).get_context_data(*args, **kwargs)
@@ -141,13 +149,19 @@ class productionMonthView(TemplateView):
             _month = calendar_objects.Month(int(self.request.GET["year"]),
                                             int(self.request.GET["month"]),
                                             calendar_objects.ProductionDay)
-        else:
+        elif self.kwargs.get("year", None):
             _month = calendar_objects.Month(int(self.kwargs["year"]), 
                                         int(self.kwargs["month"]),
                                         calendar_objects.ProductionDay)
+        
+        else:
+            today =datetime.date.today()
+            _month = calendar_objects.Month(today.year, 
+                                        today.month,
+                                        calendar_objects.ProductionDay)
+
         _month.get_month_agenda()
         context["month"] = _month
-        context["mode"] = "production"
         context["form"] = MonthViewFilterForm()
         return context
 
@@ -157,7 +171,7 @@ class productionWeekView(TemplateView):
 
     uses calender_objects.Week to generate a calender based on the filtered data."""
     
-    template_name=os.path.join("planning","week_view.html")
+    template_name=os.path.join("planning","production", "week_view.html")
 
     def get_context_data(self, *args, **kwargs):
         context = super(productionWeekView, self).get_context_data(*args, **kwargs)
@@ -183,7 +197,7 @@ class productionDayView(TemplateView):
 
     uses calender_objects.Day to generate a calender based on the filtered data."""
     
-    template_name=os.path.join("planning","day_view.html")
+    template_name=os.path.join("planning","production","day_view.html")
 
     def get_context_data(self, *args, **kwargs):
         context = super(productionDayView, self).get_context_data(*args, **kwargs)

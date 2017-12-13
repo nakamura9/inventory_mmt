@@ -1,0 +1,96 @@
+{% extends 'window.html' %}
+{% block content %}
+<style>
+    .time{
+        border-bottom: 1px solid white;
+        background-color: #337ab7;
+        margin: 2px;
+        padding: 5px;
+        min-width: 100px;
+        min-height: 40px;
+        color: white;
+
+    }
+    .item{
+        border: 1px solid #337ab7;
+        padding: 5px;
+    }
+    .title{
+        padding: 2px;
+
+    }
+
+    .white-link{
+        color: white;
+        text-decoration: none;
+    }
+    .heading {
+        margin:2px;
+        padding: 5px;
+        min-width: 150px;
+        height: 50px;
+        font-size: 18px;
+        background-color: #337ab7;
+        color: white;
+    }
+</style>
+<div class="row">        
+    <div class="col-sm-3 well">
+        <h2>Week Starting: {{week.days.0}}</h2>
+        <hr />
+        <h3>Select View:</h3>
+        <hr />
+        <a  class="btn btn-primary" href = "{% url 'planning:production-month' year=week.year month=week.month %}" >Month</a>
+        <a  class="btn btn-primary" href = "{% url 'planning:production-week' year=week.year month=week.month week=1 %}">Week</a>
+        <a  class="btn btn-primary" href = "{% url 'planning:production-day' year=week.year month=week.month day=1 %}">Day</a>
+        
+        <div class="bg-info">
+            <form action="" method="GET" role="form">
+                <legend>Filters</legend>
+            
+                <div class="form-group">
+                    <table>
+                        {{form.as_table}}
+                    </table>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-sm-9">
+        <table>
+                <thead>
+                    <tr id="titles">
+                        <th class="heading">Monday</th>
+                        <th class="heading">Tuesday</th>
+                        <th class="heading">Wednesday</th>
+                        <th class="heading">Thursday</th>
+                        <th class="heading">Friday</th>
+                        <th class="heading">Saturday</th>
+                        <th class="heading">Sunday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {% for day in week.week_agenda %}
+                            <td style="vertical-align: top; min-height:500px; border: 1px solid #337ab7;">
+                                {% for pe in day.agenda %}
+                                    
+                                    <div class="panel panel-info">
+                                          <div class="panel-heading">
+                                                <h3 class="panel-title">{{pe.machine.machine_name}}</h3>
+                                          </div>
+                                          <div class="panel-body">
+                                                <p>Running Hours: <b>{{pe.running_hours}}</b></p>
+                                          </div>
+                                    </div>
+                                    
+                                {% endfor %}
+                            </td>    
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+    </div>
+</div>
+{% endblock %}

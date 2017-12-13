@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import json
 import threading
 import time
+import datetime
 
 from django.shortcuts import render, reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +15,7 @@ from common_base.models import Category, Account
 from common_base.utilities import ajax_required, parse_file, parse_spares_file
 from common_base.feature_testing import parse_file as pf
 from inv import models as inv_models
+from inv.forms import RunDataForm
 
 
 CSV_FILE_STATUS = {"messages":[],
@@ -135,6 +137,20 @@ def ajaxAuthenticate(request):
     else:
         return HttpResponse(json.dumps({"authenticated":False}),
                             content_type="application/json")
+
+def add_run_data(request):
+    """request is made by ajax"""
+    data = RunDataForm(request.POST)
+    print request.POST
+    run = data.save()
+    inv_models.Machine.objects.get(pk=request.POST["machine"]).run_data.add(run)
+    """inv_models.Machine.objects.get(pk=request.POST["machine"]).run_data.create(    
+        start_date = datetime.datetime.strptime(request.POST["start_date"], "%m/%d/%Y"),
+        run_days = int(request.POST["run_days"]),
+        run_hours = float(request.POST["run_hours"])
+    )"""
+    return HttpResponse(json.dumps({"success":True}), content_type="application/json")
+
 @csrf_exempt
 def add_equipment(request):
     models = {"machine": inv_models.Machine,

@@ -61,7 +61,6 @@ class WorkOrder(models.Model):
         obj = super(WorkOrder, self).save(*args, **kwargs)
         net_spares = [sp for sp in self.spares_issued.all() if sp not in \
                             self.spares_returned.all()]
-        print net_spares
         if self.component:
             for s in net_spares:
                 self.component.spares_data.add(s) 

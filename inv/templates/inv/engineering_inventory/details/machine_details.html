@@ -93,6 +93,28 @@ ul, li, span{
                                     {% endfor %}
                                 </tbody>
                             </table>
+                            <h3>Run History:</h3>
+                            <p><b>Note:</b> The run data assumes that the selected start date is a monday and all run days are sequential</p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Start Date</th>
+                                        <th>Run Hours(per day)</th>
+                                        <th>Run Days(per week)</th>
+                                        <th>Total Run Hours for period</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for r in object.recent_run_data %}
+                                    <tr>
+                                            <td>{{r.start_date}}</td>
+                                            <td>{{r.run_hours}}</td>
+                                            <td>{{r.run_days}}</td>
+                                            <td>{{r.total_run_hours}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                     </div>
                 <!--
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

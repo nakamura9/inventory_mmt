@@ -1,7 +1,7 @@
 import datetime
 import calendar
-
-from inv.models import Order
+from django.db.models import Q
+from inv.models import Order, Machine
 from jobcards.models import PreventativeTask
 from checklists.models import Checklist
 
@@ -44,6 +44,34 @@ class Day(object):
     def sort_agenda(self):
         raise NotImplementedError()
         
+class ProductionElement(object):
+    def __init__(self, machine, date):
+        """instantiated with a machine and a date abstraction used to
+        facilitate advanced functionality within the calendar"""
+        self.machine = machine
+        if isinstance(date, datetime.datetime):
+            self.date = date.date()
+        else:
+            self.date = date
+
+        self.run_data = self.machine.run_on_date(self.date)
+
+    @property
+    def planned_downtime(self):
+        p_tasks = self.machine.preventativetask_set.filter(scheduled_for=self.date)
+        if p_tasks.count() > 0:
+            return sum((i.estimated_downtime for i in p_tasks)) 
+
+        return 0.0
+
+
+    @property
+    def running_hours(self):
+        return self.run_data.run_hours
+
+    @property
+    def net_up_time(self):
+        return self.running_hours - self.planned_downtime
 
 class ProductionDay(Day):
     """Lists events associated with orders"""
@@ -52,17 +80,13 @@ class ProductionDay(Day):
         """Production days look out for manufacture days and 
         delivery dates. 
         NB Production day ignores include as there is only one model involved"""
-        self.agenda = [order \
-                     for order in Order.objects.filter(manufacture_date = self.date)]
+        self.agenda = [ProductionElement(mech, self.date) for mech in Machine.objects.all() if mech.is_running_on_date(self.date)]
         
-        for order in Order.objects.filter(delivery_date = self.date):
-            self.agenda.append(order)
-
+                
+        
     @property
-    def order_count(self):
+    def run_count(self):
         return len(self.agenda)
-
-
 
 class MaintenanceDay(Day):
     """Lists events based on preventativeTasks and Checklists"""
@@ -176,5 +200,7 @@ class Month(object):
                                         include = self.include)
                 day.get_agenda()
                 self.month_agenda[-1].append(day)
+
+        
 
                 
