@@ -5,6 +5,7 @@ from itertools import chain
 
 from django.utils import timezone
 from django.db import models
+from django.db.models import Q
 
 from inv.models import *
 from common_base.models import Account

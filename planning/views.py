@@ -144,18 +144,22 @@ class productionMonthView(TemplateView):
     template_name=os.path.join("planning","production","month_view.html")
 
     def get_context_data(self, *args, **kwargs):
+        
         context = super(productionMonthView, self).get_context_data(*args, **kwargs)
         if self.request.GET.get("year", None):
+            context['month_string'] = datetime.datetime.strftime(datetime.date(int(self.request.GET["year"]), int(self.request.GET["month"]), 1),"%b, %Y")
             _month = calendar_objects.Month(int(self.request.GET["year"]),
                                             int(self.request.GET["month"]),
                                             calendar_objects.ProductionDay)
         elif self.kwargs.get("year", None):
+            context["month_string"] =datetime.datetime.strftime(datetime.date(int(self.kwargs["year"]), int(self.kwargs["month"]), 1),"%b, %Y")
             _month = calendar_objects.Month(int(self.kwargs["year"]), 
                                         int(self.kwargs["month"]),
                                         calendar_objects.ProductionDay)
         
         else:
             today =datetime.date.today()
+            context["month_string"] = datetime.datetime.strftime(today,"%b, %Y")
             _month = calendar_objects.Month(today.year, 
                                         today.month,
                                         calendar_objects.ProductionDay)

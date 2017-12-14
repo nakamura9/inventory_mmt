@@ -11,9 +11,7 @@ urlpatterns = [
     url(r'^get-users$', get_users, name="get-users"),
     url(r'^add-category/?$', add_category,name="add-category"),
     url(r'^get-combos/?$', get_combos, name="get-combos"),
-    url(r'^process-file$', parse_csv_file, name="process-file"),
-    url(r'^test-process-file$', test_parse_csv_file, name="test-process-file"),
-    url(r'^get-process-updates$', get_run_data, name="get-process-updates"),
+    url(r'^process-file$', parse_csv_file, name="process-file"),    url(r'^get-process-updates$', get_run_data, name="get-process-updates"),
     url(r'^get-equipments$', add_equipment, name="get-equipment"),
     url(r'^add-run-data$', add_run_data, name="add-run-data"),
 ]

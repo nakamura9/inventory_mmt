@@ -6,7 +6,7 @@
 <!--
 <div class="bg-info" id="message" style="padding: 20px;">
     <h5>Import csv file</h5>
-    <form method="POST" action="{% url 'ajax:test-process-file' %}">
+    <form method="POST" action="{% url 'ajax:process-file' %}">
         {% csrf_token%}
         <input type="file" name ="csv_file" id="id_csv_file" >
         <button class="btn btn-success" type="submit">Process file</button>        
@@ -30,11 +30,41 @@
 <div id="list"></div>
 -->
 
+<div id="graph">
+
+</div>
+
 {{now}}
 
 
 {% endblock %}
 {% block _body_script %}
+
+var data = {};
+
+d3.select("body")
+    .append("svg")
+        .attr("width", 700)
+        .attr("height", 500)
+    .selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+
+
+alert("working");
+
+
+
+
+
+
+
+
+
+
+
+
 function hiddenField(){
     _id = $("#search").val();
 

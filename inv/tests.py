@@ -93,7 +93,7 @@ class ViewTests(TestCase, TestDataMixin):
         self.assertEqual(response.status_code, 200)
 
     #test get inventory forms
-    def test_get_raw_materials(self):
+    """def test_get_raw_materials(self):
         response = self.client.get(reverse("inventory:raw-materials"))
         
         self.assertEqual(response.status_code, 200)
@@ -128,7 +128,7 @@ class ViewTests(TestCase, TestDataMixin):
         response = self.client.get(reverse("inventory:new-inventory-item"))
         
         self.assertEqual(response.status_code, 200)
-
+    """
 
     #test posting and deleting of engineering inventory
     def test_post_check_and_delete_component_form(self):

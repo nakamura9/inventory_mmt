@@ -23,7 +23,21 @@ class TestUtilities(TestCase):
         data = time_choices("13:00:00", "20:00:00", "00:15:00")
         self.assertIsInstance(data, list)
 
-    
+    def test_filter_by_dates(self):
+        """test with start only, stop only or both"""
+        pass
+
+    def test_role_test(self):
+        """tests function for determining the role of a user requesting a page"""
+        pass
+
+    def test_parse_spares_file(self):
+        """will need to create a sample a spares file"""
+        pass
+
+    def test_parse_inventory_file(self):
+        """will need to create a dummpy inventory_file"""
+        pass
 
 class TestViews(TestCase):
     """Used to test content created by the category form."""
@@ -34,6 +48,7 @@ class TestViews(TestCase):
         cls.client = Client()
     
     def test_post_check_and_delete_category(self):
+        """checks if a request creates a category"""
         #delete view for category not yet implemented
         response = self.client.post(reverse("inventory:new-category"),
                                     data={
@@ -45,7 +60,18 @@ class TestViews(TestCase):
         self.assertIsInstance(models.Category.objects.get(
                             name="Posted Test Category"), models.Category)
         
+    def test_sign_up_get(self):
+        """get sign up page"""
+        pass
 
+    def test_sign_up_post(self):
+        """create account page"""
+        pass
+
+
+    def test_logout(self):
+        """logs in and then checks with the session that no user is present"""
+        pass
 
 class TestDataMixin(object):
     """This class is used to provide test data for other applications, especially those whose tests have multiple dependancies.
@@ -188,7 +214,8 @@ class TestDataMixin(object):
 class TestModels(TestCase, TestDataMixin):
     """Tests the common models.
     
-    models: Comment, Task, Account"""
+    models: Comment, Task, Account, Category"""
+    
     def test_create_account(self):
         models.Account(username= "Test User",
                 first_name="Test",
@@ -213,3 +240,9 @@ class TestModels(TestCase, TestDataMixin):
                 created_for="checklist",
                 task_number=1, description="A Test Checklist Task")
         self.assertIsInstance(task, models.Task)
+
+    def test_create_category(self):
+        category = models.Category.objects.create(created_for="work_order",
+                                                    name="Electrical",
+                                                    description="Some description")
+        self.assertIsInstance(category, models.Category)

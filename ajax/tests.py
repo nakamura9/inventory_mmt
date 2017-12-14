@@ -79,8 +79,9 @@ class OtherAjaxTests(TestCase, TestDataMixin):
     Tests ajax functions not associated with select widgets
 
     Tests:  
-        test add task
+        test 
         test ajaxAuthenticate
+
 
     """
     
@@ -96,17 +97,28 @@ class OtherAjaxTests(TestCase, TestDataMixin):
         cls.create_dummy_accounts()
 
 
-    def test_add_task(self):
-        """"Tests task addition response, '0' indicates success"""
+    def test_get_users(self):
+        """test is a json object is returned"""
+        pass
 
-        session = self.client.session
-        session["tasks"] = []
-        session.save()
-        response = self.client.post(reverse("ajax:add_task"), 
-                                    {"task":"Some Test Task"},
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    def test_add_run_data(self):
+        """test made for machine run data"""
+        pass
 
-        self.assertEqual(response.content, "0")
+    def test_add_equipment(self):
+        """used in the report generation form"""
+        pass
+    
+    def test_get_combos(self):
+        pass
+
+    def test_parse_csv_file(self):
+        """especially considering the issue of the posted file name """
+        pass
+
+    def test_get_run_data(self):
+        """consider making the page aware of a process that is not running"""
+        pass
 
     def test_ajaxAuthenticate(self):
         """Test authentication via ajax"""

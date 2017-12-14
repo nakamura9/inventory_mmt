@@ -8,6 +8,8 @@ import datetime
 
 from django.utils import timezone
 from django.db import models
+from django.db.models import Q
+
 
 
 class Asset(models.Model):
@@ -184,7 +186,7 @@ class Machine(models.Model):
         """used to calculate downtime over a period of time"""
         p_tasks = self.preventativetask_set.filter(Q(completed_date__gte=start) & Q(completed_date__lte=stop))
         if p_tasks.count() > 0:
-            return sum((i.actual_downtime for i in p_tasks)) 
+            return sum((i.actual_downtime.seconds for i in p_tasks)) / 3600.0 
 
         return 0.0
 
@@ -192,23 +194,45 @@ class Machine(models.Model):
         """used to calculate downtime over a period due to breakdowns"""
         wos = self.workorder_set.filter(Q(completion_date__gte=start) & Q(completion_date__lte=stop))
         if wos.count() > 0:
-            return sum((i.downtime for i in wos))
+            return sum((i.downtime.seconds for i in wos)) / 3600.0
+        return 0
 
     def run_hours_over_period(self, start, end):
         """calculate run data for a period of time.
         NB Very inefficient!
         """
         period = (end - start).days
-
+        if period == 0:
+            raise ValueError("The period is less than one day use 'run_on_date' instead")
         curr_day = start
         total_hours = 0
         for i in range(period):
             curr_day = curr_day + datetime.timedelta(days=i)
             curr_run = self.run_on_date(curr_day)
-            if curr_run.is_running(curr_day):
-                total_hours += curr_run.run_hours
-
+            if curr_run:
+                if curr_run.is_running(curr_day):
+                    total_hours += curr_run.run_hours
+        #need to come up with way of approximating run_time
+        if total_hours == 0:
+            return 24 * period
+        
         return total_hours
+
+    def availability_on_date(self, date):
+        """Returns the machine availability for that date"""
+        breakdowns = self.workorder_set.filter(execution_date=date)
+        if breakdowns.count() > 0:
+            downtime = sum(i.downtime.seconds for i in breakdowns) /3600.0
+        else: 
+            downtime = 0.0
+        run_data = self.run_on_date(date)
+        
+        if run_data:
+            available_time = run_data.run_hours
+            return ((available_time - downtime)/ available_time) * 100
+        
+        else:
+            return 100
 
     def run_on_date(self, date):
         """returns the run data for the stated date

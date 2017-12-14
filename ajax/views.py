@@ -129,7 +129,6 @@ def ajaxAuthenticate(request):
     Input: JSON -> "username": string, "password": string
     Output: HTTPResponse JSON-> "authenticated": Boolean
     """
-    print request.POST
     if authenticate(username=request.POST["username"], 
             password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":True}),
@@ -141,18 +140,25 @@ def ajaxAuthenticate(request):
 def add_run_data(request):
     """request is made by ajax"""
     data = RunDataForm(request.POST)
-    print request.POST
     run = data.save()
     inv_models.Machine.objects.get(pk=request.POST["machine"]).run_data.add(run)
-    """inv_models.Machine.objects.get(pk=request.POST["machine"]).run_data.create(    
-        start_date = datetime.datetime.strptime(request.POST["start_date"], "%m/%d/%Y"),
-        run_days = int(request.POST["run_days"]),
-        run_hours = float(request.POST["run_hours"])
-    )"""
+    
     return HttpResponse(json.dumps({"success":True}), content_type="application/json")
 
 @csrf_exempt
 def add_equipment(request):
+    """can return a serialized version of an abitrary inventory item
+    
+    Input:
+    ========
+    POST data
+        pk, type
+
+    Output
+    =========
+    JSON
+    """
+
     models = {"machine": inv_models.Machine,
             "section": inv_models.Section,
             "subunit": inv_models.SubUnit,
@@ -165,7 +171,7 @@ def add_equipment(request):
         
     else:
         equipment = [models[model_type].objects.get(pk=pk)]
-    print equipment
+    
     data = serializers.serialize("json", equipment)
     return HttpResponse(data, content_type="application/json")
 
@@ -177,11 +183,14 @@ def get_combos(request):
     search input datalists
 
     method: POST
+    =============
     Input : 
+    =============
         str -> search string
         model -> the models to be searched
 
     Output: 
+    =============
         matches -> a list of matching data corresponding to the search string
     """
 
@@ -292,17 +301,12 @@ def add_category(request):
         Category(**data).save()
         return HttpResponse("0")
 
-def test_parse_csv_file(request):
-    file_name = request.POST.get("csv_file")
-    print file_name
-    pf(file_name)
-    return HttpResponseRedirect(reverse("inventory:inventory-home"))
-
 def parse_csv_file(request):
     """Asynchronous way of importing data as csv.
     
     Input:
         csv_file-> the local path to the file to be imported.
+        consider changing to a file that is uploaded.
         
     Output:
         None - the application starts a new thread and calls the parse_file funtion which iterates over the whole file and classifies the data according to the unique ids that follow some regular pattern."""

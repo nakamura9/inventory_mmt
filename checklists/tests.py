@@ -57,7 +57,7 @@ class TestViews(TestCase, TestDataMixin):
         """Expect status code '200' for get request to checklist_detailview"""
         
         response = self.client.get(reverse("checklists:checklist_details", 
-                                    kwargs={"pk": "Test Checklist"}))
+                                    kwargs={"pk": models.Checklist.objects.first().pk}))
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["object"].title, "Test Checklist")
@@ -85,7 +85,7 @@ class TestViews(TestCase, TestDataMixin):
         """Expect status code '200' for get request to checklist_updateview"""
 
         response = self.client.get(reverse("checklists:update_checklist",
-                                 kwargs={"pk":"Test Checklist"}))
+                                 kwargs={"pk":models.Checklist.objects.first().pk}))
         self.assertEqual(response.status_code, 200)
 
     def test_post_checklist_updateview(self):
@@ -99,7 +99,7 @@ class TestViews(TestCase, TestDataMixin):
         session.save()
         self._checklist_data["estimated_time"] = "0100"
         response = self.client.post(reverse("checklists:update_checklist",
-                                            kwargs={"pk":"Test Checklist"}), 
+                                            kwargs={"pk":models.Checklist.objects.first().pk}), 
                                             data=self._checklist_data)
 
         self.assertEqual(response.status_code, 200)    
@@ -108,7 +108,7 @@ class TestViews(TestCase, TestDataMixin):
         """Expect status code '302' for get request to delete_checklist"""
         
         response = self.client.get(reverse("checklists:delete_checklist",
-                                            kwargs={"pk": "Test Checklist"}))
+                                            kwargs={"pk": models.Checklist.objects.first().pk}))
         self.assertEqual(response.status_code, 302)#because the page redirects
 
 

@@ -83,7 +83,7 @@ def filter_by_dates(queryset, start, stop):
         elif 'scheduled_for' in dir(sample):
             queryset = queryset.filter(scheduled_for__gte = start)
         else:
-            print "not found"        
+            pass        
             
 
     if stop:
@@ -98,7 +98,7 @@ def filter_by_dates(queryset, start, stop):
         elif 'scheduled_for' in dir(sample):
             queryset = queryset.filter(scheduled_for__lte = stop)
         else:
-            print "not found"
+            pass
     
     return queryset
 
@@ -125,7 +125,6 @@ def ajax_required(ret_unexcepted):
 
 
 def role_test(user):
-    print user.username
     try:
         acc = Account.objects.get(username=user.username)
     except:

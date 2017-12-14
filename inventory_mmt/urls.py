@@ -13,7 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+
+from django.conf.urls import url, include, static
+
+from django.conf import settings
 from django.contrib import admin
 from inv import views as inv_views
 from common_base.views import sign_up, logout, login, test_features
@@ -37,4 +40,4 @@ urlpatterns = [
     url(r'^ajax/', include("ajax.urls", namespace = "ajax")),
     url(r'reports/', include("reports.urls",  namespace="reports")),
     url(r'^maintenance/', include("maintenance.urls", namespace="maintenance")),
-]
+] + static.static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

@@ -84,9 +84,8 @@ def parse_file(file_name):
     global components
     fil = pd.read_csv(file_name)
     
-    print "Starting..."
+    #print "Starting..."
     i=0
-    print fil.iloc[0,0]
     # test to make sure errors dont run aaway with it
     length = fil.shape[0]
 
@@ -98,7 +97,7 @@ def parse_file(file_name):
                     num = int(fil.iloc[i,0])
                     break
                 except:
-                    print "Error: %s row: %d: There is missing data in this row" % (str(fil.iloc[i,0]), i)
+                    #print "Error: %s row: %d: There is missing data in this row" % (str(fil.iloc[i,0]), i)
                     i += 1
                 
             if len(str(num)) % 2 != 0:
@@ -128,14 +127,14 @@ def parse_file(file_name):
             i = i +  1
 
         except ValueError as e:
-            print "Error: row %d: %s with id: %s" % (i, str(e), id_string)
+            #print "Error: row %d: %s with id: %s" % (i, str(e), id_string)
             i += 1
 
         except IOError as e:
             print "Error: row %d: %s" % (i, str(e))
         
         except IndexError:
-            print "Finished processing"
+            #print "Finished processing"
             break
     
-    print components
+    #print components
