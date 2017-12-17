@@ -61,7 +61,7 @@
                     <td>{{r.scope}}</td>
                     <td>{{r.author}}</td>
                     <td>{{r.start_period}} to {{r.end_period}}</td>
-                    <td><a href="{% url 'reports:maintenance-report' pk=r.pk %}">View</a> | <a href="{% url 'reports:delete-report' pk=r.pk %}">Delete</a></td>
+                    <td><a class="btn btn-success" href="{% url 'reports:report' pk=r.pk %}">View</a> <a class="btn btn-danger" href="{% url 'reports:delete-report' pk=r.pk %}">Delete</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

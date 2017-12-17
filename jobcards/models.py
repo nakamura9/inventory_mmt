@@ -69,7 +69,6 @@ class WorkOrder(models.Model):
         return obj
 
 
-
 class PreventativeTask(models.Model):
     """Model representing preventatitve maintenance jobs.
 
@@ -141,6 +140,7 @@ class PreventativeTask(models.Model):
             return True
         else:
             return False
+
 
 class Costing(models.Model):
     """Model used when planning the budget of a preventative task."""

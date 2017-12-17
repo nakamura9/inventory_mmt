@@ -105,12 +105,29 @@
     
     <h3>Machine Availability Graphs</h3>
     <div class="report-images">
-        {% for path in graph_images %}
+        {% if object.machine.count == 1 %}
+        <h3>Machine Availability</h3>
+        <div style="margin-top: .5cm;">
+                <img alt="Graph not found" width="700" height="400" src="{{graphs.machine}}" >
+            </div>
+        
+        {% else %}
+        <h3>Overall Machine Availability</h3>
+        <div style="margin-top: .5cm;">
+            <img alt="Graph not found" width="700" height="400" src="{{graphs.combined_availability}}" >
+        </div>
+        <div style="margin-top: .5cm;">
+            <img alt="Graph not found" width="700" height="400" src="{{graphs.all_machines_by_machine}}" >
+        </div>
+        <h3>Availability by Machine</h3>
+        {% for path in graphs.each_machine %}
         <div style="margin-top: .5cm;">
             <img alt="Graph not found" width="700" height="400" src="{{path}}" >
         </div>
         {% endfor %}
+        {% endif %}
     </div>
+    <hr />
     <p>This report was authored by {{object.author.first_name}} {{object.author.last_name}} on the {{object.created}}. </p>
 </div>
 </div>
@@ -123,7 +140,7 @@
           </div>
           <div class="panel-body">
               
-              <button type="button" class="btn btn-success">Generate PDF</button>
+              <a href="{% url 'reports:generate-pdf' pk=object.pk %}" class="btn btn-success">Generate PDF</a>
               
                 Will be populated with report filters....
           </div>

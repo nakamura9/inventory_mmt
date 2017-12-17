@@ -95,25 +95,49 @@ class Checklist(models.Model):
     comments = models.ManyToManyField("common_base.Comment")
     tasks = models.ManyToManyField("common_base.Task")
     
-    @property
-    def is_open(self):
+    def will_be_open_over_period(self, start, stop):
+        """method used in reports to filter checklists that will not be undertaken during the stated period"""
+        curr = start
+        if self.on_hold:
+            return False
+
+        #quick determination if possible
+        if self.next is not None:
+            if self.next >= start and self.next < stop:
+                return True 
+
+        #manual technique
+        while curr < stop:
+            if self.is_open_on_date(curr):
+                return True
+            else:
+                curr = curr +datetime.timedelta(days=1)
+            
+        return False
+
+    def is_open_on_date(self, date):
         if self.on_hold:
             return False
         
         if self.last_completed_date is None:
             return True
         else:
-            delta = datetime.date.today() - self.last_completed_date
+            delta = date - self.last_completed_date
 
         if delta.days > self.mapping[self.frequency]:
             return True
         else:
             return False
+
+    @property
+    def is_open(self):
+        return self.is_open_on_date(datetime.date.today())
     
     @property
     def next(self):
         "determine the next date for a checklist"
-        return self.last_completed_date + \
+        if self.last_completed_date:
+            return self.last_completed_date + \
             datetime.timedelta(days=self.mapping[self.frequency])
 
     @property

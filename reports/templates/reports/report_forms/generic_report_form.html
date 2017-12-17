@@ -1,0 +1,179 @@
+{% extends "window.html" %}
+{% block head_style %}
+#equipment {
+    height: 350px;
+}
+
+{% endblock %}
+{% block content %}
+{% load static %}
+<div class="row">
+    <h2>{{report_name}} Report</h2>
+    <hr />
+</div>
+<div class="row">
+    <form method="POST" action="">
+    {% csrf_token %}
+
+    <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                          <h3 class="panel-title">Report Details</h3>
+                    </div>
+                    <div class="panel-body">
+                          <label for="author">Author</label>
+                          <select id="author" name="author" class="form-control">
+                            {% for i in users %}  
+                            <option value="{{i.username}}">{{i.username}}</option>
+                            {% endfor %}
+                          </select>  
+                      <label for="scope">Period</label>
+                        <select class="form-control" onchange="if($('#scope').val() == 'custom'){$('#custom_date').removeAttr('hidden');}else{$('#custom_date').attr('hidden', 'hidden')}" name="scope" id="scope">
+                                <option value="1">Today</option>
+                            {% if type == "maintenance_plan" or type == "spares_requirements" %}
+                          <option value="7">Next Week</option>
+                          <option value="30">Next Month</option>
+                          <option value="180">Next 6 months</option>
+                          {% else %}
+                          
+                          <option value="7">Last Week</option>
+                          <option value="30">Last Month</option>
+                          <option value="180">Last 6 months</option>
+                          {% endif %}
+                          <option value="custom">Custom period</option>
+                        </select> 
+                        <div hidden id="custom_date">
+                              <label for="start">Start Date</label>
+                              <input class="form-control" type="text" id="start" name="start">
+                              <label for="end">End Date</label>
+                              <input class="form-control" name="end" type="text" id="end">
+                        </div>
+                        
+                    </div>
+              </div>
+            </div>
+            <div class="col-sm-8"></div>
+        </div>
+
+{% if type == "maintenance_plan" %}
+    {% include "reports/report_forms/maintenance_plan_form.html" %}
+{% elif type == "maintenance_review" %}
+    {% include "reports/report_forms/maintenance_review_form.html" %}
+{% elif type == "breakdown" %}
+    {% include "reports/report_forms/breakdown_form.html" %}
+{% elif type == "component_failure" %}
+    {% include "reports/report_forms/component_failure_form.html" %}
+{% elif type == "spares_usage" %}
+    {% include "reports/report_forms/spares_usage_form.html" %}
+{% elif type == "spares_requirements" %}
+    {% include "reports/report_forms/spares_requirements_form.html" %}
+
+{% endif %}
+<div class="col-sm-12">
+    <span style="float:right; padding:5px;">
+            <button type="submit" class="btn  btn-primary " onclick="generateReport()">Create Report</button>
+            </span>
+</div>
+</div>
+
+</form>
+
+{% endblock %}
+{% block body_script %}
+
+    var selected_equipment = [];
+
+    $("#start").datepicker();
+    $("#end").datepicker();
+            function prepSectionUpdate(){
+                var url = "{% url 'ajax:update_section' %}";
+                var machine = $('#id_machine').val();
+                var section = $('#id_section');
+                updateSections(url, machine, section);
+        }
+             
+            function prepSubUnitUpdate(){
+                var url = "{% url 'ajax:update_subunit' %}";
+                var section = $('#id_section').val();
+                var subunit = $('#id_subunit');
+                updateSubUnits(url, section, subunit);
+            }
+        
+            function prepSubAssemblyUpdate(){
+                var url = "{% url 'ajax:update_subassembly' %}";
+                var subunit = $('#id_subunit').val();
+                var subassembly = $('#id_subassembly');
+                updateSubAssemblies(url, subunit, subassembly);
+            }
+        
+            function prepComponentUpdate(){
+                var url = "{% url 'ajax:update_component' %}";
+                var subassembly = $('#id_subassembly').val();
+                var component = $('#id_component');
+                updateComponents(url, subassembly, component);
+            }
+    
+            
+
+            function addEquipment(){
+                //traverse the tree and look for the lowest selected element
+                
+                var data;
+                var level;
+                if($("#id_component").val() != ""){
+                    data = {"type": "component",
+                                "pk": $("#id_component").val()};
+                    level = 5;
+                }else if($("#id_subassembly").val() != ""){
+                    data = {"type": "subassembly",
+                                "pk": $("#id_subassembly").val()};
+                    level = 4;
+                }else if($("#id_subunit").val() != ""){
+                    data = {"type": "subunit",
+                                "pk": $("#id_subunit").val()};
+    
+                    level = 3;
+                }else if($("#id_section").val() != ""){
+                    data = {"type": "section",
+                                "pk": $("#id_section").val()};
+                    level = 2;
+                }else{
+                    data = {"type": "machine",
+                                "pk": $("#id_machine").val()};
+                    level = 1;
+                      }
+            addHiddenInput(data["pk"], "equipment[]", data["pk"]);
+            $.ajax({
+                method: "POST",
+                url : "{% url 'ajax:get-equipment' %}",
+                data : data,
+                level: level,
+                success: function(result){
+                    var data_string = "Level: "+ this.level;
+                    var levels = ["None", "Machine", "Section",
+                                "SubUnit", "SubAssembly",
+                                "Component"];
+                    data_string += "<br />" +levels[level] + ":" + result[0].pk 
+                    addItemToList("equipment", data_string, result[0].pk, "removeEquipment('"+result[0].pk+"')");
+                    
+
+                }
+    
+            });
+    }
+    
+    function removeEquipment(id){
+        $("#equipment_item_"+id).remove();
+        $("#"+id).remove();
+    }
+
+    function bspanel(klass, title, content){
+        var container = $("<div>").addClass("panel panel-" + klass);
+        var title = $("<div>").addClass("panel-heading").append($("<h3>").addClass("panel-title").text(title));
+        var content = $("<div>").addClass("panel-body").html(content);
+
+        return container.append(title).append(content);
+    }
+
+{% endblock %}

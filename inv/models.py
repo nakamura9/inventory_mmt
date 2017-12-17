@@ -2,14 +2,13 @@ from __future__ import unicode_literals
 from __future__ import division
 
 
-
 from datetime import timedelta
 import datetime
+
 
 from django.utils import timezone
 from django.db import models
 from django.db.models import Q
-
 
 
 class Asset(models.Model):
@@ -58,7 +57,6 @@ class Plant(models.Model):
     
     def __str__(self):
         return self.plant_name
-
 
 
 class RunData(models.Model):
@@ -136,8 +134,6 @@ class RunData(models.Model):
         return (weeks * self.run_days * self.run_hours) + (days * self.run_hours)
 
 
-    
-
 class Machine(models.Model):
     """
     Will be related to an asset and use its attributes.
@@ -179,7 +175,8 @@ class Machine(models.Model):
         """used to calculate the machines availability over a given period"""
         downtime = self.unplanned_downtime_over_period(start, stop)
         available_time = self.run_hours_over_period(start, stop)
-
+        if downtime > available_time:
+            return 0
         return ((available_time-downtime)/ available_time) * 100
 
     def planned_downtime_over_period(self, start, stop=datetime.date.today()):
@@ -229,6 +226,8 @@ class Machine(models.Model):
         
         if run_data:
             available_time = run_data.run_hours
+            if downtime > available_time:
+                return 0.0
             return ((available_time - downtime)/ available_time) * 100
         
         else:

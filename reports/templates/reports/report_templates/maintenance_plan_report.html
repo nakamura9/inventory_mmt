@@ -1,112 +1,119 @@
-{% extends window.html %}
+{% extends "window.html" %}
+{% block head_style %}
+.page-layout {
+    width: 21cm;
+    background-color: white;
+}
+.page-content {
+    margin: .7cm;
+}
+{% endblock %}
 {% block content %}
+{% load static %}
+<div class="row">
+<div class="col-sm-3"></div>
+<div class="col-sm-6">
 
-<div class="row">
-    <div class="col-sm-12">
-        <span class="right">
-        <button type="button" class="btn btn-default">Print</button>
-        </span>
+<div class="page-layout">
+<div class="page-content">
+    <h2>Maintenance Plan Report</h2>
+    <h4><b><u>Report Summary</u></b></h4>
+    <ul class="well">
+        <li>The report covers the period from {{object.start_period}} to {{object.end_period}}</li>
+        {% if object.machine.count != 0 %}
+        <li>The equipment covered in this report consists of {% for mech in object.machine.all %}{{mech}} {% endfor %}</li>
+        {% else %}
+        <li>The scope of this report is all machines</li>
+        {% endif %}
+        <li>Over this period, there are scheduled to be {{p_task_count}} preventative tasks resulting in {{p_task_downtime}} hours of downtime </li>
+        <li>There are also scheduled to be {{check_count}} checklists</li>
+    </ul>
+    
+    <h3><u><b>Planned maintenance over the period</b></u></h3>
+    <h4><b>Preventative Tasks</b></h4>
+    
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Equipment</th>
+                <th>Planned Hours</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in p_tasks %}
+            <tr>
+                <td>{{task.scheduled_for}}</td>
+                <td>{{task.machine}}</td>
+                <td>{{task.estimated_labour_time}}</td>
+                <td>{{task.description}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <h4><b>Checklists</b></h4>
+    
+    
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Machine</th>
+                <th>Frequency</th>
+                <th>Estimated Time</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for check in checks %}
+            <tr>
+                <td>{{check.machine}}</td>
+                <td>{{check.frequency}}</td>
+                <td>{{check.estimated_time}}</td>
+                <td>{{check.title}}</td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if graphs.one %}
+    <h3>Equipment Preventative Tasks over Period</h3>
+    <div style="margin-top: .5cm;">
+        <img alt="Graph not found" width="700" height="400" src="{{graphs.one}}" >
     </div>
-</div>
-<div class="row">
-        <h3>Maintenance Plan Report</h3>
-</div>
-<div class="row">
-    <div class="col-sm-4">
-        <div class="panel panel-default">
-              <div class="panel-heading">
-                    <h3 class="panel-title">Report Information</h3>
-              </div>
-              <div class="panel-body">
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th>Author</th>
-                                <td>{{object.author}}</td>
-                                <th>Target</th>
-                                <td>{{object.target.first}}</td>
-                                <th>Date Created</th>
-                                <td>{{object.created}}</td>
-                            </tr>
-                        </tbody>
-                    </table>      
-              </div>
-        </div>
+    {% else %}
+    <h3>Total Tasks Per Machine</h3>
+    <div style="margin-top: .5cm;">
+        <img alt="Graph not found" width="700" height="400" src="{{graphs.combined}}" >
     </div>
-    <div class="col-sm-8">
-        
-        <div class="panel panel-default">
-              <div class="panel-heading">
-                    <h3 class="panel-title">Report Parameters</h3>
-              </div>
-              <div class="panel-body">
-                    
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th>Period(From):</th>
-                                <td>{{object.start_period}}</td>
-                            </tr>
-                            <tr>
-                                <th>Period(To):</th>
-                                <td>{{object.end_period}}</td>
-                            </tr>
-                            <tr>
-                                <th>Machine:</th>
-                                <td>{{object.machine}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-              </div>
-        </div>
-        
+    <h3>Tasks Per Machine</h3>
+    {% for graph in graphs.each %}
+    <div style="margin-top: .5cm;">
+        <img alt="Graph not found" width="700" height="400" src="{{graph}}" >
     </div>
+    {% endfor %}
+    {% endif %}
+    <hr />
+    <p>This report was authored by {{object.author.first_name}} {{object.author.last_name}} on the {{object.created}}. </p>
 </div>
-<div class="row">
-    <div class="col-sm-12">
-        {% for task in task_list %}
-        
-        <div class="panel panel-info">
-              <div class="panel-heading">
-                    <h3 class="panel-title">{{task.description|truncatechars:100}}</h3>
-              </div>
-              <div class="panel-body">
-                    
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th>Date</th>
-                                <td>{{task.scheduled_for}}</td>
-                            </tr>
-                            <tr>
-                                    <th>Number of tasks</th>
-                                    <td>{{task.tasks.all.count}}</td>
-                                </tr>
-                                <tr>
-                                        <th>Work Hours</th>
-                                        <td>{{task.estimated_labour_time}}</td>
-                                    </tr>
-                                    <tr>
-                                            <th>Estimated DownTime</th>
-                                            <td>{{task.estimated_downtime}}</td>
-                                        </tr>
-                                        <tr>
-                                                <th>Assigned to</th>
-                                                <td>{{task.assignments.first.username}}</td>
-                                            </tr>
-                        </tbody>
-                    </table>
-                    
-              </div>
-        </div>
-        
-        {% endfor %}
+</div>
+</div>
+<div class="col-sm-3">
+    
+    <div class="panel panel-primary">
+          <div class="panel-heading">
+                <h3 class="panel-title">Report Control Panel</h3>
+          </div>
+          <div class="panel-body">
+              
+              <a href="{% url 'reports:generate-pdf' pk=object.pk %}" class="btn btn-success">Generate PDF</a>
+              
+                Will be populated with report filters....
+          </div>
     </div>
+    
 </div>
-<div class="row">
-    <span class="right"><button class="btn btn-success">Annotate</button></span>
-    <textarea hidden class="form-control"></textarea>
 </div>
 
 {% endblock %}

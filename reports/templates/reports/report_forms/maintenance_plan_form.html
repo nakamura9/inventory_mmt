@@ -1,0 +1,49 @@
+
+<div class="row well">
+        
+    <div class="col-sm-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                  <h3 class="panel-title">Select Equipment for analysis</h3>
+            </div>
+            <div class="panel-body">
+              <label for="id_machine">Machine</label>
+              <select class="form-control" id="id_machine" onchange="prepSectionUpdate()">
+                  <option value="*">All Machines</option>
+                  {% for mech in machine_field %}
+                      <option value="{{mech.pk}}">{{mech.machine_name}}</option>
+                  {% endfor %}
+              </select>
+              <label for="id_section">Section</label>
+              <select class="form-control" id="id_section" onchange="prepSubUnitUpdate()" >
+                  <option value="">----------</option>
+              </select>
+              <label for="id_subunit">Sub Unit</label>
+              <select class="form-control" id="id_subunit" onchange="prepSubAssemblyUpdate()" >
+                  <option value="">----------</option>
+              </select>
+              <label for="id_subassembly">SubAssembly</label>
+              <select class="form-control" id="id_subassembly" onchange="prepComponentUpdate()" >
+                  <option value="">----------</option>
+              </select>
+              <label class="form-control" for="id_component">Component</label>
+              <select class="form-control" id="id_component" >
+                  <option value="">----------</option>
+              </select>
+              <button type="button" class="btn btn-primary" onclick="addEquipment()">Add</button>            
+            </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+        
+        <div class="panel panel-default">
+              <div class="panel-heading">
+                    <h3 class="panel-title">Selected Equipment</h3>
+              </div>
+              <div class="panel-body">
+                    <div id="equipment"></div>
+              </div>
+        </div>
+        
+    </div>
+</div>

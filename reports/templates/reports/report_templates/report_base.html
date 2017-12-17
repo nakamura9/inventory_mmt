@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block _title %}{% endblock %}</title>
+        {% load static %}
+        <meta name="charset" content="utf-8" >
+        <meta name="viewport" content="width=device-width, initial-scale=1" >
+        <link rel="stylesheet" href="{% static 'common_base/bootstrap/css/bootstrap.min.css' %}" >
+        <link rel="stylesheet" href="{% static 'common_base/jquery-ui-1.12.1.custom/jquery-ui.theme.css' %}">
+    </head>
+    <body>
+        {%block _content %}
+        {% endblock %}
+        
+        
+    </body>
+</html>

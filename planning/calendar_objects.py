@@ -60,7 +60,7 @@ class ProductionElement(object):
     def planned_downtime(self):
         p_tasks = self.machine.preventativetask_set.filter(scheduled_for=self.date)
         if p_tasks.count() > 0:
-            return sum((i.estimated_downtime for i in p_tasks)) 
+            return sum((i.estimated_downtime.seconds for i in p_tasks)) / 3600.0 
 
         return 0.0
 
