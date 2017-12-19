@@ -4,6 +4,7 @@ import json
 import threading
 import time
 import datetime
+import os
 
 from django.shortcuts import render, reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -11,9 +12,10 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect,HttpResponse
 from django.contrib.auth import authenticate
 from django.core import serializers
 from django.http import JsonResponse
+from django.core.files.storage import FileSystemStorage
 
 from common_base.models import Category, Account
-from common_base.utilities import ajax_required, parse_file, parse_spares_file
+from common_base.utilities import ajax_required, parse_file, parse_spares_file, CSV_RUNNING
 from common_base.feature_testing import parse_file as pf
 from inv import models as inv_models
 from inv.forms import RunDataForm
@@ -30,6 +32,8 @@ CSV_FILE_STATUS = {"messages":[],
                     "file_length": 0,
                     }
 """The views that correspond to the URLS """
+
+
 
 @csrf_exempt
 def get_users(request):
@@ -326,12 +330,15 @@ def parse_csv_file(request):
         
     Output:
         None - the application starts a new thread and calls the parse_file funtion which iterates over the whole file and classifies the data according to the unique ids that follow some regular pattern."""
-
-    file_name = request.POST.get("csv_file")
-    if not file_name.endswith(".csv"):
+    
+    file = request.FILES.get("csv_file")
+    #print dir(file)
+    if not file.name.endswith(".csv"):
         return render(request, "inv/browse.html",
                         context={"message": "You have entered an incorrect file type. Make sure the extension is '.csv'. "})    
 
+    fil = FileSystemStorage()
+    fil.save(file.name, file)
     
     global CSV_FILE_STATUS
     CSV_FILE_STATUS["running"] = True
@@ -341,10 +348,14 @@ def parse_csv_file(request):
         target = parse_file
     else:
         target = parse_spares_file
-        
-    t = threading.Thread(target=target, args=(CSV_FILE_STATUS, file_name))
+   
+    CSV_RUNNING =True
+
+    t = threading.Thread(target=target, args=(CSV_FILE_STATUS, 
+                os.path.join("media", file.name)))
     t.setDaemon(True)
     t.start()
+
 
     return HttpResponseRedirect(reverse("inventory:csv-panel"))
 
@@ -385,3 +396,18 @@ def get_run_data(request):
             
     
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+def stop_parsing(request):
+    global CSV_FILE_STATUS, CSV_RUNNING
+    
+    CSV_RUNNING = False
+    CSV_FILE_STATUS = {"messages":[],
+                    "successful": 0,
+                    "errors": 0,
+                    "start": 0.0,
+                    "stop": 0.0,
+                    "running": False,
+                    "finished": False,
+                    "file_length": 0,
+                    }
+    return HttpResponseRedirect(reverse("inventory:inventory-home"))

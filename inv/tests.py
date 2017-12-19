@@ -3,6 +3,8 @@ import datetime
 from django.shortcuts import reverse
 from django.test import TestCase, Client
 
+from common_base.models import Account
+from inventory_mmt import settings
 from common_base.tests import TestDataMixin
 from .models import *
 
@@ -22,6 +24,7 @@ class ViewTests(TestCase, TestDataMixin):
     def setUpClass(cls):
         super(ViewTests, cls).setUpClass()
         cls.client = Client()
+        settings.ALLOW_RANDOM_ACCESS = True
 
     #test detail pages
     def test_get_component_details(self):
@@ -67,7 +70,6 @@ class ViewTests(TestCase, TestDataMixin):
     #get engineering inventory_forms
     def test_get_component_form(self):
         response = self.client.get(reverse("inventory:add_component"))
-        
         self.assertEqual(response.status_code, 200)
 
     
@@ -92,43 +94,6 @@ class ViewTests(TestCase, TestDataMixin):
         
         self.assertEqual(response.status_code, 200)
 
-    #test get inventory forms
-    """def test_get_raw_materials(self):
-        response = self.client.get(reverse("inventory:raw-materials"))
-        
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_category(self):
-        response = self.client.get(reverse("inventory:new-category"))
-        
-        self.assertEqual(response.status_code, 200)
-    
-    
-    def test_get_order_details(self):
-        response = self.client.get(reverse("inventory:order-details",
-                                            kwargs={"pk":"100"}))
-        
-        self.assertEqual(response.status_code, 200)
-
-
-    def test_get_order_form(self):
-        response = self.client.get(reverse("inventory:new-order"))
-        
-        self.assertEqual(response.status_code, 200)
-
-
-    def test_get_inventory_details(self):
-        response = self.client.get(reverse("inventory:order-details",
-                                            kwargs={"pk":"100"}))
-        
-        self.assertEqual(response.status_code, 200)
-
-
-    def test_get_inventory_form(self):
-        response = self.client.get(reverse("inventory:new-inventory-item"))
-        
-        self.assertEqual(response.status_code, 200)
-    """
 
     #test posting and deleting of engineering inventory
     def test_post_check_and_delete_component_form(self):
@@ -285,3 +250,6 @@ class ModelTests(TestCase):
 
     def test_create_inventory_item(self):
         pass
+
+class TestModelMethods(TestCase):
+    pass

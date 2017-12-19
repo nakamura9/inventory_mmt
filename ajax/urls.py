@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^get-equipments$', add_equipment, name="get-equipment"),
     url(r'^add-run-data$', add_run_data, name="add-run-data"),
     url(r'^spares-request$', spares_request, name="spares-request"),
+    url(r'^stop-parsing$', stop_parsing, name="stop-parsing"),
 ]

@@ -61,7 +61,7 @@ row li{
             
             <div class="bg-info" id="message" style="padding: 20px;">
                     <h5>Import csv file</h5>
-                    <form method="POST" action="{% url 'ajax:process-file' %}">
+                    <form method="POST" action="{% url 'ajax:process-file' %}" enctype="multipart/form-data">
                         {% csrf_token%}
                         <input type="file" name ="csv_file" id="id_csv_file" >
                         <fieldset>

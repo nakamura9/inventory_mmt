@@ -139,6 +139,7 @@ class MaintenanceInbox(ListView):
 
         
         if self.request.user:
+            print self.request.user
             user = Account.objects.get(pk= self.request.user.pk)
             context["message"] = "%s:Hello %s." % (user.role, user.username)
             context["jobs"] = [order for order in WorkOrder.objects.all() if user == order.assigned_to]

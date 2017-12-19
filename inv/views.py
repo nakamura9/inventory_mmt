@@ -261,6 +261,7 @@ class ComponentCreateView(UserPassesTestMixin,CreateView):
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
     def test_func(self):
+        print role_test(self.request.user)
         return role_test(self.request.user)
 
     def post(self, *args, **kwargs):

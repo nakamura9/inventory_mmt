@@ -26,6 +26,7 @@ class ReportFactory(object):
         report = self.reports[self.report.scope](self.report)
         return report.generate_report()
 
+
 class AbstractReport(object):
     def __init__(self, report):
         self.report = report
@@ -49,7 +50,7 @@ class AbstractReport(object):
         plotter = pf.create_plotter()
         plotter.generate_plot_urls()
         self.context["graphs"]= plotter.plot_urls
-    
+
 
 class MaintenancePlanReport(AbstractReport):
     template = template_name = os.path.join("reports", "report_templates", "maintenance_plan_report.html")
@@ -97,6 +98,7 @@ class BreakdownReport(AbstractReport):
         self.context["wos"] = self.report.list_work_orders()
         downtime = sum(( i.downtime.seconds for i in self.report.list_work_orders())) / 3600.0
         self.context["total_downtime"] = downtime
+
 
 class WeakPointReport(AbstractReport):
     """This report performs weak point analysis of breakdowns over a period
@@ -187,7 +189,7 @@ class WeakPointReport(AbstractReport):
         self.context["total_downtime"] =downtime
         self.create_plots()
 
-        
+
 class SparesRequirementsReport(AbstractReport):
     template_name = os.path.join("reports", "report_templates", "spares_requirements_report.html")
     
@@ -203,7 +205,7 @@ class SparesRequirementsReport(AbstractReport):
         self.context["object"] = self.report
         self.context["spares_count"] = self.get_spares_count()
         self.context["p_tasks"] = self.p_tasks
-        
+
 
 class SparesUsageReport(AbstractReport):
     template_name = os.path.join("reports", "report_templates", "spares_usage_report.html")

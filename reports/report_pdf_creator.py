@@ -5,6 +5,7 @@ from django.template import Context
 from django.template.loader import get_template
 from .models import Report
 from xhtml2pdf import pisa
+from .report_creator import *
 
 
 
@@ -42,8 +43,20 @@ def generate_pdf(request, pk=None):
     response['Content-Disposition'] = 'attachment; filename="report.pdf"'
     
     # find the template and render it.
+    context_mapping = {
+        "maintenance_review": MaintenanceReviewReport,
+        "maintenance_plan": MaintenancePlanReport,
+        "breakdown": BreakdownReport,
+        "weak_point": WeakPointReport,
+        "spares_requirements": SparesRequirementsReport,
+        "spares_usage": SparesUsageReport
+                        }
+    template_path = os.path.join("reports","report_templates",
+                        "pdf_templates", report.scope + "_pdf_template.html")
     template = get_template(template_path)
-    html = template.render(Context(context))
+    context_creator = context_mapping[report.scope](report)
+    context_creator.generate_context()
+    html = template.render(Context(context_creator.context))
     
     # create a pdf
     pisaStatus = pisa.CreatePDF(

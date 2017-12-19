@@ -5,9 +5,10 @@ import pandas as pd
 from django.core.exceptions import *
 import time
 from inv import models as inv_models
+from inventory_mmt import settings
 
 from common_base.models import Account
-
+CSV_RUNNING = True
 
 def time_choices(start, stop, interval, delta=False):
     """
@@ -125,6 +126,8 @@ def ajax_required(ret_unexcepted):
 
 
 def role_test(user):
+    if settings.ALLOW_RANDOM_ACCESS:
+        return True
     try:
         acc = Account.objects.get(username=user.username)
     except:
@@ -134,6 +137,8 @@ def role_test(user):
 
 
 def parse_spares_file(status_store, file_name):
+    global CSV_RUNNING
+
     fil =  pd.read_csv(file_name)
     file_length = fil.shape[0]
     status_store["messages"].append("Starting...")
@@ -145,6 +150,8 @@ def parse_spares_file(status_store, file_name):
 
     i= 0
     while i < file_length:
+        if not CSV_RUNNING:
+            return file
         try:
             inv_models.Spares(name = fil.iloc[i, 1],
             description = fil.iloc[i, 4],
@@ -165,6 +172,8 @@ def parse_spares_file(status_store, file_name):
     status_store["stop"] = time.time()
 
 def parse_file(status_store, file_name):
+    global CSV_RUNNING
+
     fil = pd.read_csv(file_name)
     file_length = fil.shape[0]
     status_store["messages"].append("Starting...")
@@ -172,6 +181,9 @@ def parse_file(status_store, file_name):
     status_store["file_length"] = file_length
     i=0
     while i < file_length:
+        #used to stop the thread controlled by ajax:stop-parsing
+        if not CSV_RUNNING:
+            return
         try:
             while True:
                 try:

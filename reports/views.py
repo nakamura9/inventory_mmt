@@ -10,7 +10,6 @@ from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.views.generic import TemplateView, ListView, DetailView, View
 from django.views.generic.edit import CreateView
-from formtools.wizard.views import SessionWizardView
 from django.core import serializers
 from django.http import JsonResponse
 

@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'formtools',
     'inv',
     'jobcards',
     'checklists',
@@ -133,6 +132,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "common_base", "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+
+ALLOW_RANDOM_ACCESS = False
 
 """
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
