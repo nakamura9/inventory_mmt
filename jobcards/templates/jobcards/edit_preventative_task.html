@@ -103,13 +103,15 @@
         <div class="col-sm-4">
             <h4>Tools:</h4>
             <p><a class="btn btn-info" data-toggle="modal" href='#category-modal-view'>Add Category</a></p>
-            <p><a class="btn btn-info" href="#spares-modal" data-toggle="modal">Add Spares</a></p>
-            
+            <p><a class="btn btn-info" href="#spares-modal" data-toggle="modal">Add Required Spares</a></p>
+            <p><a class="btn btn-warning" href="#spares-request-modal" data-toggle="modal">Request Spares</a></p>
         </div>
     </div>
 
 {% include "common_base/modals/category_modal.html" %}
 {% include "inv/engineering_inventory/create_update/spares_modal.html" %}
+{% include "jobcards/modals/spares_request.html"%}
+
 {% endblock %}
 {% block body_script %}
     $("#id_scheduled_for").datepicker();

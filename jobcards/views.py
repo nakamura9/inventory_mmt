@@ -22,7 +22,7 @@ from common_base.models import Task, Account, Comment
 from common_base.forms import LoginForm
 from inv.models import *
 from .forms import *
-from .models import PreventativeTask, WorkOrder
+from .models import PreventativeTask, WorkOrder, SparesRequest
 from inv.forms import SparesForm
 
 
@@ -99,6 +99,11 @@ class NewPreventativeTaskView(UserPassesTestMixin ,CreateView):
             p_task.tasks.create(created_for="preventative_task",
                                 task_number=n,
                                 description=t)
+
+        for pk in self.request.POST.getlist("requested_spares[]"):
+            sr = SparesRequest.objects.get(pk=pk)
+            sr.preventative_task = p_task
+            sr.save()
             
         for i in self.request.POST.getlist("assignments[]"): #LIFE SAVER!!!
             p_task.assignments.add(Account.objects.get(username=i))
@@ -139,6 +144,10 @@ class EditNewPreventativeTaskView(UserPassesTestMixin, UpdateView):
             for s in self.request.POST.getlist("removed_spares[]"):
                 p_task.required_spares.remove(Spares.objects.get(stock_id=s))
 
+        for pk in self.request.POST.getlist("requested_spares[]"):
+            sr = SparesRequest.objects.get(pk=pk)
+            sr.preventative_task = p_task
+            sr.save()
         
         if self.request.POST.get("removed_resolvers[]", None):
             for r in self.request.POST.getlist("removed_resolvers[]"):

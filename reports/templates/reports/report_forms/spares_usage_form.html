@@ -1,0 +1,33 @@
+
+
+<div class="row">
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                  <h3 class="panel-title">Select Machine for analysis</h3>
+            </div>
+            <div class="panel-body">
+              <label for="id_machine">Machine</label>
+              <select class="form-control" id="id_machine">
+                  <option value="*">All Machines</option>
+                  {% for mech in machine_field %}
+                      <option value="{{mech.pk}}">{{mech.machine_name}}</option>
+                  {% endfor %}
+              </select>
+              
+              <button type="button" class="btn btn-primary" onclick="addMachine()">Add</button>            
+              <div id="equipment"></div>
+            </div>
+            
+      </div>
+    </div>
+    <div class="col-sm-4"></div>
+</div>
+<script type="text/javascript">
+        function addMachine(){
+            var _id = $("#id_machine").val();
+            addItemToList("equipment", "Machine > "+_id, _id, "removeEquipment('"+_id+"')");
+            addHiddenInput(_id, "equipment[]", _id);
+        }
+</script>

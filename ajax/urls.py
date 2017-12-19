@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^process-file$', parse_csv_file, name="process-file"),    url(r'^get-process-updates$', get_run_data, name="get-process-updates"),
     url(r'^get-equipments$', add_equipment, name="get-equipment"),
     url(r'^add-run-data$', add_run_data, name="add-run-data"),
+    url(r'^spares-request$', spares_request, name="spares-request"),
 ]

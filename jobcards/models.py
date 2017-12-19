@@ -145,3 +145,11 @@ class PreventativeTask(models.Model):
 class Costing(models.Model):
     """Model used when planning the budget of a preventative task."""
     id= models.CharField(max_length=32, primary_key=32)
+
+class SparesRequest(models.Model):
+    linked_spares = models.ForeignKey("inv.Spares", null=True)
+    name = models.CharField(max_length= 32, null=True, blank=True)
+    unit = models.CharField(max_length = 32, null=True, blank=True)
+    quantity = models.FloatField(default=0.0)
+    preventative_task = models.ForeignKey("PreventativeTask", null=True)
+    

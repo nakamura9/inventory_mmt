@@ -36,10 +36,6 @@ def link_callback(uri, rel):
 def generate_pdf(request, pk=None):
     report = Report.objects.get(pk=pk)
 
-    if True:
-        context = get_maintenance_report_context(report)
-        template_path = os.path.join("reports", "report_templates", "pdf_maintenance_report.html")
-
     
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')

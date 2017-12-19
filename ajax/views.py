@@ -10,12 +10,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
 from django.contrib.auth import authenticate
 from django.core import serializers
+from django.http import JsonResponse
 
 from common_base.models import Category, Account
 from common_base.utilities import ajax_required, parse_file, parse_spares_file
 from common_base.feature_testing import parse_file as pf
 from inv import models as inv_models
 from inv.forms import RunDataForm
+from jobcards.models import SparesRequest
 
 
 CSV_FILE_STATUS = {"messages":[],
@@ -301,6 +303,20 @@ def add_category(request):
         Category(**data).save()
         return HttpResponse("0")
 
+def spares_request(request):
+
+    sr = SparesRequest(unit=request.POST["unit"],
+                    quantity=request.POST["quantity"])
+    if request.POST["name"] != "":
+        sr.name = request.POST["name"]
+    else:
+        sr.linked_spares = inv_models.Spares.objects.get(stock_id= request.POST["spares"])
+
+    sr.save()
+
+    return JsonResponse({"pk": sr.pk,
+                        "success":True})
+
 def parse_csv_file(request):
     """Asynchronous way of importing data as csv.
     
@@ -331,6 +347,7 @@ def parse_csv_file(request):
     t.start()
 
     return HttpResponseRedirect(reverse("inventory:csv-panel"))
+
 
 def get_run_data(request):
     """Function called repeatedly to display the current status of a data import process

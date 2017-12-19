@@ -18,7 +18,7 @@ matplotlib.use('agg')
 from matplotlib import pyplot as plt
 from statistics import mean
 
-from inv.models import Machine
+from inv.models import Machine,Section, SubAssembly, SubUnit, Component
 from jobcards.models import WorkOrder, PreventativeTask
 from django.db.models import Q
 
@@ -32,15 +32,29 @@ class PlotCreatorFactory(object):
         scopes = {"maintenance_review": MaintenanceReviewPlotFactory,
                 "breakdown": BreakdownPlotFactory,
                 "maintenance_plan": MaintenancePlanPlotFactory,
+                "weak_point": WeakPointPlotFactory,
+                "spares_usage": SparesUsagePlotFactory,
+                "spares_requirements": SparesRequirementsPlotFactory,
                 }
         
         return scopes[self.report.scope](self.report)
 
     
 class AbstractPlotFactory(object):
-    """abstract class for defining the PlotFactory interface"""
+    """abstract class for defining the PlotFactory interface
+    Input
+    ======
+    Report Object
+    
+    Output
+    =======
+    plot_urls - dictionary of report plot strings
+    
+    Methods
+    ========
+    generate_plot_urls() - uses the report object to select which plots to create and what quantity"""
 
-    def __init__(self, report):
+    def __init__(self, report, *args):
         self.report = report
         self.plot_urls = {}
 
@@ -48,6 +62,48 @@ class AbstractPlotFactory(object):
         raise NotImplementedError()
 
 
+class WeakPointPlotFactory(AbstractPlotFactory):
+    """Weak point analysis report plot factory"""
+    def __init__(self, report, reporter):
+        self.report = report
+        self.reporter = reporter
+        self.plot_urls = {}
+        
+    def machine_plot(self):
+        plotter = MachineBreakdownFrequencyDowntimePlotter(self.report)
+        self.plot_urls['machine'] = plotter.plot()
+
+    def section_plot(self, mech):
+        plotter =BreakdownFrequencyDowntimePlotter(self.report, "section",mech)
+        return plotter.plot()
+
+    def component_plot(self, mech):
+        plotter =BreakdownFrequencyDowntimePlotter(self.report, "component", mech)
+        return plotter.plot()
+
+
+    def generate_plot_urls(self):
+        if len(self.report.equipment_list) > 1:
+            self.machine_plot()
+    
+        sections = []
+        components = []
+        for mech in self.report.machine.all():
+            sections.append(self.section_plot(mech))
+            components.append(self.component_plot(mech))
+        self.plot_urls["sections"] = sections
+        self.plot_urls["components"] = components
+
+class SparesRequirementsPlotFactory(AbstractPlotFactory):
+    def generate_plot_urls(self):
+        pass
+
+
+class SparesUsagePlotFactory(AbstractPlotFactory):
+    def generate_plot_urls(self):
+        pass
+
+    
 class BreakdownPlotFactory(AbstractPlotFactory):
 
     def combined_frequency_plot(self):
@@ -138,7 +194,14 @@ class MaintenancePlanPlotFactory(AbstractPlotFactory):
 
 class EquipmentMappingMixin(object):
     """class that abstracts the mapping of pk length to model query"""
-    
+    def get_equipment_from_pk(self, pk):
+        mapping = {2: Machine,
+                    4:Section,
+                    6:SubUnit,
+                    8:SubAssembly,
+                    10:Component}
+        return mapping[len(str(pk))].objects.get(pk=pk)
+
     def equipment_map(self, equipment):
         mapping = {2:Q(machine=equipment),
                     4:Q(section=equipment),
@@ -146,6 +209,7 @@ class EquipmentMappingMixin(object):
                     8:Q(subassembly=equipment),
                     10:Q(component=equipment)}
     
+        
         return mapping[len(equipment.pk)]
 
 class AbstractPlotter(object):
@@ -267,7 +331,6 @@ class AbstractPlotter(object):
             self.y.append(self.y_axis_monthly(curr_date, next_date))
             curr_date = next_date
 
-        print self.y
 
 class PreventativeMaintenanceFrequencyPlotter(AbstractPlotter, EquipmentMappingMixin):
     ylabel = "Prevenative Task Frequency"
@@ -275,7 +338,7 @@ class PreventativeMaintenanceFrequencyPlotter(AbstractPlotter, EquipmentMappingM
         super(PreventativeMaintenanceFrequencyPlotter, self).__init__(report, *args, **kwargs)
         self.equipment = equipment
         self.title = equipment
-        self.file_name = str(equipment) +"_task_frequency_"+ self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = str(equipment) +"_task_frequency.png"
         self.path = os.path.join(self._base_path, self.file_name)
 
     def y_axis_daily(self, day):
@@ -296,7 +359,7 @@ class CombinedPreventativeMaintenancePlotter(AbstractPlotter, EquipmentMappingMi
     def __init__(self, *args, **kwargs):
         super(CombinedPreventativeMaintenancePlotter, self).__init__(*args, **kwargs)
         self.title = "Combined preventative tasks"
-        self.file_name =  "combineds_task_count_"+ self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name =  "combineds_task_count_.png"
         self.path = os.path.join(self._base_path, self.file_name)
 
 
@@ -323,7 +386,7 @@ class IndividualBreakdownFrequencyPlotter(AbstractPlotter, EquipmentMappingMixin
         super(IndividualBreakdownFrequencyPlotter, self).__init__(report, *args, **kwargs)
         self.title = str(equipment) + ": Breakdows per Epoch"
         self.equipment = equipment
-        self.file_name = "breakdowns_per_epoch"+ self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = str(equipment) + "_breakdowns_per_epoch.png"
         self.path = os.path.join(self._base_path, self.file_name)
 
     def y_axis_daily(self, day):
@@ -367,6 +430,136 @@ class BaseBreakdownPlotter(AbstractPlotter, EquipmentMappingMixin):
     def match_equipment_to_wos(self, equipment):
         return self.work_orders.filter(self.equipment_map(equipment))
 
+class BreakdownFrequencyDowntimePlotter(BaseBreakdownPlotter):
+    
+    def __init__(self,report,level, machine):
+        super(BreakdownFrequencyDowntimePlotter, self).__init__(report)
+        self.ylabel = "No. of breakdowns"
+        self.frequency = {}
+        self.downtime = {}
+        self.level = level
+        self.machine = machine
+        self.wos = self.report.list_work_orders()
+        
+        self.title = level.capitalize() + ": breakdown frequency and hours"
+        self.file_name = datetime.datetime.strftime(datetime.datetime.now(),"%H%M%S%f") + "breakdown_frequency_plot.png"
+        self.path = os.path.join(self._base_path, self.file_name)
+        
+    
+    def curr_level(self, wo):
+        mapping = {"section":wo.section,
+                            "subunit":wo.subunit,
+                            "subassembly":wo.subassembly,
+                            "component":wo.component}
+        if mapping[self.level]:
+            return mapping[self.level].pk
+        return None
+
+    def get_dicts(self):
+        for wo in self.wos.filter(machine=self.machine):
+            if self.curr_level(wo):
+                
+                self.frequency[self.curr_level(wo)] = self.frequency.get(
+                                        self.curr_level(wo), 0) +1
+                self.downtime[self.curr_level(wo)] =self.downtime.get(
+                                    self.curr_level(wo), 0) + \
+                                        (wo.downtime.seconds /3600.0)
+
+
+    def plot_duration(self):
+        count = 1
+        self.y_dt = []
+        self.xlabel = "Equipment"
+        for e, f in self.frequency.iteritems():
+            obj = self.get_equipment_from_pk(e)
+            self.xticks.append(str(obj))
+            self.x.append(count)
+            count += 1
+            self.y.append(f)
+            self.y_dt.append(self.downtime[e])
+
+    def plot(self):
+        """plots the graph"""
+        # The angle of the data changes based on the number of items in the 
+        # x axis
+        self.get_dicts()
+        self.plot_duration()
+
+        if self.y==[] or self.y_dt ==[]:
+            return ""
+        print self.title
+        
+        dynamic_angle = len(self.x) * 4
+        fig, ax1 = plt.subplots()
+        plt.xticks(self.x, self.xticks, rotation=dynamic_angle)
+        ax1.set_title(self.title)
+        ax1.set_xlabel("Equipment")
+        ax1.set_ylabel("No. of breakdowns")
+        ax1.set_ylim(0, max(self.y) + 2)
+        ax1.bar(self.x, self.y, width=0.8)
+        ax2 = ax1.twinx()
+        ax2.set_ylim(0, max(self.y_dt)+2)
+        ax2.plot(self.x, self.y_dt, "-o", color="b", linewidth=4, markersize=12)
+        ax2.set_ylabel("Downtime Hours")
+        plt.tight_layout()
+        plt.savefig(self.path)
+        plt.clf()
+        return "/media/" + self.file_name
+
+
+class MachineBreakdownFrequencyDowntimePlotter(BaseBreakdownPlotter):
+    
+    def __init__(self,report):
+        super(MachineBreakdownFrequencyDowntimePlotter, self).__init__(report)
+        self.ylabel = "No. of breakdowns"
+        self.title = "Equipment against breakdown frequency and hours"
+        self.file_name = datetime.datetime.strftime(datetime.datetime.now(),"%H%M%S%f") + "breakdown_frequency_plot.png"
+        self.path = os.path.join(self._base_path, self.file_name)
+
+    def get_breakdowns_and_downtime(self):
+        self.frequency = {}
+        self.downtime = {}
+        for mech in self.report.machine.all():
+            self.frequency[mech.pk] = self.report.list_work_orders().filter(
+                                        machine=mech).count()
+            self.downtime[mech.pk] = mech.unplanned_downtime_over_period(
+                            self.report.start_period, self.report.end_period)
+    
+    def plot_duration(self):
+        self.get_breakdowns_and_downtime()
+        count = 1
+        self.y_f = []
+        self.y_dt = []
+        self.xlabel = "Equipment"
+        for e, f in self.frequency.iteritems():
+            obj = self.get_equipment_from_pk(e)
+            self.xticks.append(str(obj))
+            self.x.append(count)
+            count += 1
+            self.y_f.append(f)
+            self.y_dt.append(self.downtime[e])
+
+    def plot(self):
+        """plots the graph"""
+        # The angle of the data changes based on the number of items in the 
+        # x axis
+        self.plot_duration()
+        plt.title(self.title)
+        dynamic_angle = len(self.x) * 4
+        fig, ax1 = plt.subplots()
+        plt.xticks(self.x, self.xticks, rotation=dynamic_angle)
+        ax1.set_xlabel("Equipment")
+        ax1.set_ylabel("No. of breakdowns")
+        ax1.set_ylim(0, max(self.y_f) + 2)
+        ax1.bar(self.x, self.y_f, width=0.8)
+        ax2 = ax1.twinx()
+        ax2.set_ylim(0, max(self.y_dt)+2)
+        ax2.plot(self.x, self.y_dt, "-o", color="b", linewidth=4, markersize=12)
+        ax2.set_ylabel("Downtime Hours")
+        plt.tight_layout()
+        plt.savefig(self.path)
+        plt.clf()
+        return "/media/" + self.file_name
 
 class CombinedBreakdownFrequencyPlotter(BaseBreakdownPlotter):
     """Plots each piece of equipment that makes the length of the report to the number of work orders raised against it over the entire period"""
@@ -375,7 +568,7 @@ class CombinedBreakdownFrequencyPlotter(BaseBreakdownPlotter):
     
     def __init__(self, report):
         super(CombinedBreakdownFrequencyPlotter, self).__init__(report)    
-        self.file_name = "breakdowns"+ self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = "breakdowns.png"
         self.path = os.path.join(self._base_path, self.file_name)
 
     def y_value(self, e):
@@ -388,7 +581,7 @@ class CombinedDowntimePlotter(BaseBreakdownPlotter):
     title = "Downtime hours over entire period per equipment"
     def __init__(self, report):
         super(CombinedDowntimePlotter, self).__init__(report)    
-        self.file_name = "downtime"+ self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = "downtime" + ".png"
         self.path = os.path.join(self._base_path, self.file_name)
 
     def y_value(self, e):
@@ -404,8 +597,7 @@ class PreventativeVsBreakdownMaintenancePlotter(AbstractPlotter, EquipmentMappin
     def __init__(self, report, equipment):
         super(PreventativeVsBreakdownMaintenancePlotter, self).__init__(report)
         self.title = str(equipment) + ": Breakdown vs Preventative maintenance frequency"
-        self.file_name = self.file_name = str(equipment) + "breakdowns_vs_p_tasks"+ \
-            self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = str(equipment) + "_breakdowns_vs_p_tasks.png"
         self.path = os.path.join(self._base_path, self.file_name)
         self.equipment = equipment
 
@@ -435,19 +627,15 @@ class PreventativeVsBreakdownMaintenancePlotter(AbstractPlotter, EquipmentMappin
 
     def plot_features(self):
         """overriding with multiple bar chart"""
-        print self.y
         y1 = [i[0] for i in self.y]
-        print y1
         y2 = [i[1] for i in self.y]
-        print y2
         plt.bar([x-0.2 for x in self.x], y1, width=0.2, color='r', align='center')
         plt.bar(self.x, y2, width=0.2, color='b', align='center')
 
-class AbstractAvailabilityPlotFactory(AbstractPlotter):
-    ylabel = "Availability"
 
-class MultipleMachineAvailabilityPlotter(AbstractAvailabilityPlotFactory):
+class MultipleMachineAvailabilityPlotter(AbstractPlotter):
     title = "Availability of all machines by machine"
+    ylabel = "Availability"
     
     def __init__(self, report):
         super(MultipleMachineAvailabilityPlotter, self).__init__(report)
@@ -455,8 +643,7 @@ class MultipleMachineAvailabilityPlotter(AbstractAvailabilityPlotFactory):
         if self.machines.count() == 0:
             self.machines = Machine.objects.all()
         
-        self.file_name = "machines_availability"+  \
-            self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = "machines_availability.png"
         self.path = os.path.join(self._base_path, self.file_name)
 
     def preplot(self):
@@ -473,9 +660,10 @@ class MultipleMachineAvailabilityPlotter(AbstractAvailabilityPlotFactory):
             count +=1
 
 
-class CombinedEquipmentAvailabilityPlotter(AbstractAvailabilityPlotFactory):
+class CombinedEquipmentAvailabilityPlotter(AbstractPlotter):
     """Plots a graph of equipment availability for all equipment in the report"""
     title = "Availability of all machines by date"
+    ylabel = "Availability"
 
     def __init__(self, report):
         super(CombinedEquipmentAvailabilityPlotter, self).__init__(report)
@@ -483,7 +671,7 @@ class CombinedEquipmentAvailabilityPlotter(AbstractAvailabilityPlotFactory):
         if self.machines.count() == 0:
             self.machines = Machine.objects.all()
         
-        self.file_name = "all_machines_availability"+ self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = "all_machines_availability.png"
         self.path = os.path.join(self._base_path, self.file_name)
 
     def y_axis_daily(self, *args):
@@ -502,15 +690,15 @@ class CombinedEquipmentAvailabilityPlotter(AbstractAvailabilityPlotFactory):
         return mean(mech.availability_over_period(curr_date, next_date) for mech in self.machines )
 
 
-class MachineAvailabilityPlotter(AbstractAvailabilityPlotFactory):
+class MachineAvailabilityPlotter(AbstractPlotter):
     """Plots the availability for a single machine."""
+    ylabel = "Availability"
     
     def __init__(self, report, machine):
         super(MachineAvailabilityPlotter, self).__init__(report)
         self.machine = machine
         self.title = self.machine.machine_name
-        self.file_name = self.machine.machine_name + "_availability_" +\
-            self.report.end_period.strftime("%Y%m%d") + ".png"
+        self.file_name = self.machine.machine_name + "_availability.png"
         self.path = os.path.join(self._base_path, self.file_name)
 
     def y_axis_daily(self, day):
