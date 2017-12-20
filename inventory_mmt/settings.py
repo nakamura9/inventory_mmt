@@ -13,17 +13,21 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+key_file = open("keys.txt", "r")
+db = key_file.readline()
+secret = key_file.readline()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'eq$slf1@+eh8ivkwf9#^nj^4*jn+h+#7*mtyv(pgd9n#e8x$6v'
+SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+#make sure the ip address is matched
 ALLOWED_HOSTS = ["*"]
 
 
@@ -83,13 +87,25 @@ WSGI_APPLICATION = 'inventory_mmt.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
+if DEBUG:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'TEST_NAME': os.path.join(BASE_DIR, 'test.sqlite3'),
     }
 }
+else:
+    DATABASES = {
+        'default':{
+            'ENGINE': django.db.backends.postgresql_psycopg2,
+            'NAME': 'inventory_db',
+            'USER': 'nakamura9a',
+            'PASSWORD': db,
+            'HOST': '',
+            'PORT': '',
+        }
+    }
 
 
 # Password validation

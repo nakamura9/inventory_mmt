@@ -18,10 +18,8 @@ from django.conf.urls import url, include, static
 
 from django.conf import settings
 from django.contrib import admin
-from inv import views as inv_views
-from common_base.views import sign_up, logout, login, test_features
+from common_base.views import *
 from inv import urls as inv_urls
-from inv.views import *
 
 
 
@@ -31,6 +29,7 @@ urlpatterns = [
     url(r'^inventory/', include(inv_urls, namespace="inventory")),
     url(r'^logout/$', logout, name="logout"),
     url(r'^login/$', login, name="login"),
+    url(r'^about/$', AboutTemplateView.as_view(), name="about"),
     url(r'^sign_up/?$', sign_up, name="sign_up"),
     url(r'^jobcards/', include("jobcards.urls")),
     url(r'^checklists/', include("checklists.urls")),

@@ -3,9 +3,12 @@
 Login
 {% endblock %}
 {% block _content %}
-    <div class="jumbotron">
-        {% load static %}
-        <img src="{% static 'plantlink.jpg' %}">
+{% load static %}
+    <div class="jumbotron" style="background-image: url({% static 'plantlink.jpg' %});
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: contain;">
+        
         <h1>Welcome!</h1>
         <p>Hunyani inventory management login</p>
     </div>

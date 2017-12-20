@@ -8,10 +8,14 @@ from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,reverse
 from django.forms import ModelChoiceField
+from django.views.generic import TemplateView
 
 from .forms import userForm
 from .models import Account
 from inv.models import Machine
+
+class AboutTemplateView(TemplateView):
+    template_name = os.path.join("common_base", "about.html")
 
 def test_features(request):
     return render(request, os.path.join("common_base", "test.html"), )
