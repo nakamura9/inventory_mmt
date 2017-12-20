@@ -240,7 +240,12 @@ class WorkOrderDetailView(DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(WorkOrderDetailView, self).get_context_data(*args, **kwargs)
-        context["admin_user"] = True if Account.objects.get(pk=self.request.user.pk).role == "admin" else False
+        try:
+            role = Account.objects.get(pk=self.request.user.pk).role
+            context["admin_user"] = True if  role == "admin" else False
+        except:
+            context["admin_user"] = False
+         
         return context
 
 

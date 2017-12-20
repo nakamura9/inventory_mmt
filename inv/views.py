@@ -398,8 +398,8 @@ class SectionDetailView(DetailView):
         context = super(SectionDetailView, self).get_context_data(*args, **kwargs)
         Planned = namedtuple("Planned", "date resolver est_time type")
         planned_for_machine =PreventativeTask.objects.filter(section=self.object, completed_date = None)
-        context["planned_jobs"] = [Planned(job.execution_date, job.resolver,
-                                        job.estimated_time, "Planned Job") \
+        context["planned_jobs"] = [Planned(job.scheduled_for, job.assignments.first(),
+                                        job.estimated_downtime, "Planned Job") \
                                         for job in planned_for_machine]
 
         checklist_on_machine = Checklist.objects.filter(section = self.object)

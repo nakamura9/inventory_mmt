@@ -177,7 +177,7 @@ class MaintenanceReviewPlotFactory(AbstractPlotFactory):
 class MaintenancePlanPlotFactory(AbstractPlotFactory):
     def machine_tasks_plot(self, e):
         plotter = PreventativeMaintenanceFrequencyPlotter(self.report, e)
-        self.plot_urls["each"].append(plotter.plot())
+        return plotter.plot()
 
     def combined_tasks_plot(self):
         plotter = CombinedPreventativeMaintenancePlotter(self.report)
@@ -187,7 +187,7 @@ class MaintenancePlanPlotFactory(AbstractPlotFactory):
         if len(self.report.equipment_list) > 1:
             self.plot_urls["each"] = []
             for e in self.report.equipment_list:
-                self.machine_tasks_plot(e)
+                self.plot_urls["each"].append(self.machine_tasks_plot(e))
 
             self.combined_tasks_plot()
         else:

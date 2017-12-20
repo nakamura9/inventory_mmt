@@ -13,6 +13,7 @@ from django.contrib.auth import authenticate
 from django.core import serializers
 from django.http import JsonResponse
 from django.core.files.storage import FileSystemStorage
+from django.db.models import Q
 
 from common_base.models import Category, Account
 from common_base.utilities import ajax_required, parse_file, parse_spares_file, CSV_RUNNING
@@ -20,6 +21,7 @@ from common_base.feature_testing import parse_file as pf
 from inv import models as inv_models
 from inv.forms import RunDataForm
 from jobcards.models import SparesRequest
+
 
 
 CSV_FILE_STATUS = {"messages":[],
@@ -135,6 +137,7 @@ def ajaxAuthenticate(request):
     Input: JSON -> "username": string, "password": string
     Output: HTTPResponse JSON-> "authenticated": Boolean
     """
+    print request.POST
     if authenticate(username=request.POST["username"], 
             password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":True}),
@@ -205,35 +208,18 @@ def get_combos(request):
 
     
     if s and _model:
-        items = []
-        if _model == "account":
-            items += get_account(s)
-
-        elif _model == "machine":
-            items += [m.machine_name for m in get_machine(s)]
-
-        elif  _model == "section":
-            items += [s.section_name for s in get_section(s)]
-
-        elif _model == "subunit":
-            items += [s.unit_name for s in get_subunit(s)]
-
-        elif _model == "subassembly":
-            items += [s.unit_name for s in get_subassy(s)]
-
-        elif _model == "component":
-            items += [c.component_name for c in get_component(s)]
+        mapping = {"account":get_account,
+        "machine":get_machine,
+        "section":get_section,
+        "subunit":get_subunit,
+        "subassembly":get_subassy,
+        "component":get_component,
+        "spares":get_spares,
+        "inv":inv_list}
         
-        elif _model == "spares":
-            items += [sp.stock_id for sp in get_spares(s)]
+        items = mapping[_model](s)
         
-        elif _model == "inv":
-            # the third element is used client side to select the detail view
-            items += [[c.pk, c.component_name, c.machine.machine_name, 0] for c in  get_component(s)]
-            items += [[sp.pk, sp.stock_id, sp.name, 1] for sp in get_spares(s)]
-            items += [[sa.pk, sa.unit_name, sa.machine.machine_name, 2] for sa in get_subassy(s)]    
-
-
+        #return the first 20 results for really long queries
         if len(items) > 20:
             items = items[:20]
             
@@ -241,62 +227,58 @@ def get_combos(request):
     else:
         return HttpResponse(json.dumps({"matches": []}))
 
-def get_machine(name):
-    items = []
-    items += [m for m in inv_models.Machine.objects.filter(pk__startswith=name)]
-    items += [m for m in inv_models.Machine.objects.filter(machine_name__contains=name) if m not in items ]
-    
-
+def inv_list(s):
+    #two steps back 
+    items = [[c.pk, c.component_name, c.machine.machine_name, 0] for c in \
+                inv_models.Component.objects.filter(
+                    Q(component_name__startswith=s) |
+                    Q(unique_id__startswith=s))]
+    items += [[sa.pk, sa.unit_name, sa.machine, 2] for sa in \
+                inv_models.SubAssembly.objects.filter(
+                    Q(unit_name__startswith=s) |
+                    Q(unique_id__startswith=s))]
     return items
 
+def get_machine(name):
+    return [m.machine_name for m in inv_models.Machine.objects.filter(
+        Q(machine_name__startswith=name) |
+        Q(unique_id__startswith=name))]
+
 def get_section(name):
-    items = []
-    items += [s for s in inv_models.Section.objects.filter(pk__startswith=name)]
-    items += [s for s in inv_models.Section.objects.filter(section_name__contains=name) if s not in items]
-    
-    return items 
+    return [s.section_name for s in inv_models.Section.objects.filter(
+        Q(section_name__startswith=name) |
+        Q(unique_id__startswith=name))]
 
 def get_subunit(name):
-    items = []
-    items += [s for s in inv_models.SubUnit.objects.filter(pk__startswith=name)]
-    items += [s for s in inv_models.SubUnit.objects.filter(unit_name__startswith=name) if s not in items ]
-    
-    return items 
+    return [s.unit_name for s in inv_models.SubUnit.objects.filter(
+        Q(unit_name__startswith=name) |
+        Q(unique_id__startswith=name))]
 
 def get_subassy(name):
     """Searches subassemblies by name"""
-
-    return [sa for sa in inv_models.SubAssembly.objects.filter(unit_name__startswith=name)]
+    return [s.unit_name for s in inv_models.SubAssembly.objects.filter(
+        Q(unit_name__startswith=name) |
+        Q(unique_id__startswith=name))]
 
 def get_component(name):
     """Searches a component by name, and id"""
-
-    items = []
-    items += [c for c in inv_models.Component.objects.filter(component_name__startswith=name)]
-    items += [c for c in inv_models.Component.objects.filter(unique_id__startswith=name) if c not in items] 
-    return items
-
+    return [c.component_name for c in inv_models.Component.objects.filter(
+            Q(component_name__startswith=name) |
+            Q(unique_id__startswith=name))]
 
 
 def get_spares(name):
     """searches spares by name and stock_id """
-    items = []
-    items += [sp for sp in inv_models.Spares.objects.filter(stock_id__startswith=name)]
-    items += [sp for sp in inv_models.Spares.objects.filter(name__startswith=name) if sp not in items] 
-    return items
+    return [s.stock_id for s in inv_models.Spares.objects.filter(
+            Q(stock_id__startswith=name) | 
+            Q(name__startswith=name))]
 
 def get_account(name):
     """Searches accounts by username, first name and last name"""
-    items = []
-    items += [a.username  for a in Account.objects.filter(
-                username__startswith=name)]
-    items += [a.username  for a in Account.objects.filter(
-                first_name__startswith=name) if a.username not in items]
-    items += [a.username  for a in Account.objects.filter(
-                last_name__startswith=name) if a.username not in items]
-    
-    return items
-
+    return [a.username for a in Account.objects.filter(
+                                Q(username__startswith=name) |
+                                Q(first_name__startswith=name) |
+                                Q(last_name__startswith=name))]
 
 def add_category(request):
     """Quick addition of categories to the database."""
@@ -355,7 +337,6 @@ def parse_csv_file(request):
                 os.path.join("media", file.name)))
     t.setDaemon(True)
     t.start()
-
 
     return HttpResponseRedirect(reverse("inventory:csv-panel"))
 

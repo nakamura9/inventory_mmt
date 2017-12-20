@@ -7,6 +7,7 @@ from django.test import Client
 from django.shortcuts import reverse
 
 from common_base.tests import TestDataMixin
+from inv.models import Spares
 from common_base.models import Account
 
 
@@ -99,7 +100,80 @@ class OtherAjaxTests(TestCase, TestDataMixin):
 
     def test_get_users(self):
         """test is a json object is returned"""
-        pass
+        response = self.client.post(reverse("ajax:get-users"), 
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["users"]) > 0)
+
+    def test_get_combos_component(self):
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "T_C",
+                        "model": "component"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 1)
+
+    def test_get_combos_inv(self):
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "Test",
+                        "model": "inv"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 2)
+
+
+    def test_get_combos_machine(self):
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "T_M",
+                        "model": "machine"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 1)
+
+    def test_get_combos_section(self):
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "T_SE",
+                        "model": "section"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 1)
+
+    def test_get_combos_subassembly(self):
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "T_SA",
+                        "model": "subassembly"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 1)
+    
+    def test_get_combos_subunit(self):
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "T_S",
+                        "model": "subunit"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 1)
+
+    def test_get_combos_spares(self):
+        #find out why the test_data is not created
+        Spares(name="test_spares",
+                            description="some test description",
+                            stock_id="T_S",
+                            quantity=1).save()
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "T_S",
+                        "model": "spares"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 1)
 
     def test_add_run_data(self):
         """test made for machine run data"""
@@ -109,9 +183,6 @@ class OtherAjaxTests(TestCase, TestDataMixin):
         """used in the report generation form"""
         pass
     
-    def test_get_combos(self):
-        pass
-
     def test_parse_csv_file(self):
         """especially considering the issue of the posted file name """
         pass

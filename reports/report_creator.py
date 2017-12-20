@@ -31,6 +31,7 @@ class AbstractReport(object):
     def __init__(self, report):
         self.report = report
         self.context = {}
+        
 
     def get_template(self):
         if not self.template_name:
@@ -40,7 +41,7 @@ class AbstractReport(object):
     def generate_report(self):
         self.get_template()
         self.generate_context()
-        return self.template.render(Context(self.context))
+        return self.template.render(self.context)
 
     def generate_context(self):
         raise NotImplementedError()

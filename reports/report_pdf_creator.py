@@ -7,12 +7,13 @@ from .models import Report
 from xhtml2pdf import pisa
 from .report_creator import *
 
-
+"""Create report context variable which is a dictionary that maps report numbers to the context of the report view"""
 
 def link_callback(uri, rel):
     """
     Convert HTML URIs to absolute system paths so xhtml2pdf can access those
-    resources
+    resources.
+    This function is taken from an online source that provided xhtml2pdf.
     """
     # use short variable names
     sUrl = settings.STATIC_URL # Typically /static/
@@ -25,7 +26,7 @@ def link_callback(uri, rel):
     elif uri.startswith(sUrl):
         path = os.path.join(sRoot, uri.replace(sUrl, ""))
     else:
-        return uri # handle absolute uri (ie: http://some.tld/foo.png)
+        return uri
     # make sure that file exists
     if not os.path.isfile(path):
         raise Exception(
@@ -56,7 +57,7 @@ def generate_pdf(request, pk=None):
     template = get_template(template_path)
     context_creator = context_mapping[report.scope](report)
     context_creator.generate_context()
-    html = template.render(Context(context_creator.context))
+    html = template.render(context_creator.context)
     
     # create a pdf
     pisaStatus = pisa.CreatePDF(

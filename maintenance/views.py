@@ -139,9 +139,12 @@ class MaintenanceInbox(ListView):
 
         
         if self.request.user:
-            print self.request.user
-            user = Account.objects.get(pk= self.request.user.pk)
-            context["message"] = "%s:Hello %s." % (user.role, user.username)
+            try:
+                user = Account.objects.get(pk= self.request.user.pk)
+                context["message"] = "%s:Hello %s." % (user.role, user.username)
+            except:
+                return context
+            
             context["jobs"] = [order for order in WorkOrder.objects.all() if user == order.assigned_to]
             context["planned"] = [task  for task in PreventativeTask.objects.all() if user in task.assignments.all()]
             context["checklists"] = Checklist.objects.filter(resolver = user)
