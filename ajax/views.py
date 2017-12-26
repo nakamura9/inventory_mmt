@@ -284,7 +284,6 @@ def get_account(name):
 
 def add_category(request):
     """Quick addition of categories to the database."""
-
     if request.method == "POST":
         data = request.POST.copy().dict()
         data.pop("csrfmiddlewaretoken")

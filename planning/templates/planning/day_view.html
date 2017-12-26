@@ -37,15 +37,10 @@
         <div class="col-sm-3 well">
             <h2>Day View:</h2><hr />
             <h3>Select view</h3>
-            {% if mode == "maintenance" %}
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=day.date.year month=day.date.month %}" >Month</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=day.date.year month=day.date.month week=1 %}">Week</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
-            {% else %}
-            <a  class="btn btn-primary" href = "{% url 'planning:production-month' year=day.date.year month=day.date.month %}" >Month</a>
-            <a  class="btn btn-primary" href = "{% url 'planning:production-week' year=day.date.year month=day.date.month week=1 %}">Week</a>
-            <a  class="btn btn-primary" href = "{% url 'planning:production-day' year=day.date.year month=day.date.month day=day.date.day %}">Day</a>
-            {% endif %}
+
             <div class="bg-info">
                 <form action="" method="GET" role="form">
                     <legend>Filters</legend>
@@ -114,4 +109,5 @@
 {% endblock %}
 {% block body_script %}
 $("#id_date").datepicker();
+
 {% endblock %}

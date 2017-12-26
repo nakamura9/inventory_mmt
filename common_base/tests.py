@@ -254,20 +254,7 @@ class TestViews(TestCase):
     def setUpClass(cls):
         super(TestViews, cls).setUpClass()
         cls.client = Client()
-    
-    def test_post_check_and_delete_category(self):
-        """checks if a request creates a category"""
-        #delete view for category not yet implemented
-        response = self.client.post(reverse("inventory:new-category"),
-                                    data={
-                                    "created_for": "work_order",
-                                    "name":"Posted Test Category",
-                                    "description": "Posted Test Description"
-                                        })
-        
-        self.assertIsInstance(models.Category.objects.get(
-                            name="Posted Test Category"), models.Category)
-        
+            
     def test_sign_up_get(self):
         """get sign up page"""
         response = self.client.get(reverse("sign_up"))

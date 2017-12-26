@@ -15,18 +15,16 @@ class Day(object):
 
         day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         
-        assert(isinstance(date, datetime.date))
         self.date = date
         self.filters = {}
+        #makes sure no filter passes None to a query
         for filter in filters:
             if filters[filter]:
-                self.filters[filter] = filters[filter]#makes sure no filter passes None to a query
+                self.filters[filter] = filters[filter]
         
         self.include = [i.lower() for i in include]
         self.weekday = (date.weekday(), day_names[date.weekday()])
         self.agenda = []
-        
-    
 
     @property
     def is_weekend(self):
@@ -35,15 +33,14 @@ class Day(object):
             return False
         else: return True 
 
-
     def get_agenda(self):
         """performed by subclasses"""
         raise NotImplementedError()
 
-
     def sort_agenda(self):
         raise NotImplementedError()
-        
+
+
 class ProductionElement(object):
     def __init__(self, machine, date):
         """instantiated with a machine and a date abstraction used to
@@ -53,7 +50,6 @@ class ProductionElement(object):
             self.date = date.date()
         else:
             self.date = date
-
         self.run_data = self.machine.run_on_date(self.date)
 
     @property
@@ -61,17 +57,19 @@ class ProductionElement(object):
         p_tasks = self.machine.preventativetask_set.filter(scheduled_for=self.date)
         if p_tasks.count() > 0:
             return sum((i.estimated_downtime.seconds for i in p_tasks)) / 3600.0 
-
         return 0.0
-
 
     @property
     def running_hours(self):
-        return self.run_data.run_hours
+        for run in self.run_data:
+            if run.is_running(self.date):
+                return run.run_hours
+        return 0.0
 
     @property
     def net_up_time(self):
         return self.running_hours - self.planned_downtime
+
 
 class ProductionDay(Day):
     """Lists events associated with orders"""
@@ -80,51 +78,47 @@ class ProductionDay(Day):
         """Production days look out for manufacture days and 
         delivery dates. 
         NB Production day ignores include as there is only one model involved"""
-        self.agenda = [ProductionElement(mech, self.date) for mech in Machine.objects.all() if mech.is_running_on_date(self.date)]
-        
-                
-        
+        self.agenda = [ProductionElement(mech, self.date) \
+            for mech in Machine.objects.all() \
+                if mech.is_running_on_date(self.date)]
+
     @property
     def run_count(self):
         return len(self.agenda)
 
 class MaintenanceDay(Day):
     """Lists events based on preventativeTasks and Checklists"""
-    
-
     @property
     def checklist_count(self):
-        return len([item for item in self.agenda if isinstance(item, Checklist)])
+        return len([item for item in self.agenda if isinstance(
+            item, Checklist)])
 
     @property
     def job_count(self):
         return len([item for item in self.agenda if isinstance(item, PreventativeTask)])
-    
+
     def get_agenda(self):
         """Maintenance days look out for planned jobs and checklists"""
         self.agenda = []
         if "checks" in self.include:
             for check in Checklist.objects.all().filter(**self.filters):
-                if check.is_open and (self.date > check.creation_date):
+                if check.is_open and (self.date >= check.creation_date):
                     if check.frequency == "daily" and not self.is_weekend:
                         self.agenda.append(check)
-                    
+
                     if check.frequency != "daily" and check.creation_date.weekday() == \
                         self.weekday[0]:
                         self.agenda.append(check)
-        
-        
+
         if "jobs" in self.include:
             if self.filters.get("resolver", None):
                 self.filters["assignments"] = self.filters["resolver"]
                 del self.filters["resolver"]
-        
+
             self.agenda += [job for job in \
-                        PreventativeTask.objects.filter(
-                            scheduled_for = self.date).filter(
-                                **self.filters
-                            )]
-                    
+                PreventativeTask.objects.filter(
+                    scheduled_for=self.date).filter(**self.filters)]
+
 
 class Week(object):
     """
@@ -143,25 +137,21 @@ class Week(object):
         self.filters = filters
         self.include = include
 
-
     @property
     def first(self):
         """first day of the month"""
         return datetime.date(self.year, self.month, 1)
     
-
     def get_week_days(self):
-        
         _calendar = calendar.Calendar()
         self.days=_calendar.monthdatescalendar(self.year, self.month)[self.week]
         
-
     def get_week_agenda(self):
         if self.days == []:
             self.get_week_days()
         for day in self.days:
-            _day =self.day_type(day, filters = self.filters,
-                                include = self.include)
+            _day =self.day_type(day, filters=self.filters,
+                include=self.include)
             _day.get_agenda()
             self.week_agenda.append(_day)        
         
@@ -182,25 +172,31 @@ class Month(object):
         self.include = include
         self.month = month
 
-
     def get_dates(self):
         _calendar = calendar.Calendar()
         self.days=_calendar.monthdatescalendar(self.year, self.month)
 
-
     def get_month_agenda(self):
         if self.days == None:
             self.get_dates()
-
-        
         for row in self.days:
             self.month_agenda.append([])
             for col in row:
-                day = self.day_type(col, filters = self.filters, 
-                                        include = self.include)
+                day = self.day_type(col, filters=self.filters, 
+                    include=self.include)
                 day.get_agenda()
                 self.month_agenda[-1].append(day)
 
-        
 
-                
+def get_include(cls):
+    """
+    Utility function for selecting the models to include based on a filter accompanying
+    the GET request.
+    """
+    _include = []
+    if cls.request.GET.get("checklists", None) == "on":
+        _include.append("checks")
+    if cls.request.GET.get("planned_jobs", None) == "on":
+        _include.append("jobs")
+
+    return _include

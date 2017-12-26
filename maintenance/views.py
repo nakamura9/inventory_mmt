@@ -42,10 +42,7 @@ class PlannedMaintenanceView(ListView):
     paginate_by =20
 
     def get_queryset(self):
-        
-        
-        if len(self.request.GET.items()) == 1 or \
-            len(self.request.GET.items()) == 0:
+        if len(self.request.GET.items()) < 2:
             jobs_queryset = PreventativeTask.objects.all()
             checklist_queryset = Checklist.objects.all()
         else:

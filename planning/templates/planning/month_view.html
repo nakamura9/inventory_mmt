@@ -57,16 +57,10 @@
              - Planned Jobs</p>
             <h3>Select view.</h3>
             <hr />
-            {% if mode == "maintenance" %}
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=month.year month=month.month %}" >Month</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=month.year month=month.month week=1 %}">Week</a>
             <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=month.year month=month.month day=1 %}">Day</a>
-            {% else %}
-            <a  class="btn btn-primary" href = "{% url 'planning:production-month' year=month.year month=month.month %}" >Month</a>
-            <a  class="btn btn-primary" href = "{% url 'planning:production-week' year=month.year month=month.month week=1 %}">Week</a>
-            <a  class="btn btn-primary" href = "{% url 'planning:production-day' year=month.year month=month.month day=1 %}">Day</a>
-            {% endif %}
-
+            
         <div class="bg-info">
             <form action="" method="GET" role="form">
                 <legend>Filters</legend>

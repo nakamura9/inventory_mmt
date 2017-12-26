@@ -10,7 +10,7 @@ from django.shortcuts import reverse
 
 from common_base.tests import TestDataMixin
 from inv.models import Spares, Machine
-from common_base.models import Account
+from common_base.models import Account, Category
 from inventory_mmt import settings
 
 class selectAjaxCalls(TestCase, TestDataMixin):
@@ -196,6 +196,18 @@ class OtherAjaxTests(TestCase, TestDataMixin):
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertTrue(Machine.objects.first().run_data.all().count() == 1)
 
+    def test_add_category(self):
+        """checks if a request creates a category"""
+        #delete view for category not yet implemented
+        response = self.client.post(reverse("ajax:add-category"),
+                                    data={"csrfmiddlewaretoken":"",
+                                    "created_for": "work_order",
+                                    "name":"Posted Test Category",
+                                    "description": "Posted Test Description"
+                                        })
+        
+        self.assertIsInstance(Category.objects.get(
+                            name="Posted Test Category"), Category)
 
     def test_add_equipment(self):
         """used in the report generation form"""
