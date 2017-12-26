@@ -22,6 +22,7 @@
 </div>
 <script type="text/javascript">
     $("#id_start_date").datepicker();
+    $("#id_end_date").datepicker();
 
 function isChecked(sel){
     if(sel.is(":checked")){
@@ -42,6 +43,7 @@ function addRunData(){
             data: {
                 "csrfmiddlewaretoken": "{{csrf_token}}",
                 "start_date": $("#id_start_date").val(),
+                "end_date": $("#id_end_date").val(),
                 "machine": $("#id_machine").val(),
                 "run_hours": $("#id_run_hours").val(),
                 "run_days": $("#id_run_days").val(),
@@ -56,7 +58,9 @@ function addRunData(){
             success: function(result){
                 if(result.success){
                     alert("success");
-                    window.location.href = "{% url 'inventory:edit_machine' pk=object.pk %}"
+                    {% if edit %}
+                    window.location.href = "{% url 'inventory:edit_machine' pk=object.pk %}";
+                    {% endif %}
                 }else{
                     alert("failure");
                 }

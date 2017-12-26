@@ -77,9 +77,9 @@
                     <td>{{item.machine}}</td>
                     <td>{{item.description | truncatechars:40}}</td>
                     <td>
-                        <a href="{% url 'jobcards:preventative-task-detail' pk=item.pk %}">Details</a> |
-                        <a href="{% url 'jobcards:edit-preventative-task' pk=item.pk %}">Edit</a> |
-                        <a href="{% url 'jobcards:delete-preventative-task' pk=item.pk %}">Delete</a>
+                        <a class="btn btn-info" href="{% url 'jobcards:preventative-task-detail' pk=item.pk %}">Details</a> 
+                        <a class="btn btn-warning" href="{% url 'jobcards:edit-preventative-task' pk=item.pk %}">Edit</a> 
+                        <a class="btn btn-danger" href="{% url 'jobcards:delete-preventative-task' pk=item.pk %}">Delete</a>
                     </td>
                 </tr>
                 {% else %}
@@ -90,9 +90,9 @@
                         <td>{{item.machine}}</td>
                         <td>{{item.title | truncatechars:40}}</td>
                         <td>
-                            <a href="{% url 'checklists:checklist_details' item.pk %}">Details</a> |
-                            <a href="{% url 'checklists:update_checklist' item.pk %}">Edit</a> | 
-                            <a href="{% url 'checklists:delete_checklist' item.pk %}">Delete</a>
+                            <a class="btn btn-info" href="{% url 'checklists:checklist_details' item.pk %}">Details</a> 
+                            <a class="btn btn-warning" href="{% url 'checklists:update_checklist' item.pk %}">Edit</a>  
+                            <a class="btn btn-danger" href="{% url 'checklists:delete_checklist' item.pk %}">Delete</a>
                             
                         </td>
                     </tr>

@@ -15,6 +15,7 @@ from .models import Account
 from inv.models import Machine
 
 class AboutTemplateView(TemplateView):
+    """shows the logo and the software license"""
     template_name = os.path.join("common_base", "about.html")
 
 def test_features(request):
@@ -76,9 +77,7 @@ def sign_up(request):
 
 def logout(request):
     """Function used to logout users without an associated page
-    
     #add js dialog box next time.
-
     always returns the login page."""
     
     if request.user.is_authenticated:

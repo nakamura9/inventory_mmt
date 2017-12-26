@@ -60,8 +60,8 @@ def filter_by_dates(queryset, start, stop):
     Input
     =======
     Queryset
-    Start - string (%m/%d/%Y)
-    Stop - string (%m/%d/%Y)
+    Start - string (%m/%d/%Y) or datetime
+    Stop - string (%m/%d/%Y) or datetime
 
     Output
     ========
@@ -73,7 +73,8 @@ def filter_by_dates(queryset, start, stop):
     sample = queryset.first()
 
     if start:
-        start = datetime.datetime.strptime(start, date_format)
+        if not isinstance(start, datetime.datetime):
+            start = datetime.datetime.strptime(start, date_format)
         start = pytz.timezone("Africa/Harare").localize(start)
         if 'creation_date' in dir(sample):
             queryset = queryset.filter(creation_date__gte= start)
@@ -88,7 +89,9 @@ def filter_by_dates(queryset, start, stop):
             
 
     if stop:
-        stop = datetime.datetime.strptime(stop, date_format)
+        if not isinstance(stop, datetime.datetime):
+            stop = datetime.datetime.strptime(stop, date_format)
+    
         stop = pytz.timezone("Africa/Harare").localize(stop)
         if 'creation_date' in dir(sample):
             queryset = queryset.filter(creation_date__lte= stop)
@@ -126,7 +129,8 @@ def ajax_required(ret_unexcepted):
 
 
 def role_test(user):
-    if settings.ALLOW_RANDOM_ACCESS:
+    """checks if a user is admin used in the mixins and decorators used to limit access to certain pages"""
+    if settings.TEST_CONDITIONS:
         return True
     try:
         acc = Account.objects.get(username=user.username)
@@ -194,6 +198,7 @@ def parse_file(status_store, file_name):
                     status_store["messages"].append("Error: %s row: %d: There is missing data in this row" % (str(fil.iloc[i,0]), i))
                     i += 1
                 
+            # doesnt work
             if len(str(num)) % 2 != 0:
                 id_string =  "0" + str(num)
             else:

@@ -91,6 +91,7 @@ class PreventativeTaskEditForm(forms.ModelForm, BootstrapMixin):
         model = PreventativeTask
         fields = [ "machine", "section", "subunit", "subassembly", "component", "scheduled_for","description",  "frequency", "estimated_labour_time", "estimated_downtime" ]# tasks are handled in the POST
 
+
 class PreventativeTaskCompleteForm(forms.ModelForm, BootstrapMixin):
     """Class for completing preventative tasks.
 

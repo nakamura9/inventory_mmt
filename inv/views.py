@@ -57,31 +57,27 @@ class EngineeringInventoryView(UserPassesTestMixin , TemplateView):
 
 class AssetCreate(CreateView):
     """Asset creation view"""
-    
     template_name = os.path.join("inv", "engineering_inventory", 
-                                "create_update","addasset.html") 
+        "create_update","addasset.html") 
     model = Asset
     form_class = AssetForm
     success_url = reverse_lazy("inventory:inventory-home")
 
 class AssetUpdate(UpdateView):
     """Asset Update view"""
-
-    template_name = os.path.join("inv","engineering_inventory", "create_update", "addasset.html") 
+    template_name = os.path.join("inv","engineering_inventory", "create_update",    "addasset.html") 
     model = Asset
     form_class = AssetForm
     success_url = reverse_lazy("inventory:inventory-home")
 
 class AssetDetail(DetailView):
     """Asset Details view"""
-
     template_name = os.path.join("inv","engineering_inventory", "details", "asset_detail.html") 
     model = Asset
 
 class SparesCreate(CreateView):
     """Spares creation view"""
-
-    template_name = os.path.join("inv","engineering_inventory", "create_update",                                 "addspares.html") 
+    template_name = os.path.join("inv","engineering_inventory", "create_update",    "addspares.html") 
     model = Spares
     form_class = SparesForm
     success_url = reverse_lazy("inventory:inventory-home")
@@ -92,11 +88,9 @@ class SparesCreate(CreateView):
 class SparesListView(ListView):
     paginate_by = 20
     model = Spares
-    template_name = os.path.join("inv", "engineering_inventory", "list", "spares_list.html")
-
+    template_name = os.path.join("inv", "engineering_inventory", "list",            "spares_list.html")
 
     def get_queryset(self, *args, **kwargs):
-
         sort = self.request.GET.get("sort_by", None)
         search = self.request.GET.get("search", None)
         #machine = self.request.GET.get("machine", None)
@@ -114,6 +108,7 @@ class SparesListView(ListView):
             else:
                 queryset = self.model.objects.filter(component_set__gt=0)
         
+        #why?
         """if machine:
             if queryset:
                 queryset = queryset.filter()
@@ -139,13 +134,11 @@ class SparesListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super(SparesListView, self).get_context_data(*args, **kwargs)
         context["spares_filter_form"] = SparesFilterForm
-        
         context["current_filters"] = "&".join([i[0]+"="+i[1] for i in self.request.GET.items() if i[0] != "page"])
         return context
 
 class SparesUpdate(UpdateView):
     """Spares Updating view"""
-
     template_name = os.path.join("inv","engineering_inventory", "create_update", "addspares.html") 
     model = Spares
     form_class = SparesForm
@@ -153,14 +146,13 @@ class SparesUpdate(UpdateView):
 
 class SparesDetail(DetailView):
     """Spares details view"""
-
     template_name = os.path.join("inv", "engineering_inventory", "details","spares_detail.html") 
     model = Spares
 
 class MachineCreateView(UserPassesTestMixin, CreateView):
     """Machine Create View"""
-    
-    template_name = os.path.join("inv", "engineering_inventory", "create_update","addmachine.html") 
+    template_name = os.path.join("inv", "engineering_inventory", 
+        "create_update","addmachine.html") 
     model = Machine
     form_class = MachineForm
     success_url = reverse_lazy("inventory:inventory-home")
@@ -171,12 +163,15 @@ class MachineCreateView(UserPassesTestMixin, CreateView):
     def get_context_data(self):
         context = super(MachineCreateView, self).get_context_data()
         context["run_data_form"] = RunDataForm()
+        #flag used int add_run_data template
+        context["edit"] = False
         return context
 
 class SubUnitCreateView(UserPassesTestMixin,CreateView):
     """SubUnit create view"""
 
-    template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubunit.html")
+    template_name = os.path.join("inv", "engineering_inventory", 
+        "create_update","addsubunit.html")
     model = SubUnit
     form_class = SubUnitForm
     
@@ -189,7 +184,7 @@ class SectionCreateView(UserPassesTestMixin,CreateView):
     """Section create view"""
 
     template_name = os.path.join("inv", "engineering_inventory", 
-    "create_update", "addsection.html")
+        "create_update", "addsection.html")
     model = Section
     form_class = SectionForm
     
@@ -197,7 +192,6 @@ class SectionCreateView(UserPassesTestMixin,CreateView):
     login_url ="/login/"
     def test_func(self):
         return role_test(self.request.user)
-
 
     def get_context_data(self):
         context = super(SectionCreateView, self).get_context_data()
@@ -207,16 +201,14 @@ class SectionCreateView(UserPassesTestMixin,CreateView):
 
 class SectionUpdateView(UserPassesTestMixin,UpdateView):
     """Section update view"""
-
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsection.html")
     model = Section
-    form_class = SectionForm
-    
+    form_class = SectionForm  
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
+
     def test_func(self):
         return role_test(self.request.user)
-
 
     def get_context_data(self):
         context = super(SectionUpdateView, self).get_context_data()
@@ -224,44 +216,40 @@ class SectionUpdateView(UserPassesTestMixin,UpdateView):
         return context
 
 
-        
-
 class SubAssyCreateView(UserPassesTestMixin,CreateView):
     """SubAssembly create view"""
-
     template_name = os.path.join("inv","engineering_inventory", "create_update", "addsubassy.html")
     model = SubAssembly
     form_class = SubAssyForm
-    
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
+    
     def test_func(self):
         return role_test(self.request.user)
 
 
 class PlantCreateView(UserPassesTestMixin,CreateView):
     """Plant create view"""
-
-    template_name = os.path.join("inv", "engineering_inventory", "create_update","addplant.html")
+    template_name = os.path.join("inv", "engineering_inventory", 
+        "create_update","addplant.html")
     model = Plant
     fields = ["plant_name"]
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
+    
     def test_func(self):
         return role_test(self.request.user)
 
 
 class ComponentCreateView(UserPassesTestMixin,CreateView):
     """Component create view"""
-
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addcomponent.html")
     model = Component
     form_class = ComponentForm
-    
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
+
     def test_func(self):
-        print role_test(self.request.user)
         return role_test(self.request.user)
 
     def post(self, *args, **kwargs):
@@ -275,7 +263,6 @@ class ComponentCreateView(UserPassesTestMixin,CreateView):
 
 class ComponentEditView(UserPassesTestMixin,UpdateView):
     """Component update view"""
-
     model = Component
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addcomponent.html")
     form_class = ComponentForm
@@ -296,40 +283,41 @@ class ComponentEditView(UserPassesTestMixin,UpdateView):
 
 class MachineEditView(UserPassesTestMixin,UpdateView):
     """Machine update view"""
-
     model = Machine
     template_name = os.path.join("inv", "engineering_inventory", "create_update","update_machine.html")
     form_class = MachineForm
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
+
     def test_func(self):
         return role_test(self.request.user)
 
     def get_context_data(self):
         context = super(MachineEditView, self).get_context_data()
         context["run_data_form"] = RunDataForm()
+        context["edit"] = True
         return context
 
 class SubAssyEditView(UserPassesTestMixin,UpdateView):
     """SubAssembly update view"""
-
     model = SubAssembly
     form_class = SubAssyForm
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubassy.html")
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
+
     def test_func(self):
         return role_test(self.request.user)
 
 
 class SubunitEditView(UserPassesTestMixin,UpdateView):
     """SubUnit update view"""
-
     model = SubUnit
     form_class = SubUnitForm
     template_name = os.path.join("inv", "engineering_inventory", "create_update","addsubunit.html")
     success_url = reverse_lazy("inventory:inventory-home")
     login_url ="/login/"
+
     def test_func(self):
         return role_test(self.request.user)
 
@@ -344,35 +332,38 @@ class MachineView(DetailView):
     
     Context populated with breakdown history, checklist data and planned jobs.
     """
-    template_name = os.path.join("inv","engineering_inventory", "details", "machine_details.html")
+    template_name = os.path.join("inv","engineering_inventory", "details", 
+        "machine_details.html")
     model = Machine 
      
     def get_context_data(self, *args, **kwargs):
         context = super(MachineView, self).get_context_data(*args, **kwargs)
         Planned = namedtuple("Planned", "date resolver est_time type")
-        planned_for_machine =PreventativeTask.objects.filter(machine=self.object, 
-                                                    completed_date=None)
-        context["planned_jobs"] = [Planned(job.scheduled_for, job.assignments.first(),
-                                        job.estimated_labour_time, "Planned Job") for job in planned_for_machine]
+        planned_for_machine =PreventativeTask.objects.filter(
+            machine=self.object, completed_date=None)
+        context["planned_jobs"] = [
+            Planned(job.scheduled_for, 
+            job.assignments.first(),
+            job.estimated_labour_time, "Planned Job") \
+                for job in planned_for_machine]
         checklist_on_machine = Checklist.objects.filter(machine = self.object)
         
         
         for check in checklist_on_machine:
             if check.is_open:
-                context["planned_jobs"].append(Planned(check.creation_date, 
-                                                        check.resolver, 
-                                                        check.estimated_time,
-                                                        "Checklist"))
+                context["planned_jobs"].append(
+                    Planned(check.creation_date, 
+                        check.resolver, 
+                         check.estimated_time,
+                         "Checklist"))
 
         UnPlanned = namedtuple("UnPlanned", "date resolver description status")
-
         unplanned_job_on_machine = WorkOrder.objects.filter(machine = self.object)
-        
-        
-        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to, b.description, b.status) \
-                                    for b in unplanned_job_on_machine]
-
-        
+                
+        context["unplanned_jobs"] = [
+            UnPlanned(b.execution_date, b.assigned_to,
+                 b.description, b.status) \
+                    for b in unplanned_job_on_machine]        
         return context
 
 
@@ -380,8 +371,8 @@ class SubUnitView(DetailView):
     """
     Provides data concerning a particular subunit
     """
-
-    template_name = os.path.join("inv", "engineering_inventory", "details", "subunit_details.html")
+    template_name = os.path.join("inv", "engineering_inventory", "details", 
+        "subunit_details.html")
     model = SubUnit
 
 
@@ -390,34 +381,35 @@ class SectionDetailView(DetailView):
     
     Context populated with breakdown history, checklist data and planned jobs.
     """
-    
     model = Section
     template_name = os.path.join("inv","engineering_inventory", "details", "section_details.html")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(SectionDetailView, self).get_context_data(*args, **kwargs)
+        context = super(SectionDetailView, self).get_context_data(
+            *args, **kwargs)
         Planned = namedtuple("Planned", "date resolver est_time type")
-        planned_for_machine =PreventativeTask.objects.filter(section=self.object, completed_date = None)
-        context["planned_jobs"] = [Planned(job.scheduled_for, job.assignments.first(),
-                                        job.estimated_downtime, "Planned Job") \
-                                        for job in planned_for_machine]
+        planned_for_machine =PreventativeTask.objects.filter(
+            section=self.object, completed_date = None)
+        context["planned_jobs"] = [
+            Planned(job.scheduled_for, job.assignments.first(),
+                job.estimated_downtime, "Planned Job") \
+                    for job in planned_for_machine]
 
-        checklist_on_machine = Checklist.objects.filter(section = self.object)
-        
+        checklist_on_machine = Checklist.objects.filter(section = self.object) 
         for check in checklist_on_machine:
             if check.is_open:
-                context["planned_jobs"].append(Planned(check.creation_date, 
-                                                        check.resolver, 
-                                                        check.estimated_time,
-                                                        "Checklist"))
+                context["planned_jobs"].append(
+                    Planned(check.creation_date, 
+                        check.resolver, 
+                        check.estimated_time,
+                        "Checklist"))
 
         UnPlanned = namedtuple("UnPlanned", "date resolver description status")
-
-        unplanned_job_on_machine = WorkOrder.objects.filter(section = self.object)
-                
-        context["unplanned_jobs"] = [UnPlanned(b.execution_date, b.assigned_to, b.description, b.status) \
-                                    for b in unplanned_job_on_machine]
-
+        unplanned_job_on_machine = WorkOrder.objects.filter(
+            section = self.object)                
+        context["unplanned_jobs"] = [
+            UnPlanned(b.execution_date, b.assigned_to, b.description, b.status)\
+                for b in unplanned_job_on_machine]
         return context
 
 
@@ -441,7 +433,7 @@ class SubAssyView(DetailView):
 #                      Production inventory                                   #
 ###############################################################################
 
-
+'''
 class CategoryList(ListView):
     """Category list view"""
 
@@ -524,7 +516,7 @@ class OrderDetailView(DetailView):
 
     model = Order
     template_name = os.path.join("inv","production_inventory", "details", "orders_detailview.html")
-
+'''
 
 ###############################################################################
 #                               Delete Views                                  #                              
@@ -562,12 +554,12 @@ def delete_machine(request, pk):
     get_object_or_404(Machine, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
 
-def delete_order(request, pk):
+'''def delete_order(request, pk):
     """Deletes an Order specified by pk, raises 404 if not found"""
 
     get_object_or_404(Order, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:engineering-inventory"))
-
+'''
 def delete_run_data(request, pk=None, mech_pk=None):
     get_object_or_404(RunData, pk=pk).delete()
     return HttpResponseRedirect(reverse("inventory:edit_machine", kwargs={"pk":mech_pk}))

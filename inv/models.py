@@ -1,10 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import division
-
-
 from datetime import timedelta
 import datetime
-
 
 from django.utils import timezone
 from django.db import models
@@ -25,6 +22,7 @@ class Asset(models.Model):
 
     def __str__(self):
         return self.asset_unique_id
+
 
 class Spares(models.Model):
     """
@@ -48,6 +46,7 @@ class Spares(models.Model):
     def __str__(self):
         return self.stock_id
 
+
 class Plant(models.Model):
     """Used to distinguish main plant from sheet plant
     
@@ -61,6 +60,7 @@ class Plant(models.Model):
 
 class RunData(models.Model):
     start_date = models.DateField()
+    end_date = models.DateField()
     run_days = models.IntegerField()
     run_hours = models.FloatField()
     
@@ -79,59 +79,30 @@ class RunData(models.Model):
     def is_running(self, day):
         if isinstance(day, datetime.datetime):
             day = day.date()
-        if not day >= self.start_date:
+        #hasn't been applied yet
+        if day < self.start_date or day > self.end_date:
             return False
 
-        run_days = {1:self.monday,
-                    2:self.tuesday,
-                    3:self.wednesday,
-                    4:self.thursday,
-                    5:self.friday,
-                    6:self.saturday,
-                    0:self.sunday}
+        run_days = {0:self.monday,
+                    1:self.tuesday,
+                    2:self.wednesday,
+                    3:self.thursday,
+                    4:self.friday,
+                    5:self.saturday,
+                    6:self.sunday}
         
-        try:
-            #Slow and dirty!
-            filter = RunData.objects.filter(machine=self.machine_set.first()).order_by("start_date")
-            next =self.get_next_by_start_date()
-            if not next in filter:
-                next = None 
-        except:
-            next = None
-            
-        if not next:
-            return run_days[day.weekday()]
-
-        else:
-            if day <= next.start_date:
-                return run_days[day.weekday()]
-        
-        return False
+        return run_days[day.weekday()]
 
     @property
     def total_run_hours(self):
-        try:
-            next = self.get_next_by_start_date().start_date
-            if next > datetime.date.today():
-                next = datetime.date.today()
-        except:
-            next = datetime.date.today()
+        curr_day = self.start_date
+        hours = 0
+        while curr_day < self.end_date:
+            if self.is_running(curr_day):
+                hours += self.run_hours
+            curr_day += datetime.timedelta(days=1)
 
-        if next > self.start_date:
-            delta = next - self.start_date
-        else: 
-            return 0
-
-        weeks = int(delta.days / 7)
-
-        rem = delta.days - (weeks * 7) 
-
-        if rem > self.run_days: 
-            days  = self.run_days
-        else:
-            days = rem
-
-        return (weeks * self.run_days * self.run_hours) + (days * self.run_hours)
+        return hours
 
 
 class Machine(models.Model):
@@ -174,13 +145,18 @@ class Machine(models.Model):
     def availability_over_period(self, start, stop=datetime.date.today()):
         """used to calculate the machines availability over a given period"""
         downtime = self.unplanned_downtime_over_period(start, stop)
-        available_time = self.run_hours_over_period(start, stop)
+        available_time = self.run_hours_over_period(start, stop) - \
+            self.planned_downtime_over_period(start, stop)
+
         if downtime > available_time:
             return 0
+        elif available_time == 0:
+            return 100 #?
         return ((available_time-downtime)/ available_time) * 100
 
     def planned_downtime_over_period(self, start, stop=datetime.date.today()):
         """used to calculate downtime over a period of time"""
+        #come up with a variant for repeated tasks
         p_tasks = self.preventativetask_set.filter(Q(completed_date__gte=start) & Q(completed_date__lte=stop))
         if p_tasks.count() > 0:
             return sum((i.actual_downtime.seconds for i in p_tasks)) / 3600.0 
@@ -198,21 +174,13 @@ class Machine(models.Model):
         """calculate run data for a period of time.
         NB Very inefficient!
         """
-        period = (end - start).days
-        if period == 0:
-            raise ValueError("The period is less than one day use 'run_on_date' instead")
         curr_day = start
         total_hours = 0
-        for i in range(period):
-            curr_day = curr_day + datetime.timedelta(days=i)
-            curr_run = self.run_on_date(curr_day)
-            if curr_run:
+        while curr_day < end:
+            for curr_run in self.run_on_date(curr_day):
                 if curr_run.is_running(curr_day):
                     total_hours += curr_run.run_hours
-        #need to come up with way of approximating run_time
-        if total_hours == 0:
-            return 24 * period
-        
+            curr_day += datetime.timedelta(days=1)        
         return total_hours
 
     def availability_on_date(self, date):
@@ -231,74 +199,21 @@ class Machine(models.Model):
             return ((available_time - downtime)/ available_time) * 100
         
         else:
-            return 100
+            return 100.0
 
     def run_on_date(self, date):
         """returns the run data for the stated date
-        
-        Input
-        -----
-        date object
-        
-        Output
-        RunData object or None.
-        
         """
-        _run_data = self.run_data.filter(start_date__lte=date)
-        if _run_data.count() > 0:
-            return _run_data.latest("start_date")
-        return None
+        return self.run_data.filter(
+            Q(start_date__lte=date) & Q(end_date__gte=date))
 
     def is_running_on_date(self, date):
-        data = self.run_on_date(date)
-        if data:
-            return data.is_running(date)
-        else: return False
-
-    @property
-    def current_run(self):
-        self.run_on_date(datetime.date.today())
-
-    @property
-    def total_time(self):
-        if self.run_data.count() == 0:
-            return 0.0
-        first = self.run_data.all().order_by("start_date")[0]
-        return self.total_run_time_over_period(first.start_date)
-
-    def total_run_time_over_period(self, start, end=datetime.date.today()):
-       #for time defined within the period
-        _run_data = self.run_data.filter(models.Q(start_date__gte=start) & \
-                                            models.Q(start_date__lte=end)).order_by("start_date")
-
-        #for time defined before the period but continuing through it 
-        def initial_run_times(obj, start):
-            older = obj.run_data.filter(start_date__lt=start)
-            if older.count() > 0:
-                closest = older.latest("start_date")
-                next = closest.get_next_by_start_date()
-                days = (start - next.start_date).days
-                
-                weeks = int(days/ 7)
-                rem_days = days % 7
-                if rem_days > closest.run_days:
-                    rem_hours = closest.run_days * closest.run_hours
-                else:
-                    rem_hours = rem_days * closest.run_hours
-            
-                return (weeks * closest.run_days * closest.run_hours) + rem_hours
-
-            else: return 0
-
-        first_hours = initial_run_times(self, start)
-        
-        if _run_data.count() == 0:
-            total = 0
-        else: 
-            total = sum((r.total_run_hours for r in _run_data))
-        
-        return first_hours + total
-
+        """used on the planning application"""
+        run_set = self.run_on_date(date)
+        for run in run_set:
+            if run.is_running(date):
+                return True
+        return False
 
     def __str__(self):
         return self.machine_name
@@ -306,10 +221,6 @@ class Machine(models.Model):
     @property
     def recent_run_data(self):
         return self.run_data.all().order_by("start_date")[:5]
-
-    @property
-    def n_units(self):
-        return self.subunit_set.all().count()
 
     @property
     def n_breakdowns_today(self):
@@ -334,25 +245,6 @@ class Machine(models.Model):
         bi_ann = timezone.now() - timedelta(days=182)
         return self.workorder_set.filter(execution_date__gt = bi_ann).count()
 
-
-    @property
-    def checklist_coverage(self):
-        checklists = self.checklist_set.all()
-        n_units = self.subunit_set.all().count()
-        n_sections = self.section_set.all().count()
-        n_units_covered = 0
-        n_sections_covered = 0
-        
-        for section in self.section_set.all():
-            if section.checklist_set.all().count() > 0:
-                n_sections_covered += 1
-        for unit in self.subunit_set.all():
-            if unit.checklist_set.all().count() > 0:
-                n_units_covered += 1
-
-
-        if n_sections + n_units  != 0:
-            return ((n_sections_covered + n_units_covered) / (n_sections + n_units)) * 100
 
 class Section(models.Model):
     """
@@ -399,7 +291,8 @@ class SubUnit(models.Model):
     
     def __str__(self):
         return self.unit_name
-    
+
+
 class SubAssembly(models.Model):
     """
     Level 4
@@ -424,6 +317,7 @@ class SubAssembly(models.Model):
 
     def __str__(self):
         return self.unit_name
+
 
 class Component(models.Model):
     """
@@ -475,6 +369,7 @@ class InventoryItem(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Order(models.Model):
     """

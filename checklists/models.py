@@ -28,19 +28,20 @@ class Checklist(models.Model):
     category -> string (ENUM)
     frequency -> string (ENUM)
     on_hold -> Boolean
-    comments -> Comment Instance
-    tasks -> Task Instance
+    comments -> Multiple Comments instances
+    tasks -> Multiple Task instances
     
     
     Properties
     ==========
-    is_opem -> Boolean
+    is_open -> Boolean
     get_type -> string
     next -> timedelta
     
     Methods
     ==========
-    None
+    will_be_open_over_period(start, stop) 2 date objects return bool
+    is_open_on_date(date) date object returns bool
     """
     
     def save(self, *args, **kwargs):

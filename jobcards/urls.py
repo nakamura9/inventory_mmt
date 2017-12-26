@@ -3,7 +3,6 @@ import views as jc_views
 
 app_name = "jobcards"
 
-
 workorder_urls = [
     url(r"^new-work-order/?$", jc_views.NewWorkOrderView.as_view(), name="new-work-order"),
     url(r"^work-order-list/?$", jc_views.WorkOrderList.as_view(), name="work-order-list"),
@@ -24,7 +23,4 @@ preventative_task_urls = [
     url(r'^accept-p-task/?$', jc_views.accept_p_task, name="accept-p-task"),
 ]
 
-
-urlpatterns = [
-    url(r"^get_resolvers/?$", jc_views.get_resolvers, name="get_resolvers"),
-] + workorder_urls + preventative_task_urls         
+urlpatterns = workorder_urls + preventative_task_urls         

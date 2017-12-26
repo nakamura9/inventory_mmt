@@ -2,18 +2,12 @@
 import os
 import json
 import datetime
-import pytz
 
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.forms import widgets
-from django import forms
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 from django.views import View
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 
@@ -254,27 +248,17 @@ def delete_preventative_task(request, pk=None):
     PreventativeTask.objects.get(pk=pk).delete()
     return HttpResponseRedirect(reverse_lazy("maintenance:planned-maintenance"))
 
-@csrf_exempt
-def get_resolvers(request):
-    """Returns a json representation of all the accounts in the application for instances where the resovler might change"""
-
-    resolvers = [[acc.username, acc.id] for acc in Account.objects.all()]
-    return HttpResponse(json.dumps(
-        {"resolvers": resolvers}
-    ), content_type="application/json")
 
 
-@csrf_exempt
 def accept_p_task(request):
     pk = request.POST.get("pk")
     resolver = request.POST.get("resolver")
     p_task = PreventativeTask.objects.get(pk=pk)
     p_task.assignments_accepted.add(Account.objects.get(username=resolver))
     p_task.save()
-    return HttpResponse(json.dumps({'accepted': 'True'}), content_type="application/json")
+    return HttpResponse(json.dumps({'accepted': True}), content_type="application/json")
 
-
-@csrf_exempt
+#rewrite to make accept approve and decline consistent
 def accept_job(request):
     pk = request.POST.get("pk")
     wo = WorkOrder.objects.get(pk=pk)

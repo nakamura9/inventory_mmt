@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import datetime
-import random
+import os
 
 from django.shortcuts import reverse
 from django.test import TestCase, Client
@@ -11,67 +11,7 @@ from checklists import models as ch_models
 from inv import models as inv_models
 from jobcards import models as jb_models
 from . import models
-from .utilities import time_choices
-
-
-class TestUtilities(TestCase):
-    """Tests the utilities functions.
-    
-    ajaxRequired decorator untested because the function is copied from the github community and has been tested by the author."""
-
-    def test_time_choices(self):
-        data = time_choices("13:00:00", "20:00:00", "00:15:00")
-        self.assertIsInstance(data, list)
-
-    def test_filter_by_dates(self):
-        """test with start only, stop only or both"""
-        pass
-
-    def test_role_test(self):
-        """tests function for determining the role of a user requesting a page"""
-        pass
-
-    def test_parse_spares_file(self):
-        """will need to create a sample a spares file"""
-        pass
-
-    def test_parse_inventory_file(self):
-        """will need to create a dummpy inventory_file"""
-        pass
-
-class TestViews(TestCase):
-    """Used to test content created by the category form."""
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestViews, cls).setUpClass()
-        cls.client = Client()
-    
-    def test_post_check_and_delete_category(self):
-        """checks if a request creates a category"""
-        #delete view for category not yet implemented
-        response = self.client.post(reverse("inventory:new-category"),
-                                    data={
-                                    "created_for": "work_order",
-                                    "name":"Posted Test Category",
-                                    "description": "Posted Test Description"
-                                        })
-        
-        self.assertIsInstance(models.Category.objects.get(
-                            name="Posted Test Category"), models.Category)
-        
-    def test_sign_up_get(self):
-        """get sign up page"""
-        pass
-
-    def test_sign_up_post(self):
-        """create account page"""
-        pass
-
-
-    def test_logout(self):
-        """logs in and then checks with the session that no user is present"""
-        pass
+from .utilities import *
 
 class TestDataMixin(object):
     """This class is used to provide test data for other applications, especially those whose tests have multiple dependancies.
@@ -84,13 +24,24 @@ class TestDataMixin(object):
 
     @classmethod
     def create_test_inventory_models(cls):
+        inv_models.Spares(name="test spares",
+                            description="test description",
+                            stock_id="01").save()
         inv_models.Machine(machine_name="Test Machine",
                                 unique_id="T_M",
                                 manufacturer="Langston",
                                 commissioning_date=datetime.date.today() \
                                 - datetime.timedelta(days=500),
                                 ).save()
-
+        inv_models.RunData(
+            start_date = datetime.date.today(),
+            end_date = datetime.date.today() + datetime.timedelta(days=7),
+            run_days = 3,
+            run_hours = 1,
+            monday=True,
+            tuesday=True,
+            wednesday=True).save()
+                        
         inv_models.Section(
             unique_id="T_SE",
             section_name= "Test Section",
@@ -151,7 +102,6 @@ class TestDataMixin(object):
                         production_status="planned",
                         delivery_status="storage").save()"""
 
-
     @classmethod
     def create_test_checklist(cls):
         if inv_models.Machine.objects.all().count() == 0:
@@ -164,7 +114,7 @@ class TestDataMixin(object):
             "title": "Test Checklist",
             "creation_date": datetime.date.today(),
             "last_completed_date": None,
-            "estimated_time": datetime.timedelta(hours=1, minutes=30),
+            "estimated_time": datetime.timedelta(hours=1),
             "start_time": datetime.time(15,30),
             "machine": inv_models.Machine.objects.get(pk="T_M"),
             "section": inv_models.Section.objects.get(pk="T_SE"),
@@ -176,39 +126,183 @@ class TestDataMixin(object):
         }
         ch_models.Checklist(**cls._checklist_data).save()
 
+    @classmethod
+    def create_test_preventative_task(cls):
+        jb_models.PreventativeTask(
+            machine= inv_models.Machine.objects.get(pk="T_M"),
+            section= inv_models.Section.objects.get(pk="T_SE"),
+            subunit=inv_models.SubUnit.objects.get(pk="T_S"),
+            subassembly=inv_models.SubAssembly.objects.first(),
+            component=inv_models.Component.objects.first(),
+            description="Some description...",
+            frequency="once",
+            estimated_labour_time=datetime.timedelta(seconds=3600),
+            estimated_downtime=datetime.timedelta(seconds=3600),
+            scheduled_for=datetime.date.today(),
+            actual_downtime=datetime.timedelta(seconds=3600),
+            completed_date=datetime.date.today()).save()
 
     @classmethod
     def create_test_workorders(cls):
-        jb_models.WorkOrder(type=models.Category.objects.first(),
-                            machine= inv_models.Machine.objects.get(pk="T_M"),
-                            section= inv_models.Section.objects.get(pk="T_SE"),
-                            subunit=inv_models.SubUnit.objects.get(pk="T_S"),
-                            subassembly=inv_models.SubAssembly.objects.first(),
-                            component=inv_models.Component.objects.first(),
-                            description="Some description...",
-                            execution_date=datetime.date.today(),
-                            estimated_labour_time="00:30",
-                            assigned_to=models.Account.objects.first(),
-                            priority="low",
-                            status="requested",
-                            resolver_action= "Some action...",
-                            actual_labour_time="00:30").save()
-        jb_models.WorkOrder.first().spares_issued_set.add(Spares.objects.first()).save()
-        jb_models.WorkOrder.first().spares_returned_set.add(Spares.objects.first()).save()
+        jb_models.WorkOrder(
+            type=models.Category.objects.first(),
+            machine= inv_models.Machine.objects.get(pk="T_M"),
+            section= inv_models.Section.objects.get(pk="T_SE"),
+            subunit=inv_models.SubUnit.objects.get(pk="T_S"),
+            subassembly=inv_models.SubAssembly.objects.first(),
+            component=inv_models.Component.objects.first(),
+            description="Some description...",
+            execution_date=datetime.date.today(),
+            completion_date=datetime.date.today(),
+            estimated_labour_time=datetime.timedelta(seconds=3600),
+            assigned_to=models.Account.objects.first(),
+            priority="low",
+            status="requested",
+            resolver_action= "Some action...",
+            actual_labour_time=datetime.timedelta(seconds=3600),
+            downtime=datetime.timedelta(seconds=3600)).save()
+        job = jb_models.WorkOrder.objects.first()
+        job.spares_issued.add(inv_models.Spares.objects.first())
+        job.spares_returned.add(inv_models.Spares.objects.first())
 
     @classmethod
     def create_dummy_accounts(cls):
-        models.Account(username= "Test User",
+        regular = models.Account(username= "Test User",
                 first_name="Test",
                 last_name="User",
-                password="test123",
-                role="artisan").save()
+                role="artisan")
+        regular.set_password("test123")#LIFE SAVER !!!
+        regular.save()
 
-        models.Account(username= "Test Admin User",
+        special = models.Account(username= "Test Admin User",
                 first_name="Test",
                 last_name="User",
-                password="test123",
-                role="admin").save()
+                role="admin")
+        special.set_password("test123")
+        special.save()
+
+
+class TestUtilities(TestCase, TestDataMixin):
+    """Tests the utilities functions.
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.create_dummy_accounts()
+        cls.create_test_inventory_models()
+        cls.create_test_workorders()
+        cls.today = datetime.datetime.today()
+    
+    def setUp(self):
+        self.status_store = {"messages":[],
+                    "successful": 0,
+                    "errors": 0,
+                    "start": 0.0,
+                    "stop": 0.0,
+                    "running": False,
+                    "finished": False,
+                    "file_length": 0,
+                    }
+
+    def test_time_choices(self):
+        data = time_choices("13:00:00", "20:00:00", "00:15:00")
+        self.assertIsInstance(data, list)
+
+    def test_filter_by_dates(self):
+        """test with start only, stop only or both"""
+        wos = jb_models.WorkOrder.objects.all()
+        queryset = filter_by_dates(wos, 
+                        self.today - datetime.timedelta(days=1),
+                        self.today + datetime.timedelta(days=1))
+        self.assertEqual(queryset.count(), 1) # one 
+
+        queryset = filter_by_dates(wos, 
+            self.today + datetime.timedelta(days=1),
+            self.today + datetime.timedelta(days=3))
+        self.assertEqual(queryset.count(), 0) #empty
+
+    def test_role_test(self):
+        """tests function for determining the role of a user requesting a page"""
+        self.assertTrue(role_test(Account.objects.get(
+            username ="Test Admin User")))
+        self.assertFalse(role_test(Account.objects.get(
+            username="Test User")))
+
+    def test_parse_spares_file(self):
+        """will need to create a sample a spares file"""
+        fil = os.path.join("common_base", "test_files", "test_spares.csv")
+        parse_spares_file(self.status_store, fil)
+        self.assertEqual(self.status_store["errors"], 0)
+        self.assertEqual(self.status_store["successful"],99)
+        self.assertTrue(self.status_store["finished"])
+
+    def test_parse_inventory_file(self):
+        """will need to create a dummpy inventory_file"""
+        fil = os.path.join("common_base", "test_files", "test_inv.csv")
+        inv_models.Machine(
+            unique_id="01",
+            machine_name="test machine",
+            manufacturer="someone").save()
+        parse_file(self.status_store, fil)
+        self.assertEqual(self.status_store["errors"], 0)
+        self.assertEqual(self.status_store["successful"], 98)
+
+
+class TestViews(TestCase):
+    """Used to test content created by the category form."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestViews, cls).setUpClass()
+        cls.client = Client()
+    
+    def test_post_check_and_delete_category(self):
+        """checks if a request creates a category"""
+        #delete view for category not yet implemented
+        response = self.client.post(reverse("inventory:new-category"),
+                                    data={
+                                    "created_for": "work_order",
+                                    "name":"Posted Test Category",
+                                    "description": "Posted Test Description"
+                                        })
+        
+        self.assertIsInstance(models.Category.objects.get(
+                            name="Posted Test Category"), models.Category)
+        
+    def test_sign_up_get(self):
+        """get sign up page"""
+        response = self.client.get(reverse("sign_up"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_sign_up_post(self):
+        """create account page"""
+        response = self.client.post(reverse("sign_up"),
+            {
+                "username": "tester",
+                "role": "artisan",
+                "first_name": "unit",
+                "last_name": "test",
+                "password": "test123"
+                })
+        self.assertEqual(response.status_code, 302)
+
+    def test_logout(self):
+        """logs in and then checks with the session that no user is present"""
+        self.client.login(username="Test User", password="test123")
+        response = self.client.get(reverse("logout"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_about_view(self):
+        response = self.client.get(reverse("about"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_get(self):
+        response = self.client.get(reverse("login"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_post(self):
+        response = self.client.post(reverse("login"), {"name": "Test User",
+                                                        "pwd": "test123"})
+        self.assertEqual(response.status_code, 302)
 
 
 class TestModels(TestCase, TestDataMixin):

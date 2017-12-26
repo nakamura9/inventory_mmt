@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import json
 import threading
 import time
-import datetime
 import os
 
 from django.shortcuts import render, reverse
@@ -17,11 +16,10 @@ from django.db.models import Q
 
 from common_base.models import Category, Account
 from common_base.utilities import ajax_required, parse_file, parse_spares_file, CSV_RUNNING
-from common_base.feature_testing import parse_file as pf
 from inv import models as inv_models
 from inv.forms import RunDataForm
 from jobcards.models import SparesRequest
-
+from inventory_mmt import settings
 
 
 CSV_FILE_STATUS = {"messages":[],
@@ -36,8 +34,6 @@ CSV_FILE_STATUS = {"messages":[],
 """The views that correspond to the URLS """
 
 
-
-@csrf_exempt
 def get_users(request):
     """ajax response used to create a list of users for a form
     
@@ -137,7 +133,6 @@ def ajaxAuthenticate(request):
     Input: JSON -> "username": string, "password": string
     Output: HTTPResponse JSON-> "authenticated": Boolean
     """
-    print request.POST
     if authenticate(username=request.POST["username"], 
             password=request.POST["password"]):
         return HttpResponse(json.dumps({"authenticated":True}),
@@ -147,8 +142,12 @@ def ajaxAuthenticate(request):
                             content_type="application/json")
 
 def add_run_data(request):
-    """request is made by ajax"""
+    """Adds run data to a specific machine.
+    
+    Done in terms of days hours start date and specific work days
+    #will need to add an end date"""
     data = RunDataForm(request.POST)
+    print data.errors
     run = data.save()
     inv_models.Machine.objects.get(pk=request.POST["machine"]).run_data.add(run)
     
@@ -175,11 +174,7 @@ def add_equipment(request):
             "component": inv_models.Component}
     pk = request.POST.get("pk")
     model_type = request.POST.get("type")
-    if pk == "*":
-        equipment = inv_models.Machine.objects.all()
-        
-    else:
-        equipment = [models[model_type].objects.get(pk=pk)]
+    equipment = [models[model_type].objects.get(pk=pk)]
     
     data = serializers.serialize("json", equipment)
     return HttpResponse(data, content_type="application/json")
@@ -239,26 +234,31 @@ def inv_list(s):
                     Q(unique_id__startswith=s))]
     return items
 
+
 def get_machine(name):
     return [m.machine_name for m in inv_models.Machine.objects.filter(
         Q(machine_name__startswith=name) |
         Q(unique_id__startswith=name))]
+
 
 def get_section(name):
     return [s.section_name for s in inv_models.Section.objects.filter(
         Q(section_name__startswith=name) |
         Q(unique_id__startswith=name))]
 
+
 def get_subunit(name):
     return [s.unit_name for s in inv_models.SubUnit.objects.filter(
         Q(unit_name__startswith=name) |
         Q(unique_id__startswith=name))]
+
 
 def get_subassy(name):
     """Searches subassemblies by name"""
     return [s.unit_name for s in inv_models.SubAssembly.objects.filter(
         Q(unit_name__startswith=name) |
         Q(unique_id__startswith=name))]
+
 
 def get_component(name):
     """Searches a component by name, and id"""
@@ -273,12 +273,14 @@ def get_spares(name):
             Q(stock_id__startswith=name) | 
             Q(name__startswith=name))]
 
+
 def get_account(name):
     """Searches accounts by username, first name and last name"""
     return [a.username for a in Account.objects.filter(
                                 Q(username__startswith=name) |
                                 Q(first_name__startswith=name) |
                                 Q(last_name__startswith=name))]
+
 
 def add_category(request):
     """Quick addition of categories to the database."""
@@ -289,8 +291,8 @@ def add_category(request):
         Category(**data).save()
         return HttpResponse("0")
 
-def spares_request(request):
 
+def spares_request(request):
     sr = SparesRequest(unit=request.POST["unit"],
                     quantity=request.POST["quantity"])
     if request.POST["name"] != "":
@@ -302,6 +304,7 @@ def spares_request(request):
 
     return JsonResponse({"pk": sr.pk,
                         "success":True})
+
 
 def parse_csv_file(request):
     """Asynchronous way of importing data as csv.
@@ -332,16 +335,17 @@ def parse_csv_file(request):
         target = parse_spares_file
    
     CSV_RUNNING =True
-
-    t = threading.Thread(target=target, args=(CSV_FILE_STATUS, 
+    
+    if not settings.TEST_CONDITIONS:
+        t = threading.Thread(target=target, args=(CSV_FILE_STATUS, 
                 os.path.join("media", file.name)))
-    t.setDaemon(True)
-    t.start()
+        t.setDaemon(True)
+        t.start()
 
     return HttpResponseRedirect(reverse("inventory:csv-panel"))
 
 
-def get_run_data(request):
+def get_process_updates(request):
     """Function called repeatedly to display the current status of a data import process
     
     method: GET
@@ -377,6 +381,7 @@ def get_run_data(request):
             
     
     return HttpResponse(json.dumps(data), content_type="application/json")
+
 
 def stop_parsing(request):
     global CSV_FILE_STATUS, CSV_RUNNING

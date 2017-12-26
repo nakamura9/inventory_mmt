@@ -66,8 +66,8 @@ class ChecklistCompleteView(DetailView):
             checklist.last_completed_date = datetime.date.today()
             checklist.save()
             if self.request.POST["comment"] != "":
-                auth =self.get_object().resolver
                 chk = self.get_object()
+                auth = chk.resolver
                 chk.comments.create(author=auth,
                 created_for="checklist",
                 content=self.request.POST["comment"])
@@ -157,9 +157,9 @@ def hold_checklist(request, pk):
     Output -> JSON "authenticated": Boolean
 
     authenticates the user using json and uses the primray key to set the on_hold field of the checklist to true"""
-
-    if not authenticate(username=request.POST["username"],
-                password=request.POST["password"]):
+    user = authenticate(username=request.POST["username"],
+                password=request.POST["password"])
+    if not user:
         return HttpResponse(json.dumps({"authenticated":False}), 
                             content_type="application/json")
 

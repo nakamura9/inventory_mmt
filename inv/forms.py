@@ -10,7 +10,7 @@ class RunDataForm(forms.ModelForm, BootstrapMixin):
                 self.fields[f].widget.attrs["required"] = "False"
     class Meta:
         model =RunData
-        fields = ["start_date", "run_days", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        fields = ["start_date", "end_date","run_days", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
     machine = forms.ModelChoiceField(Machine.objects.all())
 

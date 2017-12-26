@@ -1,15 +1,17 @@
 
 from __future__ import unicode_literals
 import json
+import os
+import datetime
 
 from django.test import TestCase
 from django.test import Client
 from django.shortcuts import reverse
 
 from common_base.tests import TestDataMixin
-from inv.models import Spares
+from inv.models import Spares, Machine
 from common_base.models import Account
-
+from inventory_mmt import settings
 
 class selectAjaxCalls(TestCase, TestDataMixin):
     """
@@ -177,19 +179,58 @@ class OtherAjaxTests(TestCase, TestDataMixin):
 
     def test_add_run_data(self):
         """test made for machine run data"""
-        pass
+        response = self.client.post(reverse("ajax:add-run-data"),
+                        {"start_date": datetime.date.today().strftime("%m/%d/%Y"),
+                        "end_date": (datetime.date.today() + \
+                        datetime.timedelta(days=7)).strftime("%m/%d/%Y"),
+                        "machine": Machine.objects.first().pk,
+                        "run_hours": "4",
+                        "run_days": "3",
+                        "monday": "",
+                        "tuesday": "",
+                        "wednesday": "",
+                        "thursday": "",
+                        "friday": "on",
+                        "saturday": "on",
+                        "sunday": "on"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertTrue(Machine.objects.first().run_data.all().count() == 1)
+
 
     def test_add_equipment(self):
         """used in the report generation form"""
-        pass
+        response = self.client.post(reverse("ajax:get-equipment"),
+                        {"pk": Machine.objects.first().pk,
+                        "type": "machine"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(dict[0]["pk"] is not None)
     
     def test_parse_csv_file(self):
         """especially considering the issue of the posted file name """
-        pass
+        #thread raises an exception, detailed testing of the parsers themselves 
+        # will be done on common_base iteself
+        settings.TEST_CONDITIONS = True
 
-    def test_get_run_data(self):
+        with open(os.path.join("ajax", "test_files", "test_inv.csv"),
+                                    "r") as fp:
+            response = self.client.post(reverse("ajax:process-file"), {
+                "csv_file": fp,
+                "data_type": "machines"
+            })
+
+        self.assertTrue(response.status_code == 302)
+
+    def test_stop_parsing(self):
+        response = self.client.get(reverse("ajax:stop-parsing"))
+        self.assertTrue(response.status_code == 302)
+
+    def test_get_process_updates(self):
         """consider making the page aware of a process that is not running"""
-        pass
+        response = self.client.get(reverse("ajax:get-process-updates"))
+        dict_ = json.loads(response.content)
+        self.assertTrue(dict_["run_time"] is not None)
 
     def test_ajaxAuthenticate(self):
         """Test authentication via ajax"""
@@ -199,4 +240,4 @@ class OtherAjaxTests(TestCase, TestDataMixin):
                                     "password": "test123"},
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         
-        self.assertEqual(json.loads(response.content)["authenticated"], False)
+        self.assertTrue(json.loads(response.content)["authenticated"])
