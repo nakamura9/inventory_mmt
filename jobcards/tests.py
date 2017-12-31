@@ -10,7 +10,7 @@ from inventory_mmt import settings
 from .models import WorkOrder, PreventativeTask
 from common_base.models import Account, Category
 from inv.models import *
-
+from jobcards.templatetags.safer_id import safer_id
 
 class ViewTests(TestCase, TestDataMixin):
     @classmethod
@@ -170,7 +170,7 @@ class ViewTests(TestCase, TestDataMixin):
     
     def test_edit_preventative_task_post(self):
         self.create_test_preventative_task()
-        response = self.client.get(reverse("jobcards:preventative-task-detail",
+        response = self.client.post(reverse("jobcards:edit-preventative-task",
             kwargs={"pk":PreventativeTask.objects.first().pk}),
                 {"machine": Machine.objects.first().pk,
                 "section": Section.objects.first().pk,
@@ -181,7 +181,7 @@ class ViewTests(TestCase, TestDataMixin):
                 "estimated_labour_time":"1:00:00",
                 "estimated_downtime": "1:00:00",
                 "tasks[]": ["task three"]})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_preventative_task_detail(self):
         self.create_test_preventative_task()
@@ -205,7 +205,6 @@ class ViewTests(TestCase, TestDataMixin):
         p_task = PreventativeTask.objects.first()
         self.assertEqual(p_task.assignments_accepted.count(), 1)
 
-
-    
-    
-
+    def test_template_tag_safer_id(self):
+        id = safer_id("This is a test")
+        self.assertTrue(" " not in id)

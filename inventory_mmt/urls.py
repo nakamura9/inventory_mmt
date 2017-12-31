@@ -21,8 +21,6 @@ from django.contrib import admin
 from common_base.views import *
 from inv import urls as inv_urls
 
-
-
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^feature-tests/$', test_features),
@@ -34,7 +32,6 @@ urlpatterns = [
     url(r'^jobcards/', include("jobcards.urls")),
     url(r'^checklists/', include("checklists.urls")),
     url(r'^machine-learning/', include("machine_learning.urls", namespace="machine-learning")),
-    url(r'^rca/', include("rca.urls", namespace="rca")),
     url(r'^planning/', include("planning.urls", namespace="planning")),
     url(r'^ajax/', include("ajax.urls", namespace = "ajax")),
     url(r'reports/', include("reports.urls",  namespace="reports")),

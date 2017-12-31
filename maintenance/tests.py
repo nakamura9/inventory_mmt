@@ -34,6 +34,14 @@ class ViewTests(TestCase, TestDataMixin):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["message"],"artisan:Hello Test User.")
 
+    def test_inbox_with_user_post(self):
+        """tests the inbox page with a user logged in and checks for the 
+        appropriate message"""
+        response = self.client.post(reverse("maintenance:inbox"),
+            {"username":"Test User", "pwd":"test123"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["message"],"artisan:Hello Test User.")
+
     def test_get_machine_overview(self):
         """gets the machine overview page"""
         response = self.client.get(reverse("maintenance:machine-overview"))
@@ -50,6 +58,16 @@ class ViewTests(TestCase, TestDataMixin):
         element"""
         response = self.client.get(reverse("maintenance:planned-maintenance"),
             {"checklists":"on",
+            "start_date": "",
+            "end_date": ""})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["object_list"]), 1)
+
+    def test_get_planned_maintenance_view_filtered_jobs(self):
+        """filtered one class of objects expect the object list to have one 
+        element"""
+        response = self.client.get(reverse("maintenance:planned-maintenance"),
+            {"planned_jobs":"on",
             "start_date": "",
             "end_date": ""})
         self.assertEqual(response.status_code, 200)

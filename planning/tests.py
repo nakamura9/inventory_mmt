@@ -98,8 +98,10 @@ class ViewTests(TestCase, TestDataMixin):
         response = self.client.get(reverse("planning:maintenance-month",
             kwargs={"year": self.today.year,
                     "month": self.today.month}),
-            kwargs={"year": self.today.year,
-                    "month": self.today.month})
+            data={"year": self.today.year,
+                    "month": self.today.month,
+                    "resolver": "Test User",
+                    "machine": ""})
         self.assertEqual(response.status_code, 200)
 
     def test_production_day_view_get(self):
@@ -147,3 +149,12 @@ class CalendarObjectsTests(TestCase, TestDataMixin):
         for row in arr:
             if self.today in row:
                 self.week = arr.index(row)
+
+    def test_production_element(self):
+        pe = ProductionElement(Machine.objects.first(), self.today)
+        self.assertEqual(pe.planned_downtime, 1.0)
+        if self.today.weekday() < 3:
+            self.assertEqual(pe.running_hours, 1.0)
+        else:
+            self.assertEqual(pe.running_hours, 0.0)
+        self.assertEqual(pe.net_up_time, 0)

@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'inv',
     'jobcards',
     'checklists',
-    'rca',
     'machine_learning',
     'common_base',
     'ajax',

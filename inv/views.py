@@ -255,9 +255,10 @@ class ComponentCreateView(UserPassesTestMixin,CreateView):
     def post(self, *args, **kwargs):
         resp = super(ComponentCreateView, self).post(*args, **kwargs)
         if self.request.POST.get("spares_data", None):
-            cmp = self.get_object()
-            cmp.spares_data = Spares.objects.get(stock_id=self.request.POST["spares_data"])
-            cmp.save()
+            cmp = Component.objects.get(pk=self.request.POST["unique_id"])
+            sp=Spares.objects.get(
+                stock_id=self.request.POST["spares_data"])
+            cmp.spares_data.add(sp)
 
         return resp
 

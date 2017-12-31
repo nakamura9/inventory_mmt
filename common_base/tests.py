@@ -12,6 +12,7 @@ from inv import models as inv_models
 from jobcards import models as jb_models
 from . import models
 from .utilities import *
+from inventory_mmt import settings
 
 class TestDataMixin(object):
     """This class is used to provide test data for other applications, especially those whose tests have multiple dependancies.
@@ -222,10 +223,12 @@ class TestUtilities(TestCase, TestDataMixin):
 
     def test_role_test(self):
         """tests function for determining the role of a user requesting a page"""
+        settings.TEST_CONDITIONS = False
         self.assertTrue(role_test(Account.objects.get(
             username ="Test Admin User")))
         self.assertFalse(role_test(Account.objects.get(
             username="Test User")))
+        settings.TEST_CONDITIONS = True
 
     def test_parse_spares_file(self):
         """will need to create a sample a spares file"""

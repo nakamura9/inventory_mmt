@@ -117,6 +117,15 @@ class OtherAjaxTests(TestCase, TestDataMixin):
         dict = json.loads(response.content)
         self.assertTrue(len(dict["matches"]) == 1)
 
+    def test_get_combos_account(self):
+        response = self.client.post(reverse("ajax:get-combos"),
+                        {"str": "Test User",
+                        "model": "account"},
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        dict = json.loads(response.content)
+        self.assertTrue(len(dict["matches"]) == 1)
+
     def test_get_combos_inv(self):
         response = self.client.post(reverse("ajax:get-combos"),
                         {"str": "Test",
@@ -253,3 +262,22 @@ class OtherAjaxTests(TestCase, TestDataMixin):
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         
         self.assertTrue(json.loads(response.content)["authenticated"])
+
+    def test_spares_request(self):
+        response=self.client.post(reverse("ajax:spares-request"),
+            {"unit": "ea",
+            "quantity": "10",
+            "name":"bearing",
+            })
+        resp = json.loads(response.content)
+        self.assertTrue(resp["success"])
+
+    def test_spares_request_stock_id(self):
+        response=self.client.post(reverse("ajax:spares-request"),
+            {"unit": "ea",
+            "quantity": "10",
+            "spares":"01",
+            "name": "",
+            })
+        resp = json.loads(response.content)
+        self.assertTrue(resp["success"])

@@ -33,6 +33,14 @@ class ViewTests(TestCase, TestDataMixin):
         
         self.assertEqual(response.status_code, 200)
 
+    def test_get_component_details_linked(self):
+        comp = Component.objects.get(pk="T_C")
+        comp.spares_data.add(Spares.objects.first())
+        response = self.client.get(
+            reverse("inventory:component_details", 
+            kwargs={"pk": "T_C"}))
+        
+        self.assertEqual(response.status_code, 200)
 
     def test_get_section_details(self):
         response = self.client.get(reverse(
@@ -40,20 +48,17 @@ class ViewTests(TestCase, TestDataMixin):
             kwargs={"pk": "T_SE"}))
         self.assertEqual(response.status_code, 200)
 
-
     def test_get_machine_details(self):
         response = self.client.get(reverse(
             "inventory:machine_details", 
             kwargs={"pk": "T_M"}))
         self.assertEqual(response.status_code, 200)
 
-
     def test_get_subunit_details(self):
         response = self.client.get(reverse(
             "inventory:subunit_details", 
             kwargs={"pk": "T_S"}))
         self.assertEqual(response.status_code, 200)
-
 
     def test_get_subassembly_details(self):
         response = self.client.get(reverse(
@@ -118,6 +123,25 @@ class ViewTests(TestCase, TestDataMixin):
             "inventory:delete_component", args=["P_T_C"]))
         self.assertEqual(response.status_code, 302)#redirects
 
+    def test_post_check_and_delete_component_w_spares_form(self):
+        sp = Spares.objects.first()
+        self.client.post(reverse("inventory:add_component"),
+            data={
+                "unique_id":"P_T_C_W_S",
+                "component_name": "Posted Test Component With Spares",
+                "machine": "T_M",
+                "section": "T_SE",
+                "subunit": "T_S",
+                "spares_data": sp.stock_id,
+                "subassembly":"T_SA"})
+        cmp= Component.objects.get(pk="P_T_C_W_S")
+        self.assertIsInstance(cmp, Component)
+        self.assertNotEqual(cmp.spares_data, None) 
+        response = self.client.get(reverse(
+            "inventory:delete_component", args=["P_T_C_W_S"]))
+        self.assertEqual(response.status_code, 302)#redirects
+
+
     def test_post_check_and_delete_section_form(self):
         self.client.post(reverse("inventory:add_section"),
             data={
@@ -140,7 +164,6 @@ class ViewTests(TestCase, TestDataMixin):
         response = self.client.get(reverse(
             "inventory:delete_machine", args=["P_T_M"]))
         self.assertEqual(response.status_code, 302)#redirects
-
 
     def test_post_check_and_delete_subunit_form(self):
         response = self.client.post(reverse("inventory:add_subunit"),
@@ -166,6 +189,43 @@ class ViewTests(TestCase, TestDataMixin):
         response = self.client.get(reverse(
             "inventory:delete_subassembly", args=["P_T_SA"]))
         self.assertEqual(response.status_code, 302)#redirects
+
+    def test_edit_machine(self):
+        response=self.client.get(reverse("inventory:edit_machine",
+            kwargs={"pk": Machine.objects.first().pk}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_section(self):
+        response=self.client.get(reverse("inventory:edit_section",
+            kwargs={"pk": Section.objects.first().pk}))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_edit_subunit(self):
+        response=self.client.get(reverse("inventory:edit_subunit",
+            kwargs={"pk": SubUnit.objects.first().pk}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_subassembly(self):
+        response=self.client.get(reverse("inventory:edit_subassembly",
+            kwargs={"pk": SubAssembly.objects.first().pk}))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_edit_component(self):
+        response=self.client.get(reverse("inventory:edit_component",
+            kwargs={"pk": Component.objects.first().pk}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_component_post(self):
+        response=self.client.post(reverse("inventory:edit_component",
+            kwargs={"pk": Component.objects.first().pk}),
+            data={
+                "unique_id":"T_C",
+                "component_name": "Posted Test Component",
+                "machine": "T_M",
+                "section": "T_SE",
+                "subunit": "T_S",
+                "subassembly":"T_SA"})
+        self.assertEqual(response.status_code, 302)
 
     #test posting of inventory forms
     """def test_post_check_and_delete_order_form(self):
@@ -233,6 +293,15 @@ class TestModelMethods(TestCase, TestDataMixin):
         run_data = RunData.objects.first()#3 days * 1 hour each
         self.assertEqual(run_data.total_run_hours, 3)
 
+    def test_machine_availability_on_date(self):
+        self.create_dummy_accounts()
+        self.create_test_workorders()#one hour downtime
+
+        mech = Machine.objects.get(unique_id="T_M")
+        mech.run_data.add(RunData.objects.first())
+        availability = mech.availability_on_date(self.today)
+        self.assertEqual(round(availability, 2), 0.0)
+
     def test_machine_availability_over_period(self):
         self.create_dummy_accounts()
         self.create_test_workorders()#one hour downtime
@@ -290,4 +359,23 @@ class TestModelMethods(TestCase, TestDataMixin):
         mech = Machine.objects.get(pk="T_M")
         self.assertFalse(mech.is_running_on_date(self.today))
         mech.run_data.add(RunData.objects.first())
-        self.assertTrue(mech.is_running_on_date(self.today))
+        if self.today.weekday() < 3:
+            self.assertTrue(mech.is_running_on_date(self.today))
+
+    def test_spares_search(self):
+        response=self.client.get(reverse('inventory:spares-list'), {"search": "01"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_run_data(self):
+        RunData(start_date = self.today,
+            end_date = self.today + datetime.timedelta(days=7),
+            run_days = 3,
+            run_hours = 1,
+            thursday=True,
+            friday=True,
+            saturday=True).save()
+        response =self.client.get(reverse("inventory:delete-run-data",
+            kwargs={"pk":RunData.objects.latest("pk").pk,
+                "mech_pk": Machine.objects.first()}))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(RunData.objects.all().count(), 1)

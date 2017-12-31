@@ -68,6 +68,8 @@ class ProductionElement(object):
 
     @property
     def net_up_time(self):
+        if self.running_hours < self.planned_downtime:
+            return 0.0
         return self.running_hours - self.planned_downtime
 
 

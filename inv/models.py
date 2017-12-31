@@ -73,7 +73,6 @@ class RunData(models.Model):
     sunday = models.BooleanField(default=False)
     #override save method to specify run days
     #add specific days
-
     #write property that gets total run hours  for a given period
     
     def is_running(self, day):
@@ -193,7 +192,8 @@ class Machine(models.Model):
         run_data = self.run_on_date(date)
         
         if run_data:
-            available_time = run_data.run_hours
+            available_time = sum((run.run_hours for run in run_data \
+                if run.is_running(date)))
             if downtime > available_time:
                 return 0.0
             return ((available_time - downtime)/ available_time) * 100
@@ -227,7 +227,6 @@ class Machine(models.Model):
         yesterday = timezone.now() - timedelta(days=1)
         return self.workorder_set.filter(execution_date__gt = yesterday).count()
 
-
     @property
     def n_breakdowns_weekly(self):
         week = timezone.now() - timedelta(days=7)
@@ -238,7 +237,6 @@ class Machine(models.Model):
     def n_breakdowns_monthly(self):
         month = timezone.now() - timedelta(days=30)
         return self.workorder_set.filter(execution_date__gt = month).count()
-
 
     @property
     def n_breakdowns_sixmonths(self):
@@ -339,7 +337,8 @@ class Component(models.Model):
     component_name = models.CharField(max_length = 128)
     machine = models.ForeignKey("Machine", null=True, on_delete=models.SET_NULL)
     section = models.ForeignKey("Section", null=True, on_delete=models.SET_NULL)
-    subunit = models.ForeignKey("SubUnit", null=True, on_delete=models.SET_NULL)
+    subunit = models.ForeignKey("SubUnit", null=True, blank=True,
+        on_delete=models.SET_NULL)
     subassembly = models.ForeignKey("SubAssembly", null=True, on_delete=models.SET_NULL)
     spares_data=models.ManyToManyField("Spares",verbose_name="linked spares")
 
