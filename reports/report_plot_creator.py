@@ -16,7 +16,17 @@ import dateutil
 import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
-from statistics import mean
+try:
+    from statistics import mean
+except:
+    """python 2 on linux"""
+    def mean(arg):
+        sum = 0
+        count = 0
+        for i in arg:
+            sum += i
+            count += 1
+        return sum / count
 
 from inv.models import Machine,Section, SubAssembly, SubUnit, Component
 from jobcards.models import WorkOrder, PreventativeTask
