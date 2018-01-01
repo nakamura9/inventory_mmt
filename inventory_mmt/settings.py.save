@@ -25,10 +25,10 @@ secret = key_file.readline()
 SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 #make sure the ip address is matched
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'inventory_mmt.wsgi.application'
 if DEBUG:
     DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycop',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'TEST_NAME': os.path.join(BASE_DIR, 'test.sqlite3'),
     }
@@ -98,8 +98,8 @@ if DEBUG:
 else:
     DATABASES = {
         'default':{
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'deploy',
+            'ENGINE': django.db.backends.postgresql_psycopg2,
+            'NAME': 'inventory_db',
             'USER': 'nakamura9a',
             'PASSWORD': db,
             'HOST': '',
