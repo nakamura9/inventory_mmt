@@ -17,10 +17,10 @@ from .models import Report
 from jobcards.models import PreventativeTask, WorkOrder
 from checklists.models import Checklist
 from inv.models import Machine, Section, SubUnit, SubAssembly, Component
-from .forms import *
 from common_base.utilities import filter_by_dates
 from common_base.models import Account
 from .report_creator import *
+from report_pdf_creator import report_contexts
 
 """Abstract the report form views"""
 
@@ -82,20 +82,17 @@ class ReportForm(TemplateView):
         else:
             for i in equipment:
                 r.add_equipment(mapping[len(i)].objects.get(pk=i))
-
         r.save()
-
-
         return HttpResponseRedirect(
-                reverse_lazy("reports:report", kwargs={"pk": r.pk})
-                )
+            reverse_lazy("reports:report", kwargs={"pk": r.pk}))
+
 
 class ReportView(View):
     def get(self, request, pk):
         report = Report.objects.get(pk=pk)
         report_creator = ReportFactory(report)
-    
-        return HttpResponse(report_creator.create_report())
+        resp, report_contexts[pk] = report_creator.create_report()
+        return HttpResponse(resp)
 
 
 def delete_report(request, pk=None):

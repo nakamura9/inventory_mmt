@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import datetime
 import os
+import random
 
 from django.shortcuts import reverse
 from django.test import TestCase, Client
@@ -165,7 +166,161 @@ class TestDataMixin(object):
         job = jb_models.WorkOrder.objects.first()
         job.spares_issued.add(inv_models.Spares.objects.first())
         job.spares_returned.add(inv_models.Spares.objects.first())
+    
+    names = ["printer", "bearing", "nut", "shaft", "unit",
+        "slotter", "gasket", "gearbox", "panel",
+        "HMI", "PLC", "compressor", "fitting", "drum",
+        "roller", "mount"]
 
+    times = [360, 1800, 3600, 7200, 10800]
+    def create_n_equipment(self, n):
+        # n machines
+        # 2n sections
+        # 4n subunits 
+        #etc
+        for i in range(n):
+            m_pk = "0"+str(i)
+            inv_models.Machine(
+                machine_name=random.choice(self.names),
+                unique_id= m_pk,
+                manufacturer="Test",
+                commissioning_date=datetime.date.today() \
+                    - datetime.timedelta(days=500)).save()
+
+            for j in range(2):
+                s_pk = m_pk +"0"+ str(j)
+                inv_models.Section(
+                    unique_id=s_pk,
+                    section_name= random.choice(self.names) + " section",
+                    machine=inv_models.Machine.objects.get(
+                        pk="0"+str(i))).save()
+                        
+                for k in range(2):
+                    su_pk = s_pk+"0"+ str(k)
+                    inv_models.SubUnit(
+                    unique_id=su_pk,
+                    unit_name=random.choice(self.names) + " subunit",
+                    machine=inv_models.Machine.objects.get(pk=m_pk),
+                    section=inv_models.Section.objects.get(
+                        pk=s_pk)).save()
+
+                    for l in range(4):
+                        sa_pk = su_pk +"0"+str(l)
+                        inv_models.SubAssembly(
+                            unique_id=sa_pk,
+                            unit_name=random.choice(self.names) + " subassembly",
+                            subunit=inv_models.SubUnit.objects.get(pk=su_pk),
+                            section=inv_models.Section.objects.get(pk=s_pk),
+                            machine=inv_models.Machine.objects.get(
+                                pk=m_pk)).save()
+
+                        for m in range(4):
+                            inv_models.Component(
+                                unique_id=sa_pk +"0"+ str(m),
+                                component_name=random.choice(self.names) +\
+                                    " component",
+                                subunit=inv_models.SubUnit.objects.get(
+                                    pk=su_pk),
+                                section=inv_models.Section.objects.get(
+                                    pk=s_pk),
+                                machine=inv_models.Machine.objects.get(pk=m_pk),
+                                subassembly=inv_models.SubAssembly.objects.get(
+                                    pk=sa_pk)
+                            ).save()
+
+    def random_date(self, start, end):
+        delta = abs((end - start).days)
+        
+        choice = random.randint(0, delta)
+        return start + datetime.timedelta(days=choice)
+
+    def random_machine(self):
+        return self.get_random_object(inv_models.Machine)
+
+    def random_section(self):
+        return self.get_random_object(inv_models.Section)
+
+    def random_subunit(self):
+        return self.get_random_object(inv_models.SubUnit)
+
+    def random_subassembly(self):
+        return self.get_random_object(inv_models.SubAssembly)
+
+    def random_component(self):
+        return self.get_random_object(inv_models.Component)
+
+    def random_account(self):
+        return self.get_random_object(Account)
+
+    def get_random_object(self, model):
+        objs = [obj for obj in model.objects.all()]
+        return random.choice(objs)
+    
+    def create_n_work_orders(self, n, start, end):
+        for i in range(n):
+            d = self.random_date(start, end)
+            jb_models.WorkOrder(
+                type=models.Category.objects.first(),
+                machine= self.random_machine(),
+                section= self.random_section(),
+                subunit=self.random_subunit(),
+                subassembly=self.random_subassembly(),
+                component=self.random_component(),
+                description="Some description...",
+                execution_date=d,
+                completion_date=d,
+                estimated_labour_time=datetime.timedelta(
+                    seconds=random.choice(self.times)),
+                assigned_to=self.random_account(),
+                priority="low",
+                status="requested",
+                resolver_action= "Some action...",
+                actual_labour_time=datetime.timedelta(
+                    seconds=random.choice(self.times)),
+                downtime=datetime.timedelta(
+                    seconds=random.choice(self.times))).save()
+
+    def create_n_preventative_tasks(self, n, start, end):
+        frequencies = ["once", "weekly", "monthly"]
+        for i in range(n):
+            d = self.random_date(start, end)
+            jb_models.PreventativeTask(
+                machine= self.random_machine(),
+                section= self.random_section(),
+                subunit=self.random_subunit(),
+                subassembly=self.random_subassembly(),
+                component=self.random_component(),
+                description="Some description...",
+                frequency=random.choice(frequencies),
+                estimated_labour_time=datetime.timedelta(
+                    seconds=random.choice(self.times)),
+                estimated_downtime=datetime.timedelta(
+                    seconds=random.choice(self.times)),
+                scheduled_for=d,
+                actual_downtime=datetime.timedelta(
+                    seconds=random.choice(self.times)),
+                completed_date=d).save()
+
+    def create_n_checklists(self, n, start, end):
+        for i in range(n):
+            d = self.random_date(start, end)
+            ch_models.Checklist(**{
+               "title": "Test Checklist",
+                "creation_date": d,
+                "last_completed_date": random.choice([None, d]),
+                "estimated_time": datetime.timedelta(
+                    seconds=random.choice(self.times)),
+                "start_time": datetime.time(8,30),
+                "machine": self.random_machine(),
+                "section": self.random_section(),
+                "subunit": self.random_subunit(),
+                "subassembly": self.random_subassembly(),
+                "component": self.random_component(),
+                "resolver": self.random_account(),
+                "category": "electrical",
+                "frequency": random.choice(["daily", "weekly", "monthly"])
+            }).save()
+    
     @classmethod
     def create_dummy_accounts(cls):
         regular = models.Account(username= "Test User",

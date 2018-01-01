@@ -65,9 +65,8 @@ class AbstractPlotFactory(object):
 
 class WeakPointPlotFactory(AbstractPlotFactory):
     """Weak point analysis report plot factory"""
-    def __init__(self, report, reporter):
+    def __init__(self, report):
         self.report = report
-        self.reporter = reporter
         self.plot_urls = {}
         
     def machine_plot(self):
@@ -81,7 +80,6 @@ class WeakPointPlotFactory(AbstractPlotFactory):
     def component_plot(self, mech):
         plotter =BreakdownFrequencyDowntimePlotter(self.report, "component", mech)
         return plotter.plot()
-
 
     def generate_plot_urls(self):
         if len(self.report.equipment_list) > 1:

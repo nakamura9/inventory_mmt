@@ -20,7 +20,6 @@ class ReportFactory(object):
                         "weak_point": WeakPointReport,
                         "spares_requirements": SparesRequirementsReport,
                         "spares_usage": SparesUsageReport}
-    
 
     def create_report(self):
         report = self.reports[self.report.scope](self.report)
@@ -31,7 +30,6 @@ class AbstractReport(object):
     def __init__(self, report):
         self.report = report
         self.context = {}
-        
 
     def get_template(self):
         if not self.template_name:
@@ -41,7 +39,7 @@ class AbstractReport(object):
     def generate_report(self):
         self.get_template()
         self.generate_context()
-        return self.template.render(self.context)
+        return self.template.render(self.context), self.context
 
     def generate_context(self):
         raise NotImplementedError()
@@ -57,13 +55,11 @@ class MaintenancePlanReport(AbstractReport):
     template = template_name = os.path.join("reports", "report_templates", "maintenance_plan_report.html")
     
     def get_checklists(self):
-        all_checks = Checklist.objects.filter(reduce(operator.or_, self.report.get_q_filters()))
+        all_checks = self.report.list_checks()
         valid = [c for c in all_checks \
-                    if c.will_be_open_over_period(self.report.start_period,
-                                                        self.report.end_period)]
-
+                    if c.will_be_open_over_period(
+                        self.report.start_period, self.report.end_period)]
         return valid
-
 
     def generate_context(self):
         self.context['object'] = self.report
@@ -126,7 +122,7 @@ class WeakPointReport(AbstractReport):
     template_name = os.path.join("reports", "report_templates", "weak_point_report.html")
 
     def create_plots(self):
-        plotter = WeakPointPlotFactory(self.report, self)
+        plotter = WeakPointPlotFactory(self.report)
         plotter.generate_plot_urls()
         self.context["graphs"]= plotter.plot_urls
 
@@ -167,10 +163,7 @@ class WeakPointReport(AbstractReport):
         self.context[level + "_downtime_hours"] = downtime[longest]
 
     def get_component(self):
-        """This calculates the overall weak points in the system
-        the plotters will plot weak points per machine."""
-        self.general_weak_points("component")
-        
+        self.general_weak_points("component")   
 
     def get_unit(self):
         self.general_weak_points("section")

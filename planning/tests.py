@@ -5,7 +5,7 @@ from django.shortcuts import reverse
 
 from calendar_objects import *
 from common_base.tests import TestDataMixin
-from inv.models import Order
+from inv.models import Machine, RunData
 from jobcards.models import  WorkOrder
 
 
@@ -142,7 +142,6 @@ class CalendarObjectsTests(TestCase, TestDataMixin):
         super(CalendarObjectsTests, cls).setUpClass()
         cls.today = datetime.date.today()
         
-
     def get_week_from_date(self):
         c = calendar.Calendar()
         arr = c.monthdatescalendar(self.today.year, self.today.month)
@@ -151,7 +150,9 @@ class CalendarObjectsTests(TestCase, TestDataMixin):
                 self.week = arr.index(row)
 
     def test_production_element(self):
-        pe = ProductionElement(Machine.objects.first(), self.today)
+        mech = Machine.objects.first()
+        mech.run_data.add(RunData.objects.first())
+        pe = ProductionElement(mech, self.today)
         self.assertEqual(pe.planned_downtime, 1.0)
         if self.today.weekday() < 3:
             self.assertEqual(pe.running_hours, 1.0)

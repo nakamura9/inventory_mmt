@@ -39,7 +39,7 @@ class PlannedMaintenanceView(ListView):
     """
     model = PreventativeTask
     template_name = os.path.join("maintenance", "planned_maintenance_view.html")
-    paginate_by =20
+    paginate_by =10
 
     def get_queryset(self):
         if len(self.request.GET.items()) < 2:

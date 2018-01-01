@@ -7,6 +7,8 @@ from .models import Report
 from xhtml2pdf import pisa
 from .report_creator import *
 
+report_contexts= {}
+
 """Create report context variable which is a dictionary that maps report numbers to the context of the report view"""
 
 def link_callback(uri, rel):
@@ -36,9 +38,9 @@ def link_callback(uri, rel):
 
 
 def generate_pdf(request, pk=None):
+    global report_contexts
     report = Report.objects.get(pk=pk)
 
-    
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="report.pdf"'
@@ -53,11 +55,15 @@ def generate_pdf(request, pk=None):
         "spares_usage": SparesUsageReport
                         }
     template_path = os.path.join("reports","report_templates",
-                        "pdf_templates", report.scope + "_pdf_template.html")
+        "pdf_templates", report.scope + "_pdf_template.html")
     template = get_template(template_path)
-    context_creator = context_mapping[report.scope](report)
-    context_creator.generate_context()
-    html = template.render(context_creator.context)
+    if report_contexts.get(pk, None):
+        html = template.render(report_contexts[pk])
+        del report_contexts[pk]
+    else:
+        context_creator = context_mapping[report.scope](report)
+        context_creator.generate_context()
+        html = template.render(context_creator.context)
     
     # create a pdf
     pisaStatus = pisa.CreatePDF(

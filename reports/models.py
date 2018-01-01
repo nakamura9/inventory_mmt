@@ -11,6 +11,10 @@ from checklists.models import Checklist
 
 
 class Report(models.Model):
+    def __init__(self, *args, **kwargs):
+        self._q_objs = None
+        super(Report, self).__init__(*args, **kwargs)
+
     created = models.DateField(auto_now=True)
     author = models.ForeignKey("common_base.Account", related_name="%(class)s_author")
     target = models.ManyToManyField("common_base.Account", related_name="%(class)s_target")#dont change
@@ -27,37 +31,26 @@ class Report(models.Model):
     comments = models.ManyToManyField("common_base.Comment")
 
     def list_jobs(self):
-        """applies numerous filters to the data to match the requirements of the report
-
-        The data is first filtered by dates 
-        then its filtered by the equipment supplied to the report
-        
-        Input
-        ------
-            None
-
-        Output 
-        ------
-
-        3 element tuple of preventative tasks, work_orders and checklists"""
-
+        """3 element tuple of preventative tasks, work_orders and checklists"""
         return self.list_p_tasks(), self.list_work_orders(), self.list_checks()
+
+    @property
+    def q_objs(self):
+        if not self._q_objs:
+            self._q_objs = self.get_q_filters()
+        return self._q_objs
 
     def get_q_filters(self):
         q_objs = []
 
         if self.machine.count() >0:
             q_objs += [Q(machine=mech) for mech in self.machine.all()]
-
         if self.component.count() >0:
             q_objs += [Q(component=c) for c in self.component.all()]
-
         if self.subunit.count() >0:
             q_objs += [Q(subunit=s) for s in self.subunit.all()]
-        
         if self.subassembly.count() >0:
             q_objs += [Q(subassembly=sa) for sa in self.subassembly.all()]
-        
         if self.section.count() >0:
             q_objs += [Q(section=s) for s in self.section.all()]
 
@@ -66,12 +59,11 @@ class Report(models.Model):
     @property
     def equipment_list(self):
         equipment = []
-        for cls_ in [self.machine, self.component, self.subassembly, self.subunit, self.section]:
+        for cls_ in [self.machine, self.component, self.subassembly, 
+                self.subunit, self.section]:
             for e in cls_.all():
                 equipment.append(e)
-
         return equipment
-
 
     def add_equipment(self, e):
         """Add an abitrary equipment item to the report based on the length of its pk"""
@@ -83,36 +75,20 @@ class Report(models.Model):
         
         mapping[len(e.pk)].add(e)
 
+    def _filter_jobs(self, model):
+        query = filter_by_dates(model.objects.all(), 
+            self.start_period.strftime("%m/%d/%Y"),
+            self.end_period.strftime("%m/%d/%Y"))
+    
+        if len(self.q_objs) > 0:
+            return query.filter(reduce(operator.or_, self.q_objs))
+        else: return query
 
     def list_checks(self):
-        checks = filter_by_dates(Checklist.objects.all(), 
-                                self.start_period.strftime("%m/%d/%Y"),
-                                    self.end_period.strftime("%m/%d/%Y"))
-        q_objs = self.get_q_filters()
-
-        if len(q_objs) > 0:
-            return checks.filter(reduce(operator.or_, q_objs))
-        else: return checks
+        return self._filter_jobs(Checklist)
 
     def list_p_tasks(self):
-        p_tasks = filter_by_dates(PreventativeTask.objects.all(),
-                                    self.start_period.strftime("%m/%d/%Y"),
-                                    self.end_period.strftime("%m/%d/%Y"))
-        
-        q_objs = self.get_q_filters()
-        
-        if len(q_objs) > 0:
-            return p_tasks.filter(reduce(operator.or_, q_objs))
-        else: return p_tasks
+        return self._filter_jobs(PreventativeTask)
 
     def list_work_orders(self):
-        wos = filter_by_dates(WorkOrder.objects.all(), 
-                        self.start_period.strftime("%m/%d/%Y"),
-                        self.end_period.strftime("%m/%d/%Y"))
-
-        
-        q_objs = self.get_q_filters()
-        
-        if len(q_objs) > 0:
-            return wos.filter(reduce(operator.or_, q_objs))
-        else: return wos
+        return self._filter_jobs(WorkOrder)
