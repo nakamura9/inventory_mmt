@@ -25,11 +25,10 @@ secret = key_file.readline()
 SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 #make sure the ip address is matched
-ALLOWED_HOSTS = ["*"]
-
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 # Application definition
 
@@ -96,11 +95,11 @@ if DEBUG:
 else:
     DATABASES = {
         'default':{
-            'ENGINE': django.db.backends.postgresql_psycopg2,
-            'NAME': 'inventory_db',
-            'USER': 'nakamura9a',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'inv_mmt',
+            'USER': 'django_conn',
             'PASSWORD': db,
-            'HOST': '',
+            'HOST': 'localhost',
             'PORT': '',
         }
     }
