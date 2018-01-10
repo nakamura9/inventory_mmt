@@ -13,25 +13,26 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-key_file = open("keys.txt", "r")
-db = key_file.readline()
-secret = key_file.readline()
+#key_file = open("keys.txt", "r")
+#db = key_file.readline()
+#secret = key_file.readline()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret
+SECRET_KEY  = "#0hfoisdf98(*)(&yqh34j23408hf9wr8ry"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 #make sure the ip address is matched
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "192.168.100.9", "172.25.231.5"]
+
+ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -84,7 +85,7 @@ WSGI_APPLICATION = 'inventory_mmt.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-if DEBUG:
+if False:
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -96,9 +97,9 @@ else:
     DATABASES = {
         'default':{
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'inv_mmt',
+            'NAME': 'inventory',
             'USER': 'django_conn',
-            'PASSWORD': db,
+            'PASSWORD': 'django_conn',
             'HOST': 'localhost',
             'PORT': '',
         }
@@ -143,7 +144,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "common_base", "static")
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT =  "/srv/inventory_mmt/media/"
 MEDIA_URL = "/media/"
 
 TEST_CONDITIONS = False

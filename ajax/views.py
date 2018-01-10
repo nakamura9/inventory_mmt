@@ -337,7 +337,7 @@ def parse_csv_file(request):
     
     if not settings.TEST_CONDITIONS:
         t = threading.Thread(target=target, args=(CSV_FILE_STATUS, 
-                os.path.join("media", file.name)))
+                os.path.join(settings.MEDIA_ROOT, file.name)))
         t.setDaemon(True)
         t.start()
 
