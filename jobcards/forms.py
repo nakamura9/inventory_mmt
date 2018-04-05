@@ -133,4 +133,8 @@ class WorkOrderListFilterForm(forms.Form):
                                         for mach in Machine.objects.all()],
                                         required = False)
     status = forms.ChoiceField(choices = [("requested", "Requested"),("accepted", "Accepted"), ("completed", "Completed"), ("approved", "Approved")])
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c
+>>>>>>> 890f161e14e502a70cbb10d3f40d70c9c097ffc0

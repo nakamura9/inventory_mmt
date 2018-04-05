@@ -105,7 +105,9 @@ urlpatterns = [
     url(r'^add_plant/?$', views.PlantCreateView.as_view(), name="add_plant"),
     url(r'^engineering-inventory/?$', views.EngineeringInventoryView.as_view(), 
         name='engineering-inventory'),
-    url(r'^delete-run-data/(?P<pk>[\d ]+)/(?P<mech_pk>[\w ]+)/?$', 
-        views.delete_run_data, name="delete-run-data")
+    url(r'^delete-run-data/(?P<pk>[\w ]+)/(?P<mech_pk>[\w ]+)/?$', 
+        views.delete_run_data, name="delete-run-data"),
+    url(r'^edit-run-data/(?P<pk>[\w ]+)/?$', 
+        views.RunDataUpdateView.as_view(), name="edit-run-data")
 ] + component_urls + machine_urls + subassembly_urls + subunit_urls + \
     section_urls + asset_urls + spares_urls # + order_urls + production_inventory_urls

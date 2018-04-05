@@ -10,7 +10,7 @@ class RunDataForm(forms.ModelForm, BootstrapMixin):
                 self.fields[f].widget.attrs["required"] = "False"
     class Meta:
         model =RunData
-        fields = ["start_date", "end_date","run_days", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        fields = ["start_date", "end_date", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
     machine = forms.ModelChoiceField(Machine.objects.all())
 
@@ -42,7 +42,11 @@ class SparesFilterForm(forms.Form):
     machine = forms.ChoiceField(choices=lambda :[(mach.pk, mach.machine_name) \
 =======
     machine = forms.ChoiceField(choices=lambda : [(mach.pk, mach.machine_name) \
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c
+>>>>>>> 890f161e14e502a70cbb10d3f40d70c9c097ffc0
                                         for mach in Machine.objects.all()],
                                         required = False)
 
@@ -147,6 +151,18 @@ class ComponentForm(forms.ModelForm, BootstrapMixin):
         self.fields["subunit"].widget.attrs["onchange"] = \
 <<<<<<< HEAD
             "prepSubAssemblyUpdate()"
+<<<<<<< HEAD
 =======
                 "prepSubAssemblyUpdate()"
 >>>>>>> master
+=======
+
+class RunDataUpdateForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = RunData
+        fields = ["start_date", "end_date", "run_hours", "monday","tuesday", 
+            "wednesday", "thursday", "friday", "saturday", "sunday"]
+=======
+                "prepSubAssemblyUpdate()"
+>>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c
+>>>>>>> 890f161e14e502a70cbb10d3f40d70c9c097ffc0

@@ -29,11 +29,16 @@ DEBUG = False
 
 #make sure the ip address is matched
 <<<<<<< HEAD
+<<<<<<< HEAD
 ALLOWED_HOSTS = ["127.0.0.1"]
 =======
 ALLOWED_HOSTS = ["0.0.0.0"]
 
 >>>>>>> master
+=======
+ALLOWED_HOSTS = ["0.0.0.0"]
+
+>>>>>>> 890f161e14e502a70cbb10d3f40d70c9c097ffc0
 
 # Application definition
 
@@ -53,6 +58,8 @@ INSTALLED_APPS = [
     'maintenance',
     'planning',
     'reports',
+    'sslserver',
+    'djangosecure',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'inventory_mmt.urls'
@@ -102,6 +110,7 @@ else:
         'default':{
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
 <<<<<<< HEAD
+<<<<<<< HEAD
             'NAME': 'inv_mmt',
             'USER': 'django_conn',
             'PASSWORD': db,
@@ -110,11 +119,25 @@ else:
             'USER': 'nakamura9a',
             'PASSWORD': '123',
 >>>>>>> master
+=======
+            'NAME': 'deploy',
+            'USER': 'nakamura9a',
+            'PASSWORD': '123',
+>>>>>>> 890f161e14e502a70cbb10d3f40d70c9c097ffc0
             'HOST': 'localhost',
             'PORT': '',
         }
     }
-
+    SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+    SESSION_COOKIE_HTTPONLY = True
+    X_FRAME_OPTIONS = 'DENY'
+    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SECURE =True
+    SESSION_COOKIE_SECURE =True
+    SECURE_SSL_REDIRECT =True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -157,7 +180,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "common_base", "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
-TEST_CONDITIONS = False
+ALLOW_RANDOM_ACCESS = False
 
 """
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"

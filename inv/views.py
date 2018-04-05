@@ -322,7 +322,16 @@ class SubunitEditView(UserPassesTestMixin,UpdateView):
     def test_func(self):
         return role_test(self.request.user)
 
+class RunDataUpdateView(UserPassesTestMixin, UpdateView):
+    model =RunData
+    form_class = RunDataUpdateForm
+    template_name = os.path.join("inv", "engineering_inventory",
+        "create_update", "update_rundata.html")
+    login_url = "/login/"
+    success_url = reverse_lazy("inventory:inventory-home")
 
+    def test_func(self):
+        return role_test(self.request.user)
 ###############################################################################
 #                      Engineering Inventory Details                          #
 ###############################################################################
