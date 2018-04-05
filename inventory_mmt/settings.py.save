@@ -25,10 +25,10 @@ secret = key_file.readline()
 SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 #make sure the ip address is matched
-ALLOWED_HOSTS = ["0.0.0.0"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -43,14 +43,14 @@ INSTALLED_APPS = [
     'inv',
     'jobcards',
     'checklists',
+    'rca',
     'machine_learning',
     'common_base',
     'ajax',
     'maintenance',
     'planning',
     'reports',
-    'sslserver',
-    'djangosecure',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -61,7 +61,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
 ]
 
 ROOT_URLCONF = 'inventory_mmt.urls'
@@ -91,7 +90,7 @@ WSGI_APPLICATION = 'inventory_mmt.wsgi.application'
 if DEBUG:
     DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycop',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'TEST_NAME': os.path.join(BASE_DIR, 'test.sqlite3'),
     }
@@ -99,24 +98,15 @@ if DEBUG:
 else:
     DATABASES = {
         'default':{
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'deploy',
+            'ENGINE': django.db.backends.postgresql_psycopg2,
+            'NAME': 'inventory_db',
             'USER': 'nakamura9a',
-            'PASSWORD': '123',
-            'HOST': 'localhost',
+            'PASSWORD': db,
+            'HOST': '',
             'PORT': '',
         }
     }
-    SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-    SESSION_COOKIE_HTTPONLY = True
-    X_FRAME_OPTIONS = 'DENY'
-    CSRF_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_SECURE =True
-    SESSION_COOKIE_SECURE =True
-    SECURE_SSL_REDIRECT =True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 31536000
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

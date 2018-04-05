@@ -10,10 +10,9 @@ class RunDataForm(forms.ModelForm, BootstrapMixin):
                 self.fields[f].widget.attrs["required"] = "False"
     class Meta:
         model =RunData
-        fields = ["start_date", "end_date", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        fields = ["start_date", "run_days", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
     machine = forms.ModelChoiceField(Machine.objects.all())
-
 
 class SparesForm(forms.ModelForm, BootstrapMixin):
     """Form used to create Spares items."""
@@ -38,11 +37,7 @@ class SparesFilterForm(forms.Form):
                                     ("-last_order_price", "Price - Descending"),
                                     ("-quantity", "Quantity - Descending")])
     show_linked_only = forms.BooleanField(required=False)
-<<<<<<< HEAD
-    machine = forms.ChoiceField(choices=lambda :[(mach.pk, mach.machine_name) \
-=======
-    machine = forms.ChoiceField(choices=lambda : [(mach.pk, mach.machine_name) \
->>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c
+    machine = forms.ChoiceField(lambda : [(mach.pk, mach.machine_name) \
                                         for mach in Machine.objects.all()],
                                         required = False)
 
@@ -60,9 +55,9 @@ class InventoryItemForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = InventoryItem
         fields = ["serial_number", "name", "order_number", 
-            "quantity", "order_date", "category",
-            "supplier", "unit_price", "min_stock_level",
-            "reorder_quantity"]
+                    "quantity", "order_date", "category",
+                        "supplier", "unit_price", "min_stock_level",
+                            "reorder_quantity"]
 
 
 class OrderForm(forms.ModelForm, BootstrapMixin):
@@ -71,8 +66,8 @@ class OrderForm(forms.ModelForm, BootstrapMixin):
     class Meta:
         model = Order
         fields = ["order_number", "description",     "quantity", "unit_price", 
-            "manufacture_date", "delivery_date", "layers", "liner",
-            "flute_profile", "customer", "delivery_status", "production_status"]
+                    "manufacture_date", "delivery_date", "layers", "liner",
+                    "flute_profile", "customer", "delivery_status", "production_status"]
 
 
 class MachineForm(forms.ModelForm, BootstrapMixin):
@@ -108,7 +103,7 @@ class SubUnitForm(forms.ModelForm, BootstrapMixin):
     def __init__(self, *args , **kwargs):
         super(SubUnitForm, self).__init__(*args, **kwargs)
         self.fields["machine"].widget.attrs["onchange"] = \
-            "prepSectionUpdate()"
+                "prepSectionUpdate()"
 
 class SubAssyForm(forms.ModelForm, BootstrapMixin):
     """Form for creating SubAssemblies.
@@ -135,24 +130,15 @@ class ComponentForm(forms.ModelForm, BootstrapMixin):
     
     class Meta:
         model = Component
-        fields = ["component_name", "machine", "section", "subunit",
-            "subassembly", "unique_id"]
+        fields = ["component_name", 
+                "machine", "section", "subunit", "subassembly", "unique_id"]
     
     def __init__(self, *args , **kwargs):
         super(ComponentForm, self).__init__(*args, **kwargs)
         self.fields["machine"].widget.attrs["onchange"] = \
-            "prepSectionUpdate()"
+                "prepSectionUpdate()"
         self.fields["section"].widget.attrs["onchange"] = \
-            "prepSubUnitUpdate()"
-        self.fields["subunit"].widget.attrs["onchange"] = \
-<<<<<<< HEAD
-            "prepSubAssemblyUpdate()"
+                "prepSubUnitUpdate()"
 
-class RunDataUpdateForm(forms.ModelForm, BootstrapMixin):
-    class Meta:
-        model = RunData
-        fields = ["start_date", "end_date", "run_hours", "monday","tuesday", 
-            "wednesday", "thursday", "friday", "saturday", "sunday"]
-=======
+        self.fields["subunit"].widget.attrs["onchange"] = \
                 "prepSubAssemblyUpdate()"
->>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c
