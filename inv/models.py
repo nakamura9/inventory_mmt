@@ -61,7 +61,6 @@ class Plant(models.Model):
 class RunData(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
-    run_days = models.IntegerField()
     run_hours = models.FloatField()
     
     monday = models.BooleanField(default=False)

@@ -10,7 +10,7 @@ class RunDataForm(forms.ModelForm, BootstrapMixin):
                 self.fields[f].widget.attrs["required"] = "False"
     class Meta:
         model =RunData
-        fields = ["start_date", "end_date","run_days", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        fields = ["start_date", "end_date", "run_hours", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
     machine = forms.ModelChoiceField(Machine.objects.all())
 
@@ -142,3 +142,9 @@ class ComponentForm(forms.ModelForm, BootstrapMixin):
             "prepSubUnitUpdate()"
         self.fields["subunit"].widget.attrs["onchange"] = \
             "prepSubAssemblyUpdate()"
+
+class RunDataUpdateForm(forms.ModelForm, BootstrapMixin):
+    class Meta:
+        model = RunData
+        fields = ["start_date", "end_date", "run_hours", "monday","tuesday", 
+            "wednesday", "thursday", "friday", "saturday", "sunday"]

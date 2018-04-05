@@ -1,0 +1,17 @@
+{% extends "window.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+        <h3>Update Run Data</h3>
+        <div class="well">
+            <form method="POST" action="">
+                {% csrf_token %}
+                <table>{{form.as_table}}</table>
+                <input class="btn btn-primary" value="Submit Changes" type="submit">
+            </form>
+        </div>
+    </div>
+    <div class="col-sm-4"></div>
+</div>
+{% endblock %}

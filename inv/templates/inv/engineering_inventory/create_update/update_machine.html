@@ -12,7 +12,7 @@
                             <th>Run Hours(per day)</th>
                             <th>Run Days(per week)</th>
                             <th>Total Run Hours for period</th>
-                            <th>Delete</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -22,7 +22,7 @@
                                 <td>{{r.run_hours}}</td>
                                 <td>{{r.run_days}}</td>
                                 <td>{{r.total_run_hours}}</td>
-                                <td><a href="{% url 'inventory:delete-run-data' pk=r.pk mech_pk=object.pk %}" class="btn btn-danger">Delete</a></td>
+                                <td><a href="{% url 'inventory:delete-run-data' pk=r.pk mech_pk=object.pk %}" class="btn btn-danger">Delete</a><a href="{% url 'inventory:edit-run-data' pk=r.pk %}" class="btn btn-info">Edit</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>

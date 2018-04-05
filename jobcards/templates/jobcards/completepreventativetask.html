@@ -134,7 +134,7 @@
                     $.ajax({
                         method: "POST",
                         url: "{% url 'jobcards:accept-p-task' %}",
-                        data: {
+                        data: {"csrfmiddlewaretoken": "{{csrf_token}}",
                             "pk": "{{object.pk}}",
                             "resolver": this.user
                         }, 
@@ -186,6 +186,7 @@
                                             });
 
             {% for r in object.assignments_accepted.all %}
+            alert('{{r.username}}');
             select_widget.append($("<option>").text("{{r.username}}").attr("value", "{{r.username}}"));
             {% endfor %}
             pass_form.append(select_widget);

@@ -25,10 +25,10 @@ secret = key_file.readline()
 SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 #make sure the ip address is matched
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "*"]
 
 # Application definition
 
@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'maintenance',
     'planning',
     'reports',
+    'sslserver',
+    'djangosecure',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'inventory_mmt.urls'
@@ -103,7 +106,16 @@ else:
             'PORT': '',
         }
     }
-
+    SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+    SESSION_COOKIE_HTTPONLY = True
+    X_FRAME_OPTIONS = 'DENY'
+    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SECURE =True
+    SESSION_COOKIE_SECURE =True
+    SECURE_SSL_REDIRECT =True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -147,7 +159,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 TEST_CONDITIONS = False
-
-"""
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-SESSION_COOKIE_HTTPONLY = True"""
