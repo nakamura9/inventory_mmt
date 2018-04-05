@@ -25,15 +25,11 @@ secret = key_file.readline()
 SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 #make sure the ip address is matched
-<<<<<<< HEAD
-ALLOWED_HOSTS = ["127.0.0.1"]
-=======
-ALLOWED_HOSTS = ["0.0.0.0"]
+ALLOWED_HOSTS = ["*"]
 
->>>>>>> master
 
 # Application definition
 
@@ -47,12 +43,14 @@ INSTALLED_APPS = [
     'inv',
     'jobcards',
     'checklists',
+    'rca',
     'machine_learning',
     'common_base',
     'ajax',
     'maintenance',
     'planning',
     'reports',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -92,7 +90,7 @@ WSGI_APPLICATION = 'inventory_mmt.wsgi.application'
 if DEBUG:
     DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycop',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'TEST_NAME': os.path.join(BASE_DIR, 'test.sqlite3'),
     }
@@ -100,17 +98,11 @@ if DEBUG:
 else:
     DATABASES = {
         'default':{
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-<<<<<<< HEAD
-            'NAME': 'inv_mmt',
-            'USER': 'django_conn',
-            'PASSWORD': db,
-=======
-            'NAME': 'deploy',
+            'ENGINE': django.db.backends.postgresql_psycopg2,
+            'NAME': 'inventory_db',
             'USER': 'nakamura9a',
-            'PASSWORD': '123',
->>>>>>> master
-            'HOST': 'localhost',
+            'PASSWORD': db,
+            'HOST': '',
             'PORT': '',
         }
     }
@@ -157,7 +149,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "common_base", "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
-TEST_CONDITIONS = False
+ALLOW_RANDOM_ACCESS = False
 
 """
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
