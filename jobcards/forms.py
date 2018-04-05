@@ -116,10 +116,10 @@ class WorkOrderListFilterForm(forms.Form):
  
     start_date = forms.DateField(required = False)
     end_date = forms.DateField(required = False)
-    resolver = forms.ChoiceField(choices = [(acc.pk, acc.username) \
+    resolver = forms.ChoiceField(choices = lambda : [(acc.pk, acc.username) \
                                     for acc in Account.objects.all()],
                                     required = False)
-    machine = forms.ChoiceField(choices = [(mach.pk, mach.machine_name) \
+    machine = forms.ChoiceField(choices = lambda : [(mach.pk, mach.machine_name) \
                                         for mach in Machine.objects.all()],
                                         required = False)
     status = forms.ChoiceField(choices = [("requested", "Requested"),("accepted", "Accepted"), ("completed", "Completed"), ("approved", "Approved")])

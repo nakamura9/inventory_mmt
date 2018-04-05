@@ -36,7 +36,7 @@ class CategoryForm(forms.ModelForm, BootstrapMixin):
         fields = ["created_for", "name", "description"]
 
 class LoginForm(forms.Form):
-    username = forms.ChoiceField([(acc.username, acc.username) for acc in Account.objects.all()])
+    username = forms.ChoiceField(lambda : [(acc.username, acc.username) for acc in Account.objects.all()])
     password = forms.CharField()
 
 

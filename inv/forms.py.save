@@ -37,7 +37,7 @@ class SparesFilterForm(forms.Form):
                                     ("-last_order_price", "Price - Descending"),
                                     ("-quantity", "Quantity - Descending")])
     show_linked_only = forms.BooleanField(required=False)
-    machine = forms.ChoiceField(choices=lambda : [(mach.pk, mach.machine_name) \
+    machine = forms.ChoiceField(lambda : [(mach.pk, mach.machine_name) \
                                         for mach in Machine.objects.all()],
                                         required = False)
 

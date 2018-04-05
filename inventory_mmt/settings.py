@@ -28,7 +28,7 @@ SECRET_KEY = secret
 DEBUG = False
 
 #make sure the ip address is matched
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["0.0.0.0"]
 
 
 # Application definition
@@ -101,8 +101,8 @@ else:
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'deploy',
             'USER': 'nakamura9a',
-            'PASSWORD': db,
-            'HOST': '',
+            'PASSWORD': '123',
+            'HOST': 'localhost',
             'PORT': '',
         }
     }
