@@ -148,5 +148,3 @@ class RunDataUpdateForm(forms.ModelForm, BootstrapMixin):
         model = RunData
         fields = ["start_date", "end_date", "run_hours", "monday","tuesday", 
             "wednesday", "thursday", "friday", "saturday", "sunday"]
->>>>>>> 890f161e14e502a70cbb10d3f40d70c9c097ffc0
->>>>>>> 59d89bf35f12d681d63364e49374a151dacb73d9
