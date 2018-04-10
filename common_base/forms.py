@@ -36,11 +36,6 @@ class CategoryForm(forms.ModelForm, BootstrapMixin):
         fields = ["created_for", "name", "description"]
 
 class LoginForm(forms.Form):
-<<<<<<< HEAD
-    username = forms.ChoiceField(lambda : [(
-        acc.username, acc.username) for acc in Account.objects.all()])
-    password = forms.CharField()
-=======
     username = forms.ChoiceField(lambda : [(acc.username, acc.username) for acc in Account.objects.all()])
     password = forms.CharField()
 
@@ -55,4 +50,3 @@ class EquipmentSelectWidget(forms.widgets.MultiWidget):
     def __init__(self, attrs=None):
         _widgets = ()
         super(EquipmentSelectWidget, self).__init__(_widgets, attrs)
->>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c

@@ -38,11 +38,7 @@ class SparesFilterForm(forms.Form):
                                     ("-last_order_price", "Price - Descending"),
                                     ("-quantity", "Quantity - Descending")])
     show_linked_only = forms.BooleanField(required=False)
-<<<<<<< HEAD
-    machine = forms.ChoiceField(choices=lambda :[(mach.pk, mach.machine_name) \
-=======
     machine = forms.ChoiceField(choices=lambda : [(mach.pk, mach.machine_name) \
->>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c
                                         for mach in Machine.objects.all()],
                                         required = False)
 
@@ -145,7 +141,6 @@ class ComponentForm(forms.ModelForm, BootstrapMixin):
         self.fields["section"].widget.attrs["onchange"] = \
             "prepSubUnitUpdate()"
         self.fields["subunit"].widget.attrs["onchange"] = \
-<<<<<<< HEAD
             "prepSubAssemblyUpdate()"
 
 class RunDataUpdateForm(forms.ModelForm, BootstrapMixin):
@@ -153,6 +148,3 @@ class RunDataUpdateForm(forms.ModelForm, BootstrapMixin):
         model = RunData
         fields = ["start_date", "end_date", "run_hours", "monday","tuesday", 
             "wednesday", "thursday", "friday", "saturday", "sunday"]
-=======
-                "prepSubAssemblyUpdate()"
->>>>>>> 8e672e3971e01c149f40443606eddbc3bff71e1c
