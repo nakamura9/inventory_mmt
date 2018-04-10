@@ -28,9 +28,8 @@ SECRET_KEY = secret
 DEBUG = False
 
 #make sure the ip address is matched
+
 ALLOWED_HOSTS = ["0.0.0.0"]
-
-
 # Application definition
 
 INSTALLED_APPS = [

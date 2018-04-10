@@ -39,7 +39,7 @@ class SparesFilterForm(forms.Form):
                                     ("-quantity", "Quantity - Descending")])
     show_linked_only = forms.BooleanField(required=False)
     machine = forms.ChoiceField(choices=lambda : [(mach.pk, mach.machine_name) \
-                                        for mach in Machine.objects.all()],
+        for mach in Machine.objects.all()],
                                         required = False)
 
 class AssetForm(forms.ModelForm, BootstrapMixin):
@@ -148,3 +148,5 @@ class RunDataUpdateForm(forms.ModelForm, BootstrapMixin):
         model = RunData
         fields = ["start_date", "end_date", "run_hours", "monday","tuesday", 
             "wednesday", "thursday", "friday", "saturday", "sunday"]
+>>>>>>> 890f161e14e502a70cbb10d3f40d70c9c097ffc0
+>>>>>>> 59d89bf35f12d681d63364e49374a151dacb73d9
