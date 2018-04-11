@@ -25,11 +25,13 @@ secret = key_file.readline()
 SECRET_KEY = secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 #make sure the ip address is matched
-
-ALLOWED_HOSTS = ["0.0.0.0"]
+if not DEBUG:
+    ALLOWED_HOSTS = ["0.0.0.0"]
+else:
+    ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
