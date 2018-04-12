@@ -350,13 +350,13 @@ class MachineView(DetailView):
         context = super(MachineView, self).get_context_data(*args, **kwargs)
         Planned = namedtuple("Planned", "date resolver est_time type")
         planned_for_machine =PreventativeTask.objects.filter(
-            machine=self.object, completed_date=None)
+            machine=self.object, scheduled_for__gte=datetime.date.today())
         context["planned_jobs"] = [
             Planned(job.scheduled_for, 
             job.assignments.first(),
             job.estimated_labour_time, "Planned Job") \
                 for job in planned_for_machine]
-        checklist_on_machine = Checklist.objects.filter(machine = self.object)
+        checklist_on_machine = Checklist.objects.filter(machine = self.object, )
         
         
         for check in checklist_on_machine:
@@ -409,7 +409,7 @@ class SectionDetailView(DetailView):
         for check in checklist_on_machine:
             if check.is_open:
                 context["planned_jobs"].append(
-                    Planned(check.creation_date, 
+                    Planned(check.next, 
                         check.resolver, 
                         check.estimated_time,
                         "Checklist"))
@@ -442,91 +442,6 @@ class SubAssyView(DetailView):
 ###############################################################################
 #                      Production inventory                                   #
 ###############################################################################
-
-'''
-class CategoryList(ListView):
-    """Category list view"""
-
-    model = Category
-    context_object_name = 'categories'
-    template_name=os.path.join("inv", "production_inventory","raw_materials.html")
-
-
-class CategoryCreateView(CreateView):
-    """Category create view"""
-
-    template_name = os.path.join("inv","category_form.html")
-    form_class = CategoryForm
-    success_url = reverse_lazy("inventory:raw-materials")
-
-
-class InventoryItemUpdateView(UpdateView):
-    """Inventory Item Update view"""
-
-    model = InventoryItem
-    template_name = os.path.join("inv", "production_inventory", "create_update","inventory_item.html")
-    success_url = reverse_lazy("inventory:raw-materials")
-    form_class = InventoryItemForm
-
-
-class InventoryItemFormView(CreateView):
-    """Inventory Item Create View"""
-
-    model = InventoryItem
-    form_class = InventoryItemForm
-    template_name = os.path.join("inv", "production_inventory", "create_update","inventory_item.html")
-    success_url = reverse_lazy("inventory:raw-materials")
-
-
-class InventoryItemDetailView(DetailView):
-    """Inventory Item Detail view"""
-
-    model = InventoryItem
-    template_name= os.path.join("inv","production_inventory", "details", "inventory_item_details.html")
-    
-
-class InventoryListView(TemplateView):
-    """Inventory List view"""
-    
-    template_name = os.path.join("inv","production_inventory", "list","inventory_list.html")
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(InventoryListView, self).get_context_data(*args, **kwargs)
-        category = Category.objects.get(name=self.kwargs["filter"])
-        context["items"] = InventoryItem.objects.filter(category = category)
-        context["category"] = category 
-        return context
-
-
-class OrderCreateView(CreateView):
-    """Order Create View"""
-
-    form_class = OrderForm
-    success_url = reverse_lazy("inventory:raw-materials")
-    template_name = os.path.join("inv","production_inventory", "create_update", "order_form.html")
-
-
-class OrderUpdateView(UpdateView):
-    """Order Update view """
-
-    form_class = OrderForm
-    success_url = reverse_lazy("inventory:raw-materials")
-    template_name = os.path.join("inv", "production_inventory", "create_update","order_form.html")
-    model = Order
-
-class OrderList(ListView):
-    """Order List View"""
-
-    model = Order
-    template_name= os.path.join("inv","production_inventory", "list", "order_list.html")
-
-
-class OrderDetailView(DetailView):
-    """Order Detail View"""
-
-    model = Order
-    template_name = os.path.join("inv","production_inventory", "details", "orders_detailview.html")
-'''
 
 ###############################################################################
 #                               Delete Views                                  #                              

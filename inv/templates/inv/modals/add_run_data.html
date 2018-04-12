@@ -33,9 +33,8 @@ function isChecked(sel){
 }
 function addRunData(){
     //validation
-    if ($("#id_start_date").val() == "" || $("#id_machine").val() == "" || 
-    $("#id_run_days").val() == "" || $("#id_run_hours").val() == "" ){
-        alert("Please enter all the values");
+    if ($("#id_start_date").val() == "" || $("#id_machine").val() == "" || $("#id_run_hours").val() == "" ){
+        addAlert("Please enter all the values", "warning");
     }else{
         $.ajax({
             method: "POST",
@@ -46,7 +45,6 @@ function addRunData(){
                 "end_date": $("#id_end_date").val(),
                 "machine": $("#id_machine").val(),
                 "run_hours": $("#id_run_hours").val(),
-                "run_days": $("#id_run_days").val(),
                 "monday": isChecked($("#id_monday")),
                 "tuesday": isChecked($("#id_tuesday")),
                 "wednesday": isChecked($("#id_wednesday")),
@@ -57,12 +55,12 @@ function addRunData(){
             },
             success: function(result){
                 if(result.success){
-                    alert("success");
+                    addAlert("successfully added run data", "info");
                     {% if edit %}
                     window.location.href = "{% url 'inventory:edit_machine' pk=object.pk %}";
                     {% endif %}
                 }else{
-                    alert("failure");
+                    addAlert("Server failed to add run data", "info");
                 }
                     
             }

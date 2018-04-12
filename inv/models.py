@@ -92,6 +92,15 @@ class RunData(models.Model):
         return run_days[day.weekday()]
 
     @property
+    def run_days(self):
+        bools = [self.monday, self.tuesday, self.wednesday, self.thursday,
+            self.friday, self.saturday, self.sunday]
+        run_count = 0
+        for b in bools:
+            if b:
+                run_count += 1
+        return run_count
+    @property
     def total_run_hours(self):
         curr_day = self.start_date
         hours = 0

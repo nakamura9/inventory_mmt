@@ -64,7 +64,7 @@
     function holdChecklist(){
         if(holdCount == 1){
             if($("#reason").text() == ""){
-                alert("Please provide a reason for holding the checklist");
+                addAlert("Please provide a reason for holding the checklist", "warning");
             }else{
                 $.ajax({
                         method: "POST",
@@ -79,7 +79,7 @@
                                 holdCount = 0;
                             window.location.href = "{% url 'maintenance:inbox' %}";
                             }else{
-                                alert("The Authentication failed. Unable to Hold Checklist");
+                                addAlert("The Authentication failed. Unable to Hold Checklist", "danger");
                             }
                         }
                 });
@@ -104,7 +104,7 @@
             return true;
         }else{
             test = 0;
-            alert("Not all tasks  have been completed.")
+            addAlert("Not all tasks  have been completed.", "warning");
             return false;
         }
     }

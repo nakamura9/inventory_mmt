@@ -7,15 +7,35 @@ functions
 4. updateDatalist(source, model, datalist) performs ajax request to update a datalist
 5. checkInput(list_id) validates the value submitted in a for returns bool
 6. removeArrayElement(array, element)
+7. addAlert(msg, cls) adds a div alert to the top of the page
 */
 
+function addAlert(msg, cls){
+    /*classes can be one of:
+    *info
+    *success
+    *warning
+    *danger
+    */
+    var alertRoot = $("#global-alerts");
+    var alertBox = $("<div>").addClass('alert').addClass('alert-' + cls);
+    alertBox.text(msg);
+    var dismissButton = $("<button>").attr({
+        'class': 'close',
+        'type' : 'button',
+        'data-dismiss' : 'alert',
+        'aria-hidden': 'true'
+    }).text('x');
+    alertBox.append(dismissButton);
+    alertRoot.append(alertBox);
 
+}
 
 function saferId(str, partial){
     //check if id exists
     var str = str.toString();
     if(str == ""){
-        alert("The input is invalid");
+        addAlert("The input is invalid", "warning");
         return null;
     }
     var val = str.split(" ").join("-");
@@ -59,7 +79,7 @@ function addItemToList(list, value, id, callback){
     var dismiss_button;
     var id_tail= saferId(id, true);
     if(!id_tail){
-        alert("Invalid value");
+        addAlert("Invalid value", "warning");
         return null;
     }
     var block_id = saferId(list + "_item_" + id_tail, false);
@@ -136,7 +156,7 @@ function checkInput(list_id){
     if(match.length > 0){
         return true;
     }else{
-        alert("Please select a value from the list");
+        addAlert("Please select a value from the list", "info");
         return false;
     }
 }

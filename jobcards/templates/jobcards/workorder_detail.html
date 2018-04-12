@@ -224,7 +224,7 @@ function declineJob(){
     // check if text input is present
     if($("#reason").length){
         if($("#reason").val() == ""){
-            alert("Please supply a reason for declining the Job");
+            addAlert("Please supply a reason for declining the Job", "warning");
             $("#reason").css("border", "3px solid red");
             $("#reason").focus();
             

@@ -88,7 +88,7 @@
                 {{form.as_table}}
                 
                 </table>
-                <button id="complete_button" type="button" onclick="completeJob()" class="btn btn-primary" {% if object.assignments_accepted.all.count == 0 %} disabled{% endif %} >Complete Work Order</button>
+                <button id="complete_button" type="button" onclick="completeJob()" class="btn btn-danger" {% if object.assignments_accepted.all.count == 0 %} disabled{% endif %} >Complete</button>
             </form>
             <datalist id="spares_issued_datalist"></datalist>
         </div>
@@ -139,14 +139,14 @@
                             "resolver": this.user
                         }, 
                         success: function(resp){
-                            alert("Authenticated Successfully.");
+                            addAlert("Authenticated Successfully.", "info");
                             $("#login").remove();
                             $("#complete_button").removeAttr("disabled");
                     }
                 });
                     
                 }else{
-                    alert("Failed to authenticate as "+ user);
+                    addAlert("Failed to authenticate as "+ user, "danger");
                 }
             }
         });
@@ -155,7 +155,7 @@
     function completeJob(){
         if($("#resolver_password").length){
             if($("#resolver_password").val() == ""){
-                alert("Please provide a password");
+                addAlert("Please provide a password", "warning");
             }else{
                 $.ajax({
                     method: "POST",
@@ -167,28 +167,36 @@
                     },
                     success: function(result){
                         if(result.authenticated == true){
-                            alert("authenticated successfully");
+                            addAlert("authenticated successfully", "success");
                             $("#complete_button").attr("type", "submit");
-                            $("#resolver_password").remove();
+                            $("#pass-form").remove();
                             $("#complete_button").removeAttr("onclick");
+                            $("#complete_button").removeClass("btn-warning").addClass("btn-success");
+                            $("#complete_button").text("Submit");
                         }else{
-                            alert("You were not able to authenticate as "+ $("#resolver_username").val());
+                            addAlert("You were not able to authenticate as "+ $("#resolver_username").val(), "danger");
                         }
                     }
                 })
             }
         }else{
+            $("#complete_button").removeClass("btn-danger").addClass("btn-warning");
+            $("#complete_button").text("Authenticate");
             var pass_form = $("<div>").addClass("well");
+            pass_form.attr("id", "pass-form");
             pass_form.append($("<h4>").text("Authenticate:"));
             var select_widget = $("<select>").attr({
                                                 "id": "resolver_username",
-                                                "class":"form-control",               
+                                                "class":"form-control",
                                             });
+            $.get("{% url 'ajax:get-users'%}", function(data){
+                for( u in data.users){
+                    var user = data.users[u][1];
+                    select_widget.append($("<option>").text(user).attr(
+                        "value", user));
+                }
+            });            
 
-            {% for r in object.assignments_accepted.all %}
-            alert('{{r.username}}');
-            select_widget.append($("<option>").text("{{r.username}}").attr("value", "{{r.username}}"));
-            {% endfor %}
             pass_form.append(select_widget);
             pass_form.append($("<input>").attr({
                 "type":"password",
@@ -249,7 +257,7 @@ function validateForm(){
             return true;
         }else{
             
-            alert(tasks + " tasks  have not been completed.")
+            addAlert(tasks + " tasks  have not been completed.", "warning")
             tasks = 0;
             return false;
         }

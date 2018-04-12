@@ -190,7 +190,7 @@
             url: "{% url 'ajax:add-category' %}",
             data: {
                 "created_for": $("#id_created_for").val(),
-                "name" :$("#id_name").val(),
+                "name" :$("#id_category_name").val(),
                 "description": $("#id_description").val(),
                 "csrfmiddlewaretoken": "{{csrf_token}}"
             },

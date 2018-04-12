@@ -1,7 +1,6 @@
-{% extends 'window.html' %}
-{% block content %}
+{% extends 'window.html' %} {% block content %}
 <style>
-    .time{
+    .time {
         border-bottom: 1px solid white;
         background-color: #337ab7;
         margin: 2px;
@@ -11,42 +10,44 @@
         color: white;
 
     }
-    .item{
+
+    .item {
         border: 1px solid #337ab7;
         padding: 5px;
     }
-    .title{
+
+    .title {
         padding: 2px;
 
     }
 
-    .white-link{
+    .white-link {
         color: white;
         text-decoration: none;
     }
+
     .heading {
-        margin:2px;
+        margin: 2px;
         padding: 5px;
-        min-width: 150px;
         height: 50px;
         font-size: 18px;
         background-color: #337ab7;
         color: white;
     }
 </style>
-<div class="row">        
+<div class="row">
     <div class="col-sm-3 well">
         <h2>Week Starting: {{week.days.0}}</h2>
         <hr />
         <h3>Select View:</h3>
         <hr />
-        <a  class="btn btn-primary" href = "{% url 'planning:maintenance-month' year=week.year month=week.month %}" >Month</a>
-        <a  class="btn btn-primary" href = "{% url 'planning:maintenance-week' year=week.year month=week.month week=1 %}">Week</a>
-        <a  class="btn btn-primary" href = "{% url 'planning:maintenance-day' year=week.year month=week.month day=1 %}">Day</a>
+        <a class="btn btn-primary" href="{% url 'planning:maintenance-month' year=week.year month=week.month %}">Month</a>
+        <a class="btn btn-primary" href="{% url 'planning:maintenance-week' year=week.year month=week.month week=1 %}">Week</a>
+        <a class="btn btn-primary" href="{% url 'planning:maintenance-day' year=week.year month=week.month day=1 %}">Day</a>
         <div class="bg-info">
             <form action="" method="GET" role="form">
                 <legend>Filters</legend>
-            
+
                 <div class="form-group">
                     <table>
                         {{form.as_table}}
@@ -58,56 +59,57 @@
     </div>
     <div class="col-sm-9">
         <table>
-                <thead>
-                    <tr id="titles">
-                        <th class="heading">Monday</th>
-                        <th class="heading">Tuesday</th>
-                        <th class="heading">Wednesday</th>
-                        <th class="heading">Thursday</th>
-                        <th class="heading">Friday</th>
-                        <th class="heading">Saturday</th>
-                        <th class="heading">Sunday</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {% for day in week.week_agenda %}
-                            <td height="500" style="vertical-align: top; border: 1px solid #337ab7;">
-                                {% for task in day.agenda %}
-                                    {% if task.get_type == 'checklist' %}
-                                    <div class="item">
-                                        <div class="bg-primary title">
-                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> | {{task|truncatechars:15}}
-                                        <span style="float:right">| <a class="white-link" href="{% url 'checklists:checklist_details' pk=task.pk %}">Details</a></span>
-                                        </div>
-                                        <div class="body">
-                                            <p>Resolver: {{task.resolver}}</p>
-                                            <p>Machine: {{task.machine}}</p>
-                                            <p>Category: {{task.category}}</p>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    {% if task.get_type == 'job' %}
-                                    
-                                    <div class="item">
-                                            <div class="bg-primary title">
-                                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> | {{task|truncatechars:15}}
-                                            <span style="float:right">| <a class="white-link" href="{% url 'jobcards:complete-preventative-task' pk=task.pk %}">Details</a></span>
-                                            </div>
-                                            <div class="body">
-                                                <p>Resolver(s): {{task.assignments.first}}</p>
-                                                <p>Machine: {{task.machine}}</p>
-                                                <p>Frequency: {{task.frequency}}</p>
-                                            </div>
-                                        </div>
-                                    
-                                    {% endif %}
-                                {% endfor %}
-                            </td>    
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
+            <thead>
+                <tr id="titles">
+                    <th width="150" class="heading">Monday</th>
+                    <th width="150" class="heading">Tuesday</th>
+                    <th width="150" class="heading">Wednesday</th>
+                    <th width="150" class="heading">Thursday</th>
+                    <th width="150" class="heading">Friday</th>
+                    <th width="150" class="heading">Saturday</th>
+                    <th width="150" class="heading">Sunday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for day in week.week_agenda %}
+                    <td height="500" style="vertical-align: top; border: 1px solid #337ab7; ">
+                        {% for task in day.agenda %} {% if task.get_type == 'checklist' %}
+                        <div class="item">
+                            <div class="bg-primary title">
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> | {{task|truncatechars:15}}
+                                <span >|
+                                    <a class="white-link" href="{% url 'checklists:checklist_details' pk=task.pk %}">Details</a>
+                                </span>
+                            </div>
+                            <div class="body">
+                                <p>Resolver: {{task.resolver}}</p>
+                                <p>Machine: {{task.machine}}</p>
+                                <p>Category: {{task.category}}</p>
+                            </div>
+                        </div>
+                        {% endif %} {% if task.get_type == 'job' %}
+
+                        <div style="max-height:150px;" class="item">
+                            <div class="bg-primary title">
+                                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> | {{task|truncatechars:15}}
+                                <span >|
+                                    <a class="white-link" href="{% url 'jobcards:preventative-task-detail' pk=task.pk %}">Details</a>
+                                </span>
+                            </div>
+                            <div class="body">
+                                <p>Resolver(s): {{task.assignments.first}}</p>
+                                <p>Machine: {{task.machine}}</p>
+                                <p>Frequency: {{task.frequency}}</p>
+                            </div>
+                        </div>
+
+                        {% endif %} {% endfor %}
+                    </td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

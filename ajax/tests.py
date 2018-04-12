@@ -194,7 +194,6 @@ class OtherAjaxTests(TestCase, TestDataMixin):
                         datetime.timedelta(days=7)).strftime("%m/%d/%Y"),
                         "machine": Machine.objects.first().pk,
                         "run_hours": "4",
-                        "run_days": "3",
                         "monday": "",
                         "tuesday": "",
                         "wednesday": "",

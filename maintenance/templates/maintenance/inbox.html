@@ -1,5 +1,4 @@
-{% extends "window.html" %}
-{% block content %}
+{% extends "window.html" %} {% block content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-12 bg-info">
@@ -9,79 +8,86 @@
                     <tr>
                         {% csrf_token %}
                         <td>{{users}}</td>
-                        <td><input type="password" name="pwd" class="form-control" ></td>
-                        <td><button type="submit" class="btn btn-default">Login</button> </td>
+                        <td>
+                            <input type="password" name="pwd" class="form-control">
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-default">Login</button>
+                        </td>
                     </tr>
                 </table>
             </form>
         </div>
     </div>
     <div class="row">
-        
+
         <div class="col-sm-3 ">
             <ul class="nav nav-tabs nav-stacked">
-                <li><a class="active" href="#unplanned" data-toggle="tab" >Unplanned Jobs</a></li>
-                <li><a href="#planned" data-toggle="tab" >Planned Jobs</a></li>
-                <li><a href="#checklists" data-toggle="tab" >Checklists</a></li>
+                <li>
+                    <a class="active" href="#unplanned" data-toggle="tab">Unplanned Jobs</a>
+                </li>
+                <li>
+                    <a href="#planned" data-toggle="tab">Planned Jobs</a>
+                </li>
+                <li>
+                    <a href="#checklists" data-toggle="tab">Checklists</a>
+                </li>
             </ul>
         </div>
         <div class="col-sm-9">
             <div class="tab-content">
                 <div id="unplanned" class="tab-pane fade in active">
                     <h3>Unplanned Jobs:</h3>
-                    {% for job in jobs %}
-                    {% if job.is_open %}
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                {{job.description | truncatechars:40 }}
-                            </div>
-                            <div class = "panel-body">
-                                <p>Machine: {{job.machine}}</p>
-                                <p>SubUnit: {{job.subunit}}</p>
-                                <p>Requested by: {{job.request_by}}</p>
-                                <a href= "{% url 'jobcards:complete-work-order' pk=job.pk %}"class="btn btn-primary" >View</a>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-                <div id="planned" class="tab-pane fade">
-                    <h3>Planned Jobs:</h3>
-                    {% for job in planned %}
-                    {% if job.is_open %}
+                    {% for job in jobs %} {% if job.is_open %}
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             {{job.description | truncatechars:40 }}
                         </div>
-                        <div class = "panel-body">
+                        <div class="panel-body">
+                            <p>Machine: {{job.machine}}</p>
+                            <p>SubUnit: {{job.subunit}}</p>
+                            <p>Requested by: {{job.request_by}}</p>
+                            <a href="{% url 'jobcards:work-order-detail' pk=job.pk %}" class="btn btn-default">View</a>
+                            <a href="{% url 'jobcards:complete-work-order' pk=job.pk %}" class="btn btn-primary">Complete</a>
+                        </div>
+                    </div>
+                    {% endif %} {% endfor %}
+                </div>
+                <div id="planned" class="tab-pane fade">
+                    <h3>Planned Jobs:</h3>
+                    {% for job in planned %} {% if job.is_open %}
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            {{job.description | truncatechars:40 }}
+                        </div>
+                        <div class="panel-body">
                             <p>Resolver: {{job.resolver}}</p>
                             <p>Machine: {{job.machine}}</p>
                             <p>SubUnit: {{job.subunit}}</p>
-                            <a href= "{% url 'jobcards:complete-preventative-task' pk=job.pk %}"class="btn btn-primary" >View</a>
+                            <a href="{% url 'jobcards:preventative-task-detail' pk=job.pk %}" class="btn btn-default">Detail</a>
+                            <a href="{% url 'jobcards:complete-preventative-task' pk=job.pk %}" class="btn btn-primary">Complete</a>
                         </div>
                     </div>
-                    {% endif %}
-                    {% endfor %}
+                    {% endif %} {% endfor %}
                 </div>
-                <div class="tab-pane fade" id="checklists"> 
+                <div class="tab-pane fade" id="checklists">
                     <h3>Checklists:</h3>
-                    {% for checklist in checklists %}
-                    {% if checklist.is_open %}
+                    {% for checklist in checklists %} {% if checklist.is_open %}
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             {{checklist.title}}
                         </div>
-                        <div class = "panel-body">
+                        <div class="panel-body">
                             <p>Resolver: {{checklist.resolver}}</p>
                             <p>Machine: {{checklist.machine}}</p>
                             <p>Category: {{checklist.category}}</p>
-                            <a href="{% url 'checklists:complete_checklist' pk=checklist.pk %}" class="btn btn-primary" >Complete</a>
+                            <a href="{% url 'checklists:checklist_details' pk=checklist.pk %}" class="btn btn-default">Details</a>
+                            <a href="{% url 'checklists:complete_checklist' pk=checklist.pk %}" class="btn btn-primary">Complete</a>
                         </div>
                     </div>
-                    {% endif %}
-                    {% endfor %}
+                    {% endif %} {% endfor %}
                 </div>
-            </div>  
+            </div>
         </div>
     </div>
-{% endblock %}
+    {% endblock %}

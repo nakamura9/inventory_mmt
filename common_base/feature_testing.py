@@ -84,7 +84,6 @@ def parse_file(file_name):
     global components
     fil = pd.read_csv(file_name)
     
-    #print "Starting..."
     i=0
     # test to make sure errors dont run aaway with it
     length = fil.shape[0]

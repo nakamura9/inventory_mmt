@@ -13,7 +13,7 @@ from common_base.utilities import time_choices
 
 time_duration = [] + time_choices("00:05:00", "00:30:00", "00:05:00",
             delta=True) + time_choices("00:30:00", "02:00:00", "00:15:00",
-            delta=True) + time_choices("02:00:00", "08:00:00", "00:30:00",
+            delta=True) + time_choices("02:00:00", "23:00:00", "01:00:00",
             delta=True)
 
 class WorkOrder(models.Model):

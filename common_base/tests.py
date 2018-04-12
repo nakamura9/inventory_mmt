@@ -38,7 +38,6 @@ class TestDataMixin(object):
         inv_models.RunData(
             start_date = datetime.date.today(),
             end_date = datetime.date.today() + datetime.timedelta(days=7),
-            run_days = 3,
             run_hours = 1,
             monday=True,
             tuesday=True,

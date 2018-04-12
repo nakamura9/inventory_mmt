@@ -161,6 +161,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 ALLOW_RANDOM_ACCESS = False
+TEST_CONDITIONS = False
 
 """
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"

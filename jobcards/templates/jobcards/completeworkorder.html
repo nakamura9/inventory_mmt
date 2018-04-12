@@ -56,9 +56,8 @@
             <button id="accept_button" type="button" class="btn btn-success" onclick="acceptJob()" >Accept Job</button>
             <p>Accept Job if you want to transfer it to another resolver.</p>
             {% endif %}
-            {% if object.status != "requested" %}
-            <button class="btn btn-warning" onclick="transferJob()">Transfer to another Resolver</button>
-            {% endif %}
+            <button id="transfer-button" class="btn btn-warning" onclick="transferJob()">Transfer to another Resolver</button>
+        
         </div>
         <div class="col-sm-4 well ">
             <h3>Complete Work Order</h3>
@@ -73,9 +72,10 @@
                 {% for item in object.spares_returned.all %}
                 <input type="hidden" id="{{item.stock_id}}" name="spares_returned[]" value="{{item.stock_id}}" >
                 {% endfor %}
-            <button {% if object.status == "requested" %}disabled{% endif %} id="complete_button" type="button" onclick="completeJob()" class="btn btn-primary">Complete Work Order</button>
+            <button {% if object.status == "requested" %}disabled{% endif %} id="complete_button" type="button" onclick="completeJob()" class="btn btn-danger">Complete</button>
 
             </form>
+            <!--dont delete datalists! -->
             <datalist id="spares_issued_datalist">
 
             </datalist>
@@ -142,7 +142,13 @@
 {% include "common_base/modals/login.html"%}
 {% endblock %}
 {% block body_script %}
-$("#id_completion_date").datepicker();
+$(document).ready(function(){
+    $("#id_completion_date").datepicker();
+    {% if object.status == "requested" %}
+    $("#transfer-button").hide();
+    {% endif %}
+});
+
 
 function transferJob(){
     //check if select exists
@@ -185,7 +191,7 @@ function transferJob(){
 function completeJob(){
     if($("#resolver_password").length){
         if($("#resolver_password").val() == ""){
-            alert("Please provide a password");
+            addAlert("Please provide a password", "info");
         }else{
             $.ajax({
                 method: "POST",
@@ -197,17 +203,23 @@ function completeJob(){
                 },
                 success: function(result){
                     if(result.authenticated == true){
-                        alert("authenticated successfully");
+                        addAlert("authenticated successfully", "info");
                         $("#complete_button").attr("type", "submit");
                         $("#resolver_password").remove();
                         $("#complete_button").removeAttr("onclick");
+                        $("#complete_button").removeClass("btn-warning").addClass("btn-success");
+                        $("#complete_button").text("Submit");
+
                     }else{
-                        alert("You were not able to authenticate as {{object.assigned_to}}.");
+                        addAlert("You were not able to authenticate as {{object.assigned_to}}.", "danger");
                     }
                 }
             })
         }
     }else{
+        $("#complete_button").text("Authenticate");
+        $("#complete_button").removeClass("btn-danger").addClass("btn-warning");
+
         var pass_form = $("<div>").append(
                 $("<p>").text("Password:")
             ).append(
@@ -238,14 +250,17 @@ function userLogin(){
             if(result.authenticated == true){
                 $("#login-modal").modal("hide");
                 if("{{object.assigned_to}}" != $("#id_username").val()){
-                    alert("You authenticated as "+ $("#id_username").val() + " but the job was assigned to {{object.assigned_to}}. Transfer the job if you are now attending to it.");
+                    addAlert("You authenticated as "+ $("#id_username").val() + " but the job was assigned to {{object.assigned_to}}. Transfer the job if you are now attending to it.", "info");
                     return true;
                 }else{
                     if($("#accept_button").length){
                         //authenticate when first accepting a job
-                        $.post("{% url 'jobcards:accept-job' %}", data={"pk":"{{object.pk}}"});
+                        $.post("{% url 'jobcards:accept-job' %}", data={
+                            "pk":"{{object.pk}}",
+                            "csrfmiddlewaretoken": "{{csrf_token}}" });
                         $("#accept_button").remove();
                         $("#complete_button").removeAttr("disabled");
+                        $("#transfer-button").show();
                     }else{
                         return true;
                     }

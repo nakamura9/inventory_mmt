@@ -228,46 +228,7 @@ class ViewTests(TestCase, TestDataMixin):
         self.assertEqual(response.status_code, 302)
 
     #test posting of inventory forms
-    """def test_post_check_and_delete_order_form(self):
-        response = self.client.post(reverse("inventory:new-order"),
-                                    data={"order_number":"101",
-                        "description":"Test Description",
-                        "quantity":"100",
-                        "unit_price":"0.1",
-                        "manufacture_date":datetime.date.today(),
-                        "flute_profile":"a",
-                        "liner":"kraft",
-                        "layers":"1",
-                        "delivery_date":datetime.date.today() + \
-                            datetime.timedelta(days=5),
-                        "customer":"Test Customer",
-                        "production_status":"planned",
-                        "delivery_status":"storage"})
-        
-        self.assertIsInstance(Order.objects.get(pk="101"), Order)
-
-        response = self.client.get(reverse("inventory:order-delete", 
-                                            kwargs={"pk":"101"}))
-                                            
-        self.assertEqual(response.status_code, 302)#redirects
-
-
-    def test_post_check_and_delete_inventory_form(self):
-        #delete view for inventory not yet implemented
-        response = self.client.post(reverse("inventory:new-inventory-item"),
-                                    data={"serial_number":"101",
-                                        "name":"Test Inventory Item",
-                                        "order_number":"1",
-                                        "quantity":"100",
-                                        "unit":"ea",
-                                        "order_date":datetime.date.today(),
-                                        "category": "1",
-                                        "supplier":"Test Supplier",
-                                        "unit_price":"0.1",
-                                        "min_stock_level":"20",
-                                        "reorder_quantity":"200"})
-        
-        self.assertIsInstance(InventoryItem.objects.get(pk="101"), InventoryItem)"""
+    
 
 
 class TestModelMethods(TestCase, TestDataMixin):
@@ -340,7 +301,6 @@ class TestModelMethods(TestCase, TestDataMixin):
         RunData(
             start_date = datetime.date.today(),
             end_date = datetime.date.today() + datetime.timedelta(days=7),
-            run_days = 2,
             run_hours = 6,
             thursday=True,
             friday=True).save()
@@ -369,7 +329,6 @@ class TestModelMethods(TestCase, TestDataMixin):
     def test_delete_run_data(self):
         RunData(start_date = self.today,
             end_date = self.today + datetime.timedelta(days=7),
-            run_days = 3,
             run_hours = 1,
             thursday=True,
             friday=True,
@@ -379,3 +338,14 @@ class TestModelMethods(TestCase, TestDataMixin):
                 "mech_pk": Machine.objects.first()}))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(RunData.objects.all().count(), 1)
+
+    def test_run_days(self):
+        
+        RunData(start_date = self.today,
+            end_date = self.today + datetime.timedelta(days=7),
+            run_hours = 1,
+            thursday=True,
+            friday=True,
+            saturday=True).save()
+
+        self.assertEqual(RunData.objects.latest("pk").run_days, 3)

@@ -50,7 +50,7 @@
 function addSparesRequest(){
     //validation
     if ($("#spares").val() != "" && !(checkInput("spares"))){
-        alert("The spares string is not in the list");
+        addAlert("The spares string is not in the list", "warning");
     }else{
         $.ajax({
             method: "POST",
@@ -64,11 +64,11 @@ function addSparesRequest(){
             },
             success: function(result){
                 if(result.success){
-                    alert("success");
+                    addAlert("Created spares successfully.", "info");
                     addHiddenInput(result.pk, "requested_spares[]", result.pk);
                     $("#spares-request-modal").modal("hide");
                 }else{
-                    alert("Failed to issue spares request, make sure form entry is complete");
+                    addAlert("Failed to issue spares request, make sure form entry is complete", "danger");
                 }
                     
             }

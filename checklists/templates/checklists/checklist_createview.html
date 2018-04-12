@@ -87,7 +87,7 @@
 
     function validateForm(){
         if(task_count == 0){
-            alert("At least one task must be created");
+            addAlert("At least one task must be created", "warning");
             $("#task").css("border-color", "red");
             $("#task").focus();
             return false;

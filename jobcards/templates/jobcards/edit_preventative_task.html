@@ -167,7 +167,7 @@
 
     function removeSparesExisting(data, stock_id){
         removeSpares(data);
-        alert(stock_id);
+        addAlert("Spares item " + stock_id + " removed.", "info");
         addHiddenInput(data, "removed_spares[]", stock_id);
     }
 
@@ -240,7 +240,7 @@
             url: "{% url 'ajax:add-category' %}",
             data: {
                 "created_for": $("#id_created_for").val(),
-                "name" :$("#id_name").val(),
+                "name" :$("#id_category_name").val(),
                 "description": $("#id_description").val(),
                 "csrfmiddlewaretoken": "{{csrf_token}}"
             },

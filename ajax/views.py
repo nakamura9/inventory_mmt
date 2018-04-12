@@ -147,7 +147,6 @@ def add_run_data(request):
     Done in terms of days hours start date and specific work days
     #will need to add an end date"""
     data = RunDataForm(request.POST)
-    print data.errors
     run = data.save()
     inv_models.Machine.objects.get(pk=request.POST["machine"]).run_data.add(run)
     
@@ -316,7 +315,6 @@ def parse_csv_file(request):
         None - the application starts a new thread and calls the parse_file funtion which iterates over the whole file and classifies the data according to the unique ids that follow some regular pattern."""
     
     file = request.FILES.get("csv_file")
-    #print dir(file)
     if not file.name.endswith(".csv"):
         return render(request, "inv/browse.html",
                         context={"message": "You have entered an incorrect file type. Make sure the extension is '.csv'. "})    
