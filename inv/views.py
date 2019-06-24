@@ -124,9 +124,9 @@ class SparesListView(ListView):
 
         
 
-        if len(self.request.GET.items()) == 1 and self.request.GET.get("page", None):
+        if len(list(self.request.GET.items())) == 1 and self.request.GET.get("page", None):
             queryset = self.model.objects.all()
-        if len(self.request.GET.items()) == 0:
+        if len(list(self.request.GET.items())) == 0:
             queryset = self.model.objects.all()
 
         return queryset

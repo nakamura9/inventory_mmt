@@ -20,7 +20,7 @@ from inv.models import Machine, Section, SubUnit, SubAssembly, Component
 from common_base.utilities import filter_by_dates
 from common_base.models import Account
 from .report_creator import *
-from report_pdf_creator import report_contexts
+from .report_pdf_creator import report_contexts
 
 """Abstract the report form views"""
 

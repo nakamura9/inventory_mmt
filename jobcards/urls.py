@@ -1,5 +1,5 @@
 from django.conf.urls import url
-import views as jc_views
+from . import views as jc_views
 
 app_name = "jobcards"
 

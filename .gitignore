@@ -8,3 +8,4 @@ keys.txt
 .coverage
 htmlcov/
 @test_*
+env/

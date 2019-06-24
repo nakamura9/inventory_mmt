@@ -1,0 +1,5 @@
+// {type: class}
+// {direction: topDown}
+
+[Customer]->[Invoice]
+[InvoiceItem] -> [Invoice]

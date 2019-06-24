@@ -2,8 +2,7 @@ import copy
 import json
 import datetime
 
-from django.test import TestCase
-from django.test import Client
+from django.test import TestCase, Client
 from django.shortcuts import reverse
 
 from checklists import models

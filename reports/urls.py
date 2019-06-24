@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from .views import *
-from report_pdf_creator import generate_pdf
+from .report_pdf_creator import generate_pdf
 
 urlpatterns = [
     url(r'^$', ReportingHome.as_view(),name="home" ),

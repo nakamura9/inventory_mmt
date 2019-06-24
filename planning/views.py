@@ -5,8 +5,8 @@ from django.shortcuts import render
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-import calendar_objects
-from calendar_objects import get_include
+from . import calendar_objects
+from .calendar_objects import get_include
 from .forms import MonthViewFilterForm, WeekViewFilterForm, DayViewFilterForm
 
 
@@ -21,7 +21,7 @@ class maintenanceMonthView(TemplateView):
         context = super(maintenanceMonthView,
             self).get_context_data(*args, **kwargs)
 
-        if len(self.request.GET.items()) > 0:
+        if len(list(self.request.GET.items())) > 0:
             m = int(self.request.GET.get("month"))
             y = int(self.request.GET.get("year"))
             context["month_string"] = datetime.datetime.strftime(

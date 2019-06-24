@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-import views as ch_views
+from . import views as ch_views
 
 app_name = "checklists"
 
